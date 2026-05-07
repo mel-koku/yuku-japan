@@ -11,15 +11,19 @@ function makeLocation(overrides: Partial<Location> & { id: string; name: string;
 }
 
 describe("pickLocationForTimeSlot evening category filter", () => {
-  const landmark = makeLocation({
-    id: "hakata-port",
-    name: "Hakata Port",
+  // Mozu/Daisen Kofun shape — landmark category, no operating hours, NOT in
+  // NIGHT_FRIENDLY_LOCATION_IDS. Should be filtered out of evening slots.
+  const daytimeLandmark = makeLocation({
+    id: "mozu-mounded-tombs-kansai-8a3ee78a",
+    name: "Mozu Mounded Tombs",
     category: "landmark",
   });
 
+  // Generic landmark with confirmed evening hours — admitted via the
+  // hours-fit branch, even though it isn't on the allowlist.
   const landmarkWithEveningHours = makeLocation({
-    id: "tokyo-tower",
-    name: "Tokyo Tower",
+    id: "some-tower",
+    name: "Some Observation Tower",
     category: "landmark",
     operatingHours: {
       timezone: "Asia/Tokyo",
@@ -35,6 +39,14 @@ describe("pickLocationForTimeSlot evening category filter", () => {
     },
   });
 
+  // Tokyo Tower shape — viewpoint category, NO operating hours, but IS in
+  // NIGHT_FRIENDLY_LOCATION_IDS. Should be admitted by the allowlist.
+  const allowlistedNightLandmark = makeLocation({
+    id: "tokyo-tower-kanto-db632e17",
+    name: "Tokyo Tower",
+    category: "viewpoint",
+  });
+
   const restaurant = makeLocation({
     id: "ramen-shop",
     name: "Ramen Shop",
@@ -47,21 +59,36 @@ describe("pickLocationForTimeSlot evening category filter", () => {
     category: "museum",
   });
 
-  it("allows landmark after 6 PM (evening-appropriate category)", () => {
+  it("filters daytime landmark from evening slot when not allowlisted (regression: Mozu Kofun at 21:00)", () => {
     const result = pickLocationForTimeSlot(
-      [landmark],
+      [daytimeLandmark],
       "culture",
       new Set(),
-      120, // availableMinutes <= 180 = past 6 PM
+      120,
+      10,
+      undefined, [], "balanced", ["culture"],
+      undefined, undefined, undefined, undefined,
+      "evening", "2024-01-01",
+    );
+    expect(result).toBeUndefined();
+  });
+
+  it("admits allowlisted night landmark in evening slot (Tokyo Tower)", () => {
+    const result = pickLocationForTimeSlot(
+      [allowlistedNightLandmark],
+      "culture",
+      new Set(),
+      120,
       10,
       undefined, [], "balanced", ["culture"],
       undefined, undefined, undefined, undefined,
       "evening", "2024-01-01",
     );
     expect(result).toBeDefined();
+    expect(result?.id).toBe("tokyo-tower-kanto-db632e17");
   });
 
-  it("allows restaurant after 6 PM", () => {
+  it("admits restaurant in evening slot", () => {
     const result = pickLocationForTimeSlot(
       [restaurant],
       "food",
@@ -76,7 +103,7 @@ describe("pickLocationForTimeSlot evening category filter", () => {
     expect(result?.id).toBe("ramen-shop");
   });
 
-  it("allows daytime landmark after 6 PM when hours confirm open", () => {
+  it("admits non-allowlisted landmark when operating hours confirm evening open", () => {
     const result = pickLocationForTimeSlot(
       [landmarkWithEveningHours],
       "culture",
@@ -88,24 +115,71 @@ describe("pickLocationForTimeSlot evening category filter", () => {
       "evening", "2024-01-01",
     );
     expect(result).toBeDefined();
-    expect(result?.id).toBe("tokyo-tower");
+    expect(result?.id).toBe("some-tower");
   });
 
-  it("does not filter daytime categories before 6 PM", () => {
+  it("filters daytime landmark from evening slot at start of evening (regression: first-evening-slot bypass hole)", () => {
+    // Previously the hard filter only kicked in at availableMinutes <= 180
+    // (~60 min into the evening slot), letting the first evening pick bypass.
     const result = pickLocationForTimeSlot(
-      [landmark],
+      [daytimeLandmark],
       "culture",
       new Set(),
-      220, // > 180 = before 6 PM
+      220, // start of evening slot — used to bypass the filter
       10,
       undefined, [], "balanced", ["culture"],
       undefined, undefined, undefined, undefined,
       "evening", "2024-01-01",
     );
-    expect(result).toBeDefined();
+    expect(result).toBeUndefined();
   });
 
-  it("filters museum without hours after 6 PM", () => {
+  it("filters category-allowed location when its hours do not fit evening (e.g. cafe-tagged-restaurant closing 14:00)", () => {
+    // The new evening rule runs hours validation even for category-allowed
+    // picks, closing the bypass that admitted shopping at 17:00-closing markets.
+    // Mistagged or early-closing venues should now be filtered.
+    const earlyClosingRestaurant = makeLocation({
+      id: "morning-only-cafe",
+      name: "Morning Only Cafe",
+      category: "restaurant",
+      operatingHours: {
+        timezone: "Asia/Tokyo",
+        periods: [
+          { day: "monday", open: "07:00", close: "14:00" },
+        ],
+      },
+    });
+    const result = pickLocationForTimeSlot(
+      [earlyClosingRestaurant],
+      "food",
+      new Set(),
+      120,
+      10,
+      undefined, [], "balanced", ["food"],
+      undefined, undefined, undefined, undefined,
+      "evening", "2024-01-01",
+    );
+    expect(result).toBeUndefined();
+  });
+
+  it("admits category-allowed location when it has no hours data (preserves the no-hours-no-info case)", () => {
+    // Many DB rows lack operatingHours. Those should not be punished — the
+    // hours-fit branch only kicks in when periods are present.
+    const result = pickLocationForTimeSlot(
+      [restaurant],
+      "food",
+      new Set(),
+      120,
+      10,
+      undefined, [], "balanced", ["food"],
+      undefined, undefined, undefined, undefined,
+      "evening", "2024-01-01",
+    );
+    expect(result).toBeDefined();
+    expect(result?.id).toBe("ramen-shop");
+  });
+
+  it("filters museum without hours from evening slot", () => {
     const result = pickLocationForTimeSlot(
       [museum],
       "culture",

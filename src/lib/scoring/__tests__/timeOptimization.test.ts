@@ -352,18 +352,21 @@ describe("Time Optimization", () => {
       expect(EVENING_APPROPRIATE_CATEGORIES.has("onsen")).toBe(true);
       expect(EVENING_APPROPRIATE_CATEGORIES.has("wellness")).toBe(true);
       expect(EVENING_APPROPRIATE_CATEGORIES.has("shopping")).toBe(true);
-      expect(EVENING_APPROPRIATE_CATEGORIES.has("viewpoint")).toBe(true);
     });
 
-    it("should include landmark", () => {
-      expect(EVENING_APPROPRIATE_CATEGORIES.has("landmark")).toBe(true);
+    it("excludes landmark (admit famous night exceptions via NIGHT_FRIENDLY_LOCATION_IDS)", () => {
+      expect(EVENING_APPROPRIATE_CATEGORIES.has("landmark")).toBe(false);
     });
 
-    it("should include historic_site", () => {
-      expect(EVENING_APPROPRIATE_CATEGORIES.has("historic_site")).toBe(true);
+    it("excludes historic_site", () => {
+      expect(EVENING_APPROPRIATE_CATEGORIES.has("historic_site")).toBe(false);
     });
 
-    it("excludes daytime categories", () => {
+    it("excludes viewpoint (admit night observation decks via NIGHT_FRIENDLY_LOCATION_IDS)", () => {
+      expect(EVENING_APPROPRIATE_CATEGORIES.has("viewpoint")).toBe(false);
+    });
+
+    it("excludes other daytime categories", () => {
       expect(EVENING_APPROPRIATE_CATEGORIES.has("museum")).toBe(false);
       expect(EVENING_APPROPRIATE_CATEGORIES.has("temple")).toBe(false);
       expect(EVENING_APPROPRIATE_CATEGORIES.has("shrine")).toBe(false);
@@ -381,9 +384,26 @@ describe("Time Optimization", () => {
       category,
     });
 
-    it("gives small boost for landmark in evening slot (adjacent to afternoon optimal)", () => {
+    it("gives strong penalty for non-allowlisted landmark in evening slot", () => {
+      // Mozu/Daisen Kofun shape: landmark category, not in NIGHT_FRIENDLY_LOCATION_IDS
       const result = scoreTimeOfDayFit(makeLocation("landmark"), "evening");
-      expect(result.scoreAdjustment).toBe(3);
+      expect(result.scoreAdjustment).toBe(-15);
+      expect(result.reasoning).toContain("daytime activity");
+    });
+
+    it("does not penalize allowlisted landmark in evening slot", () => {
+      // Tokyo Tower / Skytree / Dotonbori shape — landmark in NIGHT_FRIENDLY_LOCATION_IDS
+      const tokyoTower: Location = {
+        id: "tokyo-tower-kanto-db632e17",
+        name: "Tokyo Tower",
+        city: "Tokyo",
+        region: "Kanto",
+        category: "viewpoint",
+      };
+      const result = scoreTimeOfDayFit(tokyoTower, "evening");
+      // Should NOT receive the -15 daytime-mismatch penalty.
+      // (viewpoint's optimal times include "evening", so it gets +8.)
+      expect(result.scoreAdjustment).toBeGreaterThan(-15);
     });
 
     it("gives strong penalty for museum in evening slot", () => {
