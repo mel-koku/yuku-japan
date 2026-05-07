@@ -13,6 +13,17 @@
  * All other sources (other remote hosts) still flow through /_next/image
  * so Vercel can optimize them.
  */
+// Wikimedia's current published thumbnail widths. Requests for any other
+// width return HTTP 400. Source: https://www.mediawiki.org/wiki/Common_thumbnail_sizes
+const WIKIMEDIA_ALLOWED_WIDTHS = [120, 250, 330, 500, 960, 1280, 1920, 3840] as const;
+
+function bucketWikimediaWidth(width: number): number {
+  for (const w of WIKIMEDIA_ALLOWED_WIDTHS) {
+    if (w >= width) return w;
+  }
+  return 3840;
+}
+
 export default function imageLoader({
   src,
   width,
@@ -45,15 +56,20 @@ export default function imageLoader({
   }
 
   // Wikimedia Commons: rewrite originals to /thumb/ URLs so resizing runs on
-  // Wikimedia's CDN, not Vercel's. Already-thumb URLs pass through unchanged.
+  // Wikimedia's CDN, not Vercel's. Wikimedia restricts thumbnails to a fixed
+  // set of widths (anything else 400s); see Common_thumbnail_sizes on
+  // mediawiki.org. We round up the requested width to the next allowed bucket.
   if (src.includes("upload.wikimedia.org/wikipedia/commons/")) {
+    const bucketed = bucketWikimediaWidth(width);
     if (src.includes("/commons/thumb/")) {
-      return src;
+      // Re-bucket existing thumb URLs so DB rows pre-built at non-allowed
+      // widths still resolve.
+      return src.replace(/\/(\d+)px-([^/]+)$/, `/${bucketed}px-$2`);
     }
     const match = src.match(/^(https:\/\/upload\.wikimedia\.org\/wikipedia\/commons)\/([0-9a-f])\/([0-9a-f]{2})\/(.+)$/);
     if (!match) return src;
     const [, base, x, xx, file] = match;
-    return `${base}/thumb/${x}/${xx}/${file}/${width}px-${file}`;
+    return `${base}/thumb/${x}/${xx}/${file}/${bucketed}px-${file}`;
   }
 
   if (src.startsWith("/images/")) {
