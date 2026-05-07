@@ -48,6 +48,12 @@ export const NIGHT_FRIENDLY_LOCATION_IDS = new Set<string>([
   "amerikamura-kanto-ed603e2d",
   "rainbow-bridge-kanto-6fe41eec",
   "sakai-city-hall-observation-lobby-osaka-ef4833",
+  "shibuya-sky-kanto-eeb731e4",
+  "tokyo-city-view-roppongi-kanto-a3c661c8",
+  "kobe-port-tower-kansai-6edf81fe",
+  "golden-gai-kanto-69a91c7c",
+  "hozenji-yokocho-kansai-3ef75250",
+  "gion-kansai-9e059ae5",
   // Cultural sites famous as night experiences
   "okunoin-yamanashi-315efa",
 ]);
