@@ -17,13 +17,6 @@ export function buildCityJsonLd(
       "@type": "TouristAttraction" as const,
       name: loc.name,
       ...(loc.shortDescription && { description: loc.shortDescription }),
-      ...(loc.rating && {
-        aggregateRating: {
-          "@type": "AggregateRating" as const,
-          ratingValue: loc.rating,
-          ...(loc.reviewCount && { reviewCount: loc.reviewCount }),
-        },
-      }),
       ...(loc.coordinates && {
         geo: {
           "@type": "GeoCoordinates" as const,

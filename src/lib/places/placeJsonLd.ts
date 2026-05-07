@@ -15,18 +15,25 @@ function absoluteImageUrl(url: string): string {
 
 /**
  * Build JSON-LD structured data for a place detail page.
- * Uses TouristAttraction (or LocalBusiness for food/shopping) with AggregateRating.
+ *
+ * Food categories map to specific LocalBusiness subtypes (Restaurant,
+ * CafeOrCoffeeShop, BarOrPub, GroceryStore) and emit aggregateRating —
+ * Google supports review snippets on LocalBusiness subtypes. Everything
+ * else maps to TouristAttraction without aggregateRating; Google's
+ * review-snippet eligibility list excludes TouristAttraction, so a rating
+ * there triggers an "Invalid object type for parent_node" error in Search
+ * Console without ever earning stars in SERPs.
  */
-export function buildPlaceJsonLd(location: Location) {
-  const FOOD_CATEGORIES = new Set([
-    "restaurant",
-    "cafe",
-    "bar",
-    "market",
-  ]);
-  const isFood = FOOD_CATEGORIES.has(location.category);
+const FOOD_TYPE_BY_CATEGORY: Record<string, string> = {
+  restaurant: "Restaurant",
+  cafe: "CafeOrCoffeeShop",
+  bar: "BarOrPub",
+  market: "GroceryStore",
+};
 
-  const schemaType = isFood ? "LocalBusiness" : "TouristAttraction";
+export function buildPlaceJsonLd(location: Location) {
+  const foodType = FOOD_TYPE_BY_CATEGORY[location.category];
+  const schemaType = foodType ?? "TouristAttraction";
 
   return {
     "@context": "https://schema.org",
@@ -54,7 +61,7 @@ export function buildPlaceJsonLd(location: Location) {
         addressCountry: "JP",
       },
     }),
-    ...(location.rating && {
+    ...(foodType && location.rating && {
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: location.rating,
