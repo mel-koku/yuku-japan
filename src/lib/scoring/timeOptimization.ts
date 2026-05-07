@@ -4,8 +4,13 @@ import { parseTimeToMinutes } from "@/lib/utils/timeUtils";
 /**
  * Categories appropriate for scheduling after 6 PM.
  * All other categories are considered daytime-only and will be
- * hard-filtered from evening slots (after 6 PM) unless they have
- * operating hours explicitly confirming evening availability.
+ * hard-filtered from evening slots unless they have operating
+ * hours explicitly confirming evening availability.
+ *
+ * `landmark`, `historic_site`, and `viewpoint` are intentionally
+ * excluded — most members (kofun, castles, gardens, mountain viewpoints)
+ * are daytime-only. The famous night exceptions (Tokyo Tower, Skytree,
+ * Dotonbori, etc.) are admitted via NIGHT_FRIENDLY_LOCATION_IDS below.
  */
 export const EVENING_APPROPRIATE_CATEGORIES = new Set([
   "restaurant",
@@ -15,10 +20,76 @@ export const EVENING_APPROPRIATE_CATEGORIES = new Set([
   "onsen",
   "wellness",
   "shopping",
-  "viewpoint",
-  "landmark",
-  "historic_site",
 ]);
+
+/**
+ * Per-location allowlist for famous evening exceptions whose category
+ * (landmark / viewpoint / shrine / temple) would otherwise be filtered
+ * out of evening slots. Slugs verified against Supabase 2026-05-07.
+ *
+ * Adding a location: append its DB id, run scripts/_verify-night-friendly-slugs.mjs.
+ * See docs/superpowers/handoffs/2026-05-07-night-friendly-data-gaps.md for
+ * known-missing rows (Shibuya Sky, Golden Gai, Kobe Port Tower, etc.).
+ */
+export const NIGHT_FRIENDLY_LOCATION_IDS = new Set<string>([
+  // Observation decks (city night views)
+  "tokyo-tower-kanto-db632e17",
+  "tokyo-skytree-kanto-50a21c40",
+  "umeda-sky-kanto-8cb2909e",
+  "tsutenkaku-kanto-21dc0783",
+  "fukuoka-tower-kyushu-c1f3236a",
+  // Entertainment / nightlife districts
+  "dotonbori-kansai-31988d77",
+  "shibuya-crossing-kanto-e5b09a41",
+  "susukino-sapporo-21f3c7",
+  "pontocho-alley-kansai-7944d880",
+  "denden-town-kanto-2a125b41",
+  "amerika-mura-osaka-41fd3f",
+  "amerikamura-kanto-ed603e2d",
+  "rainbow-bridge-kanto-6fe41eec",
+  "sakai-city-hall-observation-lobby-osaka-ef4833",
+  "shibuya-sky-kanto-eeb731e4",
+  "tokyo-city-view-roppongi-kanto-a3c661c8",
+  "kobe-port-tower-kansai-6edf81fe",
+  "golden-gai-kanto-69a91c7c",
+  "hozenji-yokocho-kansai-3ef75250",
+  "gion-kansai-9e059ae5",
+  // Cultural sites famous as night experiences
+  "okunoin-yamanashi-315efa",
+]);
+
+export function isNightFriendly(loc: { id: string }): boolean {
+  return NIGHT_FRIENDLY_LOCATION_IDS.has(loc.id);
+}
+
+/**
+ * Detects whether a location has hours that confirm it's a genuine evening
+ * venue — at least one period closes between 19:30 and 23:59. This filters
+ * out three categories of false positives that the basic hours-fit check
+ * would otherwise admit into evening slots:
+ *
+ * 1. The "00:00–23:59 sentinel" used for parks, gates, monument plaques
+ *    and other publicly-accessible spaces with no formal hours.
+ * 2. Early-closing daytime venues that technically overlap the start of
+ *    the evening slot (e.g., Koshien Stadium 10:00–18:00, Warner Bros
+ *    Studio Tokyo Mon-Sat 8:30–19:00).
+ * 3. Locations missing hours data entirely.
+ *
+ * Used in `pickLocationForTimeSlot` for daytime-category locations that
+ * aren't on the night-friendly allowlist — they need confirmed late hours
+ * to be admitted to an evening slot.
+ */
+export function hasGenuineEveningHours(loc: Location): boolean {
+  const periods = loc.operatingHours?.periods;
+  if (!periods || periods.length === 0) return false;
+  return periods.some((p) => {
+    const close = parseTimeToMinutes(p.close);
+    if (close == null) return false;
+    // Real evening venues close between 19:30 and 23:59 exclusive.
+    // 23:59 is the "always open" sentinel — semantically "no formal hours."
+    return close >= 19 * 60 + 30 && close < 23 * 60 + 59;
+  });
+}
 
 /**
  * Optimal time of day for different location categories
@@ -78,9 +149,12 @@ export function scoreTimeOfDayFit(
   }
 
   // Stronger penalty for daytime categories scheduled in evening slot
-  // This check runs before the adjacent-optimal boost so it takes priority
+  // This check runs before the adjacent-optimal boost so it takes priority.
+  // Per-location night-friendly allowlist bypasses the penalty.
   const isEveningDaytimeMismatch =
-    timeSlot === "evening" && !EVENING_APPROPRIATE_CATEGORIES.has(category);
+    timeSlot === "evening"
+    && !EVENING_APPROPRIATE_CATEGORIES.has(category)
+    && !NIGHT_FRIENDLY_LOCATION_IDS.has(location.id);
   if (isEveningDaytimeMismatch) {
     return {
       scoreAdjustment: -15,

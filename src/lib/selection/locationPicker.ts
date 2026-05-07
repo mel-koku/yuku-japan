@@ -10,7 +10,7 @@ import type { InterestId, TripBuilderData } from "@/types/trip";
 import type { WeatherForecast } from "@/types/weather";
 import { scoreLocation, type LocationScoringCriteria, type ScoreBreakdown } from "@/lib/scoring/locationScoring";
 import { applyDiversityFilter, type DiversityContext } from "@/lib/scoring/diversityRules";
-import { checkOpeningHoursFit, EVENING_APPROPRIATE_CATEGORIES } from "@/lib/scoring/timeOptimization";
+import { checkOpeningHoursFit, EVENING_APPROPRIATE_CATEGORIES, isNightFriendly, hasGenuineEveningHours } from "@/lib/scoring/timeOptimization";
 import { isLocationAvailableOnDate } from "@/lib/scoring/seasonalAvailability";
 import { logger } from "@/lib/logger";
 
@@ -131,23 +131,34 @@ export function pickLocationForTimeSlot(
     }
   }
 
-  // After 6 PM: hard-exclude daytime-only categories
-  // Evening slot starts with ~240 min available. When availableMinutes <= 180
-  // (60 min elapsed), we're past the 6 PM boundary.
-  if (timeSlot === "evening" && availableMinutes <= 180) {
+  // Evening slot: hard-exclude daytime-only categories for the entire slot,
+  // not just after 60 min elapsed. The first activity of the evening slot was
+  // previously bypassing this filter.
+  if (timeSlot === "evening") {
     const beforeCount = candidates.length;
     candidates = candidates.filter((loc) => {
       const cat = loc.category?.toLowerCase() ?? "";
-      if (EVENING_APPROPRIATE_CATEGORIES.has(cat)) return true;
-      // Daytime categories need confirmed evening operating hours
-      if (date) {
-        const hoursCheck = checkOpeningHoursFit(loc, "evening", date);
-        return hoursCheck.fits && hoursCheck.reasoning !== "No opening hours information available";
+      const categoryAllowed = EVENING_APPROPRIATE_CATEGORIES.has(cat) || isNightFriendly(loc);
+
+      if (!categoryAllowed) {
+        // Daytime category — admit only with hours that confirm it's a real
+        // evening venue (close between 19:30 and 23:59). This rejects the
+        // 24/7 sentinel pattern used for parks/gates/monument markers AND
+        // early-closing daytime venues that just overlap the slot start.
+        if (!date) return false;
+        return hasGenuineEveningHours(loc);
       }
-      return false;
+
+      // Category-allowed — but if opening hours are present, still validate
+      // them. Closes the bypass that admitted shopping at 17:00-closing markets.
+      if (date && loc.operatingHours?.periods?.length) {
+        const hoursCheck = checkOpeningHoursFit(loc, "evening", date);
+        return hoursCheck.fits;
+      }
+      return true;
     });
     if (beforeCount > candidates.length) {
-      logger.info("Filtered daytime-only categories after 6 PM", {
+      logger.info("Filtered daytime-only categories from evening slot", {
         before: beforeCount,
         after: candidates.length,
         availableMinutes,

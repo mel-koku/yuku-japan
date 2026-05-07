@@ -123,11 +123,13 @@ describe("generateItinerary", () => {
     expect(allTags).toContain("dining");
     expect(traditionTags.some((tag) => allTags.includes(tag))).toBe(true);
 
-    // Verify all time slots are filled (morning, afternoon, evening)
+    // Activities should span at least morning + afternoon. Evening is no
+    // longer guaranteed: the picker only fills the evening slot with
+    // restaurants/bars/onsen/etc. or hours-confirmed late venues, so an
+    // empty post-dinner timeline is valid output.
     const timeSlots = day.activities.map((activity) => activity.timeOfDay);
     expect(timeSlots).toContain("morning");
     expect(timeSlots).toContain("afternoon");
-    expect(timeSlots).toContain("evening");
   });
 
   it("groups cities by region to minimize travel time", async () => {
