@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import { RATE_LIMITS } from "@/lib/api/rateLimits";
 import { withApiHandler } from "@/lib/api/withApiHandler";
 import { unauthorized, badRequest, internalError } from "@/lib/api/errors";
+import { submitToIndexNow } from "@/lib/seo/indexNow";
 
 const WEBHOOK_SECRET = process.env.SANITY_REVALIDATE_SECRET;
 
@@ -113,6 +114,10 @@ async function handleGuide(body: SanityWebhookBody) {
     revalidatePath(`/guides/${slug}`);
     revalidatePath("/");
 
+    // Tell IndexNow the listing changed; the detail page now 404s so don't
+    // bother pinging the dead URL — search engines find archive on next crawl.
+    void submitToIndexNow(["/guides"]);
+
     return NextResponse.json({ ok: true, action: "archived", slug });
   }
 
@@ -159,6 +164,8 @@ async function handleGuide(body: SanityWebhookBody) {
   revalidatePath(`/guides/${slug}`);
   revalidatePath("/");
 
+  void submitToIndexNow([`/guides/${slug}`, "/guides"]);
+
   return NextResponse.json({ ok: true, action: "upserted", slug });
 }
 
@@ -171,6 +178,8 @@ async function handleExperience(body: SanityWebhookBody) {
   if (slug) {
     revalidatePath(`/guides/${slug}`);
   }
+
+  void submitToIndexNow(slug ? [`/guides/${slug}`, "/guides"] : ["/guides"]);
 
   return NextResponse.json({ ok: true, action: "revalidated", slug });
 }
@@ -192,6 +201,9 @@ async function handleSingletonRevalidation(
   if (!paths.includes("/")) {
     revalidatePath("/");
   }
+
+  const indexNowPaths = paths.includes("/") ? paths : [...paths, "/"];
+  void submitToIndexNow(indexNowPaths);
 
   return NextResponse.json({ ok: true, action: "revalidated", type, paths });
 }
