@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   title: "Trip Builder | Yuku Japan",
   description: TRIP_BUILDER_DESCRIPTION,
   alternates: { canonical: "/trip-builder" },
+  // Wizard is a converting surface, not a ranking surface — content is
+  // thin client-side state, and the home page is the SEO target for
+  // trip-planning queries. robots.ts also disallows crawl; this closes
+  // the side door where Google lists a URL it found backlinked.
+  robots: { index: false, follow: true },
   openGraph: {
     images: DEFAULT_OG_IMAGES,
     title: "Trip Builder | Yuku Japan",
