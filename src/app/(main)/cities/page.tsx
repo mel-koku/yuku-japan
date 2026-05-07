@@ -3,6 +3,7 @@ import { REGIONS } from "@/data/regions";
 import { REGION_DESCRIPTIONS } from "@/data/regionDescriptions";
 import { CITY_PAGE_DATA, getAllCitySlugs } from "@/lib/cities/cityData";
 import { getCityMetadata } from "@/lib/tripBuilder/cityRelevance";
+import { fetchCityHeroPhotoUrl } from "@/lib/locations/locationService";
 import { CityIndex } from "@/components/features/cities/CityIndex";
 import { DEFAULT_OG_IMAGES, DEFAULT_TWITTER_IMAGES } from "@/lib/seo/defaults";
 
@@ -31,8 +32,19 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default function CitiesIndexPage() {
+export default async function CitiesIndexPage() {
   const allSlugs = getAllCitySlugs();
+
+  const allCityEntries = REGIONS.flatMap((region) =>
+    region.cities
+      .map((c) => ({ id: c.id, data: CITY_PAGE_DATA[c.id] }))
+      .filter((e): e is { id: typeof e.id; data: NonNullable<typeof e.data> } => Boolean(e.data)),
+  );
+
+  const heroEntries = await Promise.all(
+    allCityEntries.map(async (e) => [e.id, await fetchCityHeroPhotoUrl(e.data.name)] as const),
+  );
+  const heroById = new Map(heroEntries);
 
   const regions = REGIONS.map((region) => {
     const regionDesc = REGION_DESCRIPTIONS.find((r) => r.id === region.id);
@@ -49,7 +61,7 @@ export default function CitiesIndexPage() {
           topCategories: [] as { category: string; count: number }[],
           averageRating: 0,
         },
-        heroImage: undefined as string | undefined,
+        heroImage: heroById.get(c.id),
       };
     });
 
