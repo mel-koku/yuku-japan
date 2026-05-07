@@ -16,6 +16,9 @@ vi.mock("@/lib/api/rateLimit", () => ({
 describe("GET /api/places/photo", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // mockReset clears queued *Once returns; clearAllMocks only clears history.
+    // Without this, mocks queued by tests that hit the 308 path leak into later tests.
+    vi.mocked(fetchPhotoStream).mockReset();
     vi.stubEnv("GOOGLE_PLACES_API_KEY", "test-api-key");
   });
 
@@ -81,26 +84,24 @@ describe("GET /api/places/photo", () => {
       expect(response.status).toBe(200);
       expect(fetchPhotoStream).toHaveBeenCalledWith(
         "places/ChIJN1t_tDeuEmsRUsoyG83frY4/photos/test-ref",
-        { maxWidthPx: 800, maxHeightPx: undefined },
+        { maxWidthPx: 1200 },
       );
     });
   });
 
-  describe("Dimension validation", () => {
-    it("should validate maxWidthPx is within 1-4000 range", async () => {
-      const mockResponse = createMockPhotoStreamResponse();
-      vi.mocked(fetchPhotoStream).mockResolvedValueOnce(mockResponse);
-
+  describe("Width canonicalization", () => {
+    it("redirects 308 to bucketed width when requested width is non-canonical", async () => {
       const request = createMockRequest(
         "https://example.com/api/places/photo?photoName=places/test/photos/ref&maxWidthPx=2000",
       );
       const response = await GET(request);
 
-      expect(response.status).toBe(200);
-      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", { maxWidthPx: 2000, maxHeightPx: undefined });
+      expect(response.status).toBe(308);
+      expect(response.headers.get("Location")).toContain("maxWidthPx=1920");
+      expect(fetchPhotoStream).not.toHaveBeenCalled();
     });
 
-    it("should reject maxWidthPx exceeding 4000", async () => {
+    it("falls back to 1200 when maxWidthPx exceeds the 4000 cap", async () => {
       const mockResponse = createMockPhotoStreamResponse();
       vi.mocked(fetchPhotoStream).mockResolvedValueOnce(mockResponse);
 
@@ -109,12 +110,13 @@ describe("GET /api/places/photo", () => {
       );
       const response = await GET(request);
 
+      // parsePositiveInt returns null for out-of-range values; route falls back
+      // to default 1200, which equals its bucket → canonical, no redirect.
       expect(response.status).toBe(200);
-      // parsePositiveInt returns null for out-of-range values, route falls back to 800
-      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", { maxWidthPx: 800, maxHeightPx: undefined });
+      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", { maxWidthPx: 1200 });
     });
 
-    it("should reject maxWidthPx less than 1", async () => {
+    it("falls back to 1200 when maxWidthPx is below 1", async () => {
       const mockResponse = createMockPhotoStreamResponse();
       vi.mocked(fetchPhotoStream).mockResolvedValueOnce(mockResponse);
 
@@ -124,37 +126,33 @@ describe("GET /api/places/photo", () => {
       const response = await GET(request);
 
       expect(response.status).toBe(200);
-      // parsePositiveInt returns null for invalid values, route falls back to 800
-      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", { maxWidthPx: 800, maxHeightPx: undefined });
+      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", { maxWidthPx: 1200 });
     });
 
-    it("should validate maxHeightPx is within 1-4000 range", async () => {
-      const mockResponse = createMockPhotoStreamResponse();
-      vi.mocked(fetchPhotoStream).mockResolvedValueOnce(mockResponse);
-
+    it("redirects 308 and strips maxHeightPx (route only honors width)", async () => {
       const request = createMockRequest(
         "https://example.com/api/places/photo?photoName=places/test/photos/ref&maxHeightPx=1500",
       );
       const response = await GET(request);
 
-      expect(response.status).toBe(200);
-      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", { maxWidthPx: 800, maxHeightPx: 1500 });
+      expect(response.status).toBe(308);
+      const location = response.headers.get("Location") ?? "";
+      expect(location).toContain("maxWidthPx=1200");
+      expect(location).not.toContain("maxHeightPx");
+      expect(fetchPhotoStream).not.toHaveBeenCalled();
     });
 
-    it("should accept both maxWidthPx and maxHeightPx", async () => {
-      const mockResponse = createMockPhotoStreamResponse();
-      vi.mocked(fetchPhotoStream).mockResolvedValueOnce(mockResponse);
-
+    it("redirects 308 to canonical width when both width and height are passed", async () => {
       const request = createMockRequest(
         "https://example.com/api/places/photo?photoName=places/test/photos/ref&maxWidthPx=1600&maxHeightPx=1200",
       );
       const response = await GET(request);
 
-      expect(response.status).toBe(200);
-      expect(fetchPhotoStream).toHaveBeenCalledWith("places/test/photos/ref", {
-        maxWidthPx: 1600,
-        maxHeightPx: 1200,
-      });
+      expect(response.status).toBe(308);
+      const location = response.headers.get("Location") ?? "";
+      expect(location).toContain("maxWidthPx=1920");
+      expect(location).not.toContain("maxHeightPx");
+      expect(fetchPhotoStream).not.toHaveBeenCalled();
     });
   });
 
