@@ -38,7 +38,7 @@ export async function generateMetadata({
 
   // Hero photo for OG — falls back to root metadataBase image when absent.
   // Dedicated single-row fetch, not the 200-row page query.
-  const heroPhoto = await fetchCityHeroPhotoUrl(city.name);
+  const heroPhoto = await fetchCityHeroPhotoUrl(city.name, slug);
 
   return {
     title: `${city.name}, Japan | Travel Guide | Yuku Japan`,
@@ -75,6 +75,7 @@ export default async function CityDetailPage({ params }: RouteProps) {
     fetchLocationsByCity(city.name, {
       limit: 200,
       requirePlaceId: false,
+      slug,
     }),
     getGuidesByCity(city.name, undefined, 6),
   ]);

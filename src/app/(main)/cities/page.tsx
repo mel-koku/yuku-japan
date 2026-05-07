@@ -42,7 +42,7 @@ export default async function CitiesIndexPage() {
   );
 
   const heroEntries = await Promise.all(
-    allCityEntries.map(async (e) => [e.id, await fetchCityHeroPhotoUrl(e.data.name)] as const),
+    allCityEntries.map(async (e) => [e.id, await fetchCityHeroPhotoUrl(e.data.name, e.id)] as const),
   );
   const heroById = new Map(heroEntries);
 

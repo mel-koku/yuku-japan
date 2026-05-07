@@ -322,6 +322,13 @@ export interface FetchByCityOptions {
   excludeIds?: string[];
   /** Only include locations with valid place_id */
   requirePlaceId?: boolean;
+  /**
+   * KnownCityId slug (lowercase ASCII) used as a fallback match against
+   * `planning_city`. Required for cities whose display name contains diacritics
+   * (Nikkō, Ōita, Kitakyūshū) — the DB stores ASCII in `city` and slugs in
+   * `planning_city`, so an exact `.ilike("city", "Nikkō")` returns 0 rows.
+   */
+  slug?: string;
 }
 
 /**
@@ -335,15 +342,20 @@ export async function fetchLocationsByCity(
   city: string,
   options: FetchByCityOptions = {},
 ): Promise<Location[]> {
-  const { limit = 100, excludeIds = [], requirePlaceId = true } = options;
+  const { limit = 100, excludeIds = [], requirePlaceId = true, slug } = options;
 
   const supabase = await createClient();
 
   let query = supabase
     .from("locations")
     .select(LOCATION_ITINERARY_COLUMNS)
-    .eq("is_active", true)
-    .ilike("city", city);
+    .eq("is_active", true);
+
+  if (slug) {
+    query = query.or(`planning_city.eq.${slug},city.ilike.${city}`);
+  } else {
+    query = query.ilike("city", city);
+  }
 
   if (requirePlaceId) {
     query = query.not("place_id", "is", null).neq("place_id", "");
@@ -694,14 +706,26 @@ export async function fetchSeasonalLocations(
  * Single-row fetch, no payload duplication with the full city page query.
  * Returns `undefined` if the city has no rated, photographed locations.
  */
-export async function fetchCityHeroPhotoUrl(cityName: string): Promise<string | undefined> {
+export async function fetchCityHeroPhotoUrl(
+  cityName: string,
+  slug?: string,
+): Promise<string | undefined> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("locations")
     .select("primary_photo_url")
-    .eq("city", cityName)
     .eq("is_active", true)
-    .not("primary_photo_url", "is", null)
+    .not("primary_photo_url", "is", null);
+
+  // Match on planning_city (KnownCityId slug) when provided so cities with
+  // diacritic display names (Nikkō → city='Nikko' in DB) still resolve.
+  if (slug) {
+    query = query.or(`planning_city.eq.${slug},city.ilike.${cityName}`);
+  } else {
+    query = query.eq("city", cityName);
+  }
+
+  const { data, error } = await query
     .order("rating", { ascending: false, nullsFirst: false })
     .order("review_count", { ascending: false, nullsFirst: false })
     .limit(1)
