@@ -269,6 +269,7 @@ export const LOCATION_ITINERARY_COLUMNS = `
   neighborhood,
   category,
   image,
+  primary_photo_url,
   coordinates,
   operating_hours,
   recommended_visit,
