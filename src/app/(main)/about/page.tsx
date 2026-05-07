@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Script from "next/script";
 import { Github, Linkedin, Twitter, Globe } from "lucide-react";
 import { typography } from "@/lib/typography-system";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { getAboutPageContent } from "@/lib/sanity/contentService";
+import { serializeJsonLd } from "@/lib/seo/jsonLd";
+
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://yukujapan.com").replace(/\/+$/, "");
 
 export const metadata: Metadata = {
   title: "About | Yuku Japan",
@@ -170,6 +174,31 @@ function wrapJapanese(text: string) {
 export default async function AboutPage() {
   const content = await getAboutPageContent();
 
+  // AboutPage + Organization with founder Person — strengthens entity
+  // recognition for Knowledge Graph and powers E-E-A-T signals.
+  const aboutJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    url: `${BASE_URL}/about`,
+    mainEntity: {
+      "@type": "Organization",
+      name: "Yuku Japan",
+      url: BASE_URL,
+      logo: `${BASE_URL}/icon`,
+      description:
+        "A Japan travel publication and trip planner — routed itineraries with real transit times, sourced from official Japan tourism boards.",
+      founder: {
+        "@type": "Person",
+        name: "Meljun Picardal",
+        jobTitle: "Founder",
+        sameAs: [
+          "https://github.com/mel-koku",
+          "https://www.linkedin.com/in/meljunpicardal/",
+        ],
+      },
+    },
+  };
+
   const heroEyebrow = content?.heroEyebrow ?? FALLBACK.heroEyebrow;
   const heroHeading = content?.heroHeading ?? FALLBACK.heroHeading;
   const heroSubtext = content?.heroSubtext ?? FALLBACK.heroSubtext;
@@ -189,6 +218,13 @@ export default async function AboutPage() {
 
   return (
     <main className="min-h-[100dvh]">
+      <Script
+        id="ld-about-yuku"
+        type="application/ld+json"
+        strategy="afterInteractive"
+      >
+        {serializeJsonLd(aboutJsonLd)}
+      </Script>
       {/* ── Hero ─────────────────────────────────── */}
       <section className="bg-background px-6 py-12 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">

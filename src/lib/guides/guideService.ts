@@ -127,6 +127,37 @@ export async function getGuideCount(): Promise<number> {
   return count;
 }
 
+export type SitemapGuideEntry = {
+  /** The guide slug — Supabase guides use the slug as their `id` column. */
+  id: string;
+  /** ISO timestamp from `updated_at`, or `null` if missing. */
+  updatedAt: string | null;
+};
+
+/**
+ * Lean projection for sitemap generation — id + updated_at only.
+ *
+ * Avoids dragging the full summary projection (and its image fallback
+ * pipeline) through the sitemap route just to read a timestamp.
+ */
+export async function getSitemapGuideEntries(): Promise<SitemapGuideEntry[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("guides")
+    .select("id, updated_at")
+    .eq("status", "published");
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data.map((row) => ({
+    id: typeof row.id === "string" ? row.id : "",
+    updatedAt: typeof row.updated_at === "string" ? row.updated_at : null,
+  })).filter((entry) => entry.id);
+}
+
 /**
  * Fetches all published guides for the list page.
  *
@@ -244,6 +275,32 @@ export async function getGuidesByCity(
   }
 
   const { data, error } = await query
+    .order("sort_order", { ascending: true })
+    .limit(limit);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return summariesWithFallbacks(data as unknown as GuideSummaryRow[]);
+}
+
+/**
+ * Fetches published guides whose `location_ids` array contains the given
+ * location id — used to surface a "Featured in guides" section on
+ * /places/[id]. Internal-linking signal: guides → place → guides cluster.
+ */
+export async function getGuidesByLocationId(
+  locationId: string,
+  limit: number = 3
+): Promise<GuideSummary[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("guides")
+    .select(GUIDE_SUMMARY_COLUMNS)
+    .eq("status", "published")
+    .contains("location_ids", [locationId])
     .order("sort_order", { ascending: true })
     .limit(limit);
 

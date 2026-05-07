@@ -7,20 +7,20 @@
  * description must also explicitly include images, or it'll ship
  * without a social preview.
  *
+ * The image itself is generated at request time by
+ * `src/app/opengraph-image.tsx` (a 1200×630 branded card). Resolved as
+ * an absolute URL by Next via `metadataBase` (set in `app/layout.tsx`).
+ *
  * Import this constant in each page's generateMetadata / metadata
  * openGraph + twitter blocks.
- *
- * Replace the asset with a dedicated 1200×630 OG image when branding
- * is ready; fallback.jpg is 800×533, which renders but may crop on
- * some platforms.
  */
 export const DEFAULT_OG_IMAGES = [
   {
-    url: "/images/fallback.jpg",
-    width: 800,
-    height: 533,
-    alt: "Yuku Japan",
+    url: "/opengraph-image",
+    width: 1200,
+    height: 630,
+    alt: "Yuku Japan — Routed Japan itineraries, day by day",
   },
 ];
 
-export const DEFAULT_TWITTER_IMAGES = ["/images/fallback.jpg"];
+export const DEFAULT_TWITTER_IMAGES = ["/opengraph-image"];

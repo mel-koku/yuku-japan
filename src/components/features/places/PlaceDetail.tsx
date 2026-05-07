@@ -18,6 +18,8 @@ import { cn } from "@/lib/cn";
 import { isSafeUrl } from "@/lib/utils/urlSafety";
 import { typography } from "@/lib/typography-system";
 import type { TravelGuidance } from "@/types/travelGuidance";
+import type { GuideSummary } from "@/types/guide";
+import { GuideCard } from "@/components/features/guides/GuideCard";
 import { HeartIcon, LocationCard } from "./LocationCard";
 import { useLocationHierarchy } from "@/hooks/useLocationHierarchy";
 import {
@@ -124,9 +126,10 @@ function OverviewSection({
 type PlaceDetailProps = {
   initialLocation: Location;
   initialEditorNote?: PortableTextBlock[] | null;
+  featuredGuides?: GuideSummary[];
 };
 
-export function PlaceDetail({ initialLocation, initialEditorNote }: PlaceDetailProps) {
+export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides }: PlaceDetailProps) {
   const router = useRouter();
   const { status, details, fetchedLocation } = useLocationDetailsQuery(initialLocation.id);
   const location = fetchedLocation ?? initialLocation;
@@ -791,6 +794,29 @@ export function PlaceDetail({ initialLocation, initialEditorNote }: PlaceDetailP
             </div>
           </section>
         )}
+
+      {/* Featured in guides — strengthens internal-linking cluster
+          (place ↔ guide ↔ city) and gives readers context for the place. */}
+      {featuredGuides && featuredGuides.length > 0 && (
+        <section className="py-12 sm:py-16 lg:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <m.h2
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: durationBase, ease: [...easeReveal] as [number, number, number, number] }}
+              className={cn(typography({ intent: "editorial-h2" }), "text-center mb-10")}
+            >
+              Featured in guides
+            </m.h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredGuides.map((guide, i) => (
+                <GuideCard key={guide.id} guide={guide} index={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Explore Nearby */}
       {nearbyLocations.length > 0 && (

@@ -690,34 +690,76 @@ export async function fetchSeasonalLocations(
 }
 
 /**
- * Returns the ids of every active location for sitemap generation.
- * Paginated in 1000-row chunks to bypass Supabase's default row limit.
+ * Returns the highest-rated photo URL for a city — for OG metadata only.
+ * Single-row fetch, no payload duplication with the full city page query.
+ * Returns `undefined` if the city has no rated, photographed locations.
  */
-export async function getSitemapLocationIds(): Promise<string[]> {
+export async function fetchCityHeroPhotoUrl(cityName: string): Promise<string | undefined> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("locations")
+    .select("primary_photo_url")
+    .eq("city", cityName)
+    .eq("is_active", true)
+    .not("primary_photo_url", "is", null)
+    .order("rating", { ascending: false, nullsFirst: false })
+    .order("review_count", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return undefined;
+  const url = data.primary_photo_url;
+  return typeof url === "string" && url.length > 0 ? url : undefined;
+}
+
+export type SitemapLocationEntry = {
+  id: string;
+  /** ISO timestamp; `null` if the row never had `updated_at` populated. */
+  updatedAt: string | null;
+  /** Absolute URL of the primary photo, if present. Used for Image sitemap extension. */
+  photoUrl: string | null;
+};
+
+/**
+ * Returns id + updated_at + photo for every active location, paginated in
+ * 1000-row chunks to bypass Supabase's default row limit.
+ *
+ * Used by the sitemap route so each entry can carry a real `lastmod` (vs.
+ * build-time `new Date()`) — without a credible lastmod Google ignores the
+ * field, losing per-page recrawl prioritization. Photo URL feeds the Image
+ * sitemap extension.
+ */
+export async function getSitemapLocationEntries(): Promise<SitemapLocationEntry[]> {
   const supabase = await createClient();
   const pageSize = 1000;
-  const ids: string[] = [];
+  const entries: SitemapLocationEntry[] = [];
 
   for (let page = 0; ; page += 1) {
     const { data, error } = await supabase
       .from("locations")
-      .select("id")
+      .select("id, updated_at, primary_photo_url")
       .eq("is_active", true)
       .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
       .order("id", { ascending: true })
       .range(page * pageSize, (page + 1) * pageSize - 1);
 
     if (error) {
-      logger.warn("Failed to fetch locations for sitemap", { error: error.message, page });
+      logger.warn("Failed to fetch locations for sitemap entries", { error: error.message, page });
       break;
     }
     if (!data || data.length === 0) break;
 
     for (const row of data) {
-      if (row && typeof row.id === "string") ids.push(row.id);
+      if (row && typeof row.id === "string") {
+        entries.push({
+          id: row.id,
+          updatedAt: typeof row.updated_at === "string" ? row.updated_at : null,
+          photoUrl: typeof row.primary_photo_url === "string" ? row.primary_photo_url : null,
+        });
+      }
     }
     if (data.length < pageSize) break;
   }
 
-  return ids;
+  return entries;
 }

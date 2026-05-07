@@ -12,8 +12,9 @@ import {
 import { buildCityJsonLd } from "@/lib/cities/cityJsonLd";
 import { buildBreadcrumbList, buildJsonLdGraph } from "@/lib/seo/breadcrumbs";
 import { serializeJsonLd } from "@/lib/seo/jsonLd";
-import { fetchLocationsByCity } from "@/lib/locations/locationService";
+import { fetchLocationsByCity, fetchCityHeroPhotoUrl } from "@/lib/locations/locationService";
 import { getCityMetadata } from "@/lib/tripBuilder/cityRelevance";
+import { getGuidesByCity } from "@/lib/guides/guideService";
 import { CityDetail } from "@/components/features/cities/CityDetail";
 import type { KnownCityId } from "@/types/trip";
 
@@ -35,6 +36,10 @@ export async function generateMetadata({
 
   if (!city) return { title: "City not found" };
 
+  // Hero photo for OG — falls back to root metadataBase image when absent.
+  // Dedicated single-row fetch, not the 200-row page query.
+  const heroPhoto = await fetchCityHeroPhotoUrl(city.name);
+
   return {
     title: `${city.name}, Japan | Travel Guide | Yuku Japan`,
     description: city.ogDescription,
@@ -45,7 +50,18 @@ export async function generateMetadata({
       title: `${city.name}, Japan | Travel Guide`,
       description: city.ogDescription,
       siteName: "Yuku Japan",
+      ...(heroPhoto && {
+        images: [{ url: heroPhoto, width: 1200, height: 630, alt: `${city.name}, Japan` }],
+      }),
     },
+    ...(heroPhoto && {
+      twitter: {
+        card: "summary_large_image" as const,
+        title: `${city.name}, Japan | Travel Guide`,
+        description: city.ogDescription,
+        images: [heroPhoto],
+      },
+    }),
   };
 }
 
@@ -55,10 +71,13 @@ export default async function CityDetailPage({ params }: RouteProps) {
 
   if (!city) notFound();
 
-  const locations = await fetchLocationsByCity(city.name, {
-    limit: 200,
-    requirePlaceId: false,
-  });
+  const [locations, cityGuides] = await Promise.all([
+    fetchLocationsByCity(city.name, {
+      limit: 200,
+      requirePlaceId: false,
+    }),
+    getGuidesByCity(city.name, undefined, 6),
+  ]);
 
   const stats = getCityStats(locations);
   const topLocations = getTopRatedLocations(locations);
@@ -113,6 +132,7 @@ export default async function CityDetailPage({ params }: RouteProps) {
         heroImage={heroImage}
         regionName={regionName}
         nearbyCities={nearbyCities}
+        cityGuides={cityGuides}
       />
     </>
   );

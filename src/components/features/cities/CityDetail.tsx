@@ -6,6 +6,8 @@ import { m } from "framer-motion";
 import type { CityPageData } from "@/lib/cities/cityData";
 import type { CityStats, CategoryBreakdown } from "@/lib/cities/cityHelpers";
 import type { Location } from "@/types/location";
+import type { GuideSummary } from "@/types/guide";
+import { GuideCard } from "@/components/features/guides/GuideCard";
 import { resizePhotoUrl } from "@/lib/google/transformations";
 import { getCategoryHexColor } from "@/lib/itinerary/activityColors";
 import { typography } from "@/lib/typography-system";
@@ -26,6 +28,7 @@ type Props = {
   heroImage?: string;
   regionName: string;
   nearbyCities: NearbyCity[];
+  cityGuides?: GuideSummary[];
 };
 
 const FALLBACK_HERO =
@@ -93,6 +96,7 @@ export function CityDetail({
   heroImage,
   regionName,
   nearbyCities,
+  cityGuides,
 }: Props) {
   const heroSrc = resizePhotoUrl(heroImage, 1600) ?? FALLBACK_HERO;
   const maxCount = categories[0]?.count ?? 1;
@@ -246,6 +250,23 @@ export function CityDetail({
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {hiddenGems.map((loc) => (
                 <LocationCard key={loc.id} location={loc} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Guides for this city — internal-linking cluster
+          (city → guide → place) and editorial entry points. */}
+      {cityGuides && cityGuides.length > 0 && (
+        <section className="py-12 sm:py-16 bg-canvas px-6">
+          <div className="mx-auto max-w-7xl">
+            <h2 className={typography({ intent: "editorial-h3" })}>
+              Guides for {city.name}
+            </h2>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {cityGuides.map((guide, i) => (
+                <GuideCard key={guide.id} guide={guide} index={i} />
               ))}
             </div>
           </div>

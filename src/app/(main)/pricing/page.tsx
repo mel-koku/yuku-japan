@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import { cn } from "@/lib/cn";
 import { typography } from "@/lib/typography-system";
 import { Button } from "@/components/ui/Button";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { getServiceRoleClient } from "@/lib/supabase/serviceRole";
 import { TIER_PRICES, type UnlockTier } from "@/lib/billing/types";
+import { serializeJsonLd } from "@/lib/seo/jsonLd";
+
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://yukujapan.com").replace(/\/+$/, "");
 
 export const revalidate = 3600;
 
@@ -53,8 +57,37 @@ export default async function PricingPage() {
   const isFreePromo =
     process.env.NEXT_PUBLIC_FREE_FULL_ACCESS === "true" && launchPricingActive;
 
+  // Product/AggregateOffer schema reflects canonical pricing — the launch
+  // promo is editorial messaging that ends; structured data should describe
+  // what the product is, not what a promo period happens to charge.
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "Trip Pass",
+    description:
+      "One-time unlock for full multi-day Japan itineraries: routed transit, daily briefings, and editorial picks for each stop.",
+    brand: { "@type": "Brand", name: "Yuku Japan" },
+    url: `${BASE_URL}/pricing`,
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "USD",
+      lowPrice: TIER_PRICES.short / 100,
+      highPrice: TIER_PRICES.long / 100,
+      offerCount: 3,
+      availability: "https://schema.org/InStock",
+      url: `${BASE_URL}/pricing`,
+    },
+  };
+
   return (
     <main className="min-h-[100dvh]">
+      <Script
+        id="ld-product-trip-pass"
+        type="application/ld+json"
+        strategy="afterInteractive"
+      >
+        {serializeJsonLd(productJsonLd)}
+      </Script>
       {/* Section 1: Editorial Hero */}
       <section className="bg-background px-6 py-12 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-2xl text-center">

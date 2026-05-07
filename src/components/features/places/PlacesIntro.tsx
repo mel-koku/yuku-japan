@@ -1,13 +1,8 @@
 "use client";
 
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import type { PagesContent } from "@/types/sanitySiteContent";
-import { typography } from "@/lib/typography-system";
-import { cn } from "@/lib/cn";
 
 type PlacesIntroProps = {
-  totalCount?: number;
-  content?: PagesContent;
   children?: React.ReactNode;
   /** Click handler for the search-button affordance. Opens the search modal. */
   onSearchClick?: () => void;
@@ -20,28 +15,18 @@ const ROTATING_HINTS = [
   "Late-night ramen Tokyo",
 ];
 
-export function PlacesIntro({ content, children, totalCount, onSearchClick }: PlacesIntroProps) {
+// The h1 + count line are rendered server-side in `app/(main)/places/page.tsx`
+// so Googlebot can index the topical heading without waiting for the
+// `ssr: false` dynamic boundary. This component owns the search affordance
+// and any caller-provided children (e.g. SeasonalBanner).
+export function PlacesIntro({ children, onSearchClick }: PlacesIntroProps) {
   const placeholderHint = ROTATING_HINTS[0];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-4 sm:pt-12 sm:pb-6 lg:pt-16 text-center">
-      <ScrollReveal delay={0.1} distance={20} duration={0.5}>
-        <h1 className={cn(typography({ intent: "editorial-h1" }), "text-[clamp(2rem,4vw,3rem)] max-w-3xl mx-auto")}>
-          {content?.placesHeading ?? "Every place worth knowing about, in one collection."}
-        </h1>
-      </ScrollReveal>
-
-      {totalCount && totalCount > 0 ? (
-        <ScrollReveal delay={0.12} distance={16} duration={0.45}>
-          <p className="mt-3 font-mono text-xs uppercase tracking-wide text-foreground-secondary">
-            {totalCount.toLocaleString()}+ places · 47 prefectures
-          </p>
-        </ScrollReveal>
-      ) : null}
-
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 text-center">
       {onSearchClick && (
         <ScrollReveal delay={0.18} distance={20} duration={0.5}>
-          <div className="mt-8 flex justify-center">
+          <div className="mt-2 flex justify-center">
             <button
               type="button"
               onClick={onSearchClick}

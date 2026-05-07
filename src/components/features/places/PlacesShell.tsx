@@ -496,7 +496,7 @@ export function PlacesShell({ content }: PlacesShellProps) {
     <div className="min-h-[100dvh] bg-background">
       {/* Lanes view — the bare /places experience. Always rendered; the
           search modal sits on top when active. */}
-      <PlacesIntro totalCount={total} content={content} onSearchClick={handleOpenSearch}>
+      <PlacesIntro onSearchClick={handleOpenSearch}>
         <SeasonalBanner
           locations={locations}
           onFilterSeasonal={handleFilterSeasonal}

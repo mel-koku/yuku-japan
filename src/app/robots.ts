@@ -8,7 +8,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // Photo proxy must remain crawlable so Google Images can index
+        // location hero photos. The proxy is CDN-cached at the edge so the
+        // extra bot traffic doesn't translate to origin / Google API spend.
+        allow: ["/", "/api/places/photo"],
         disallow: ["/api/", "/studio/", "/dashboard/", "/account/", "/saved/", "/itinerary/", "/trip-builder/", "/signin/", "/auth/"],
       },
     ],
