@@ -41,15 +41,15 @@ export type TripStyle = "relaxed" | "balanced" | "fast";
  */
 export type KnownCityId =
   | "kyoto" | "osaka" | "nara" | "kobe" | "otsu" | "himeji" | "wakayama"  // Kansai
-  | "tokyo" | "yokohama" | "kamakura" | "nikko" | "hakone" | "kawaguchiko"  // Kanto
-  | "nagoya" | "kanazawa" | "takayama" | "nagano" | "niigata" | "ise" | "toyama"  // Chubu
-  | "fukuoka" | "nagasaki" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"
+  | "tokyo" | "yokohama" | "kamakura" | "nikko" | "nasushiobara" | "hakone" | "kawaguchiko"  // Kanto
+  | "nagoya" | "kanazawa" | "hakusan" | "takayama" | "nagano" | "niigata" | "nagaoka" | "ise" | "toyama"  // Chubu
+  | "fukuoka" | "nagasaki" | "omura" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"
   | "arita" | "imari" | "kurokawa" | "takachiho"  // Kyushu
   | "sapporo" | "hakodate" | "asahikawa" | "kushiro" | "abashiri" | "wakkanai"
   | "toyako" | "noboribetsu" | "furano" | "shiretoko" | "niseko"  // Hokkaido
   | "sendai" | "morioka" | "aomori" | "akita" | "yamagata" | "aizuwakamatsu"
   | "ginzan" | "zao" | "tazawako" | "hiraizumi" | "hachimantai"  // Tohoku
-  | "hiroshima" | "okayama" | "matsue" | "tottori" | "shimonoseki"  // Chugoku
+  | "hiroshima" | "okayama" | "maniwa" | "matsue" | "tottori" | "shimonoseki"  // Chugoku
   | "matsuyama" | "takamatsu" | "tokushima" | "kochi" | "iyavalley"  // Shikoku
   | "naha" | "ishigaki" | "miyako" | "amami";  // Okinawa
 
