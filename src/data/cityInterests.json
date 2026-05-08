@@ -470,6 +470,34 @@
       "history": 3,
       "food": 1,
       "wellness": 1
+    },
+    "maniwa": {
+      "nature": 5,
+      "food": 2,
+      "history": 1,
+      "wellness": 1
+    },
+    "omura": {
+      "nature": 2,
+      "history": 1,
+      "culture": 1
+    },
+    "nasushiobara": {
+      "nature": 2,
+      "wellness": 1,
+      "history": 1
+    },
+    "hakusan": {
+      "nature": 6,
+      "history": 3,
+      "culture": 1,
+      "wellness": 1
+    },
+    "nagaoka": {
+      "history": 2,
+      "culture": 2,
+      "food": 1,
+      "nature": 1
     }
   },
   "metadata": {
@@ -904,6 +932,46 @@
         "lat": 45.180588799999995,
         "lng": 141.2411723
       }
+    },
+    "maniwa": {
+      "locationCount": 7,
+      "region": "Chugoku",
+      "coordinates": {
+        "lat": 35.081,
+        "lng": 133.7256
+      }
+    },
+    "omura": {
+      "locationCount": 3,
+      "region": "Kyushu",
+      "coordinates": {
+        "lat": 32.9201,
+        "lng": 129.9617
+      }
+    },
+    "nasushiobara": {
+      "locationCount": 2,
+      "region": "Kanto",
+      "coordinates": {
+        "lat": 36.9711,
+        "lng": 140.044
+      }
+    },
+    "hakusan": {
+      "locationCount": 10,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 36.5147,
+        "lng": 136.5658
+      }
+    },
+    "nagaoka": {
+      "locationCount": 5,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 37.447,
+        "lng": 138.8482
+      }
     }
   },
   "childCities": {
@@ -1007,7 +1075,6 @@
       "Ibara",
       "Kasaoka",
       "Kurashiki",
-      "Maniwa",
       "Mimasaka",
       "Misaki",
       "Niimi",
@@ -1064,7 +1131,6 @@
       "Minamishimabara",
       "Oguni",
       "Ojika",
-      "Omura",
       "Sasebo",
       "Shinkamigoto",
       "Takeo",
@@ -1093,7 +1159,6 @@
       "Motegi",
       "Naka",
       "Nasu",
-      "Nasushiobara",
       "Numata",
       "Oarai",
       "Ota",
@@ -1269,7 +1334,6 @@
       "Houki",
       "Izumo",
       "Kotoura",
-      "Maniwa",
       "Nambu",
       "Nishinoshima",
       "Oda",
@@ -1305,7 +1369,6 @@
     "niigata": [
       "Agano",
       "Gosen",
-      "Nagaoka",
       "Ojiya",
       "Sado",
       "Sanjo",
@@ -1528,7 +1591,6 @@
       "Minami Aizu",
       "Mishima",
       "Nasu",
-      "Nasushiobara",
       "Nihonmatsu",
       "Ono",
       "Shimogo",
@@ -1676,7 +1738,6 @@
       "Agematsu",
       "Gero",
       "Gujo",
-      "Hakusan",
       "Hida",
       "Iijima",
       "Kiso",
@@ -1696,7 +1757,6 @@
       "Kotoura",
       "Kurayoshi",
       "Kyotango",
-      "Maniwa",
       "Misasa",
       "Shin-Onsen",
       "Tohaku",
@@ -1802,6 +1862,11 @@
     ],
     "kobe": ["Akashi", "Awaji", "Nishinomiya", "Takarazuka", "Tamba-Sasayama"],
     "himeji": ["Ako", "Asago", "Bizen", "Kakogawa", "Taishi"],
-    "wakkanai": ["Rebun", "Rishiri", "Rishirifuji", "Sarufutsu", "Toyotomi"]
+    "wakkanai": ["Rebun", "Rishiri", "Rishirifuji", "Sarufutsu", "Toyotomi"],
+    "maniwa": [],
+    "omura": [],
+    "nasushiobara": [],
+    "hakusan": [],
+    "nagaoka": []
   }
 }

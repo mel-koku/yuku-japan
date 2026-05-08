@@ -19,23 +19,27 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   himeji:     { lat: 34.8151, lon: 134.6854 },
   wakayama:   { lat: 34.2261, lon: 135.1675 },
   // Kanto
-  tokyo:       { lat: 35.6762, lon: 139.6503 },
-  yokohama:    { lat: 35.4437, lon: 139.6380 },
-  kamakura:    { lat: 35.3192, lon: 139.5467 },
-  nikko:       { lat: 36.7199, lon: 139.6982 },
-  hakone:      { lat: 35.2324, lon: 139.1069 },
-  kawaguchiko: { lat: 35.5171, lon: 138.7519 },
+  tokyo:        { lat: 35.6762, lon: 139.6503 },
+  yokohama:     { lat: 35.4437, lon: 139.6380 },
+  kamakura:     { lat: 35.3192, lon: 139.5467 },
+  nikko:        { lat: 36.7199, lon: 139.6982 },
+  nasushiobara: { lat: 36.9711, lon: 140.0440 },  // Nasushiobara station / Shiobara Onsen entry
+  hakone:       { lat: 35.2324, lon: 139.1069 },
+  kawaguchiko:  { lat: 35.5171, lon: 138.7519 },
   // Chubu
   nagoya:    { lat: 35.1815, lon: 136.9066 },
   kanazawa:  { lat: 36.5613, lon: 136.6562 },
+  hakusan:   { lat: 36.5147, lon: 136.5658 },  // Hakusan City Hall (Tsurugi area)
   takayama:  { lat: 36.1458, lon: 137.2524 },
   nagano:    { lat: 36.6485, lon: 138.1811 },
   niigata:   { lat: 37.9026, lon: 139.0232 },
+  nagaoka:   { lat: 37.4470, lon: 138.8482 },  // Nagaoka station
   ise:       { lat: 34.4875, lon: 136.7090 },
   toyama:    { lat: 36.6959, lon: 137.2137 },
   // Kyushu
   fukuoka:    { lat: 33.5904, lon: 130.4017 },
   nagasaki:   { lat: 32.7503, lon: 129.8777 },
+  omura:      { lat: 32.9201, lon: 129.9617 },  // Kushima Castle Park / Omura station vicinity
   kumamoto:   { lat: 32.7898, lon: 130.7417 },
   kagoshima:  { lat: 31.5966, lon: 130.5571 },
   oita:       { lat: 33.2382, lon: 131.6126 },
@@ -73,6 +77,7 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   // Chugoku
   hiroshima:    { lat: 34.3853, lon: 132.4553 },
   okayama:      { lat: 34.6617, lon: 133.9352 },
+  maniwa:       { lat: 35.0810, lon: 133.7256 },  // Maniwa City Hall, Hiruzen Highlands gateway
   matsue:       { lat: 35.4723, lon: 133.0505 },
   tottori:      { lat: 35.5011, lon: 134.2351 },
   shimonoseki:  { lat: 33.9578, lon: 130.9414 },

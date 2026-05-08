@@ -125,6 +125,17 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Discover Nikkō's lavish shrines, waterfalls, and mountain hot springs. Plan your visit to this UNESCO World Heritage site.",
   },
+  nasushiobara: {
+    id: "nasushiobara",
+    name: "Nasushiobara",
+    nameJapanese: "那須塩原",
+    tagline: "Onsen valleys along the Hoki River",
+    description:
+      "Nasushiobara is the prefectural seat for Shiobara Onsen, a wooded valley of inns and pedestrian suspension bridges along the Hoki River, separate from Nikko's UNESCO complex 30 km west. Yuppo no Sato runs a 60-meter foot bath around a viewing pond at the town's center. Ryuka Falls and Senbonmatsu Dairy Farms anchor the side trips.",
+    ogDescription:
+      "Soak in Shiobara Onsen's wooded valley, walk its suspension bridges, and visit Senbonmatsu's pastoral dairy farms north of Nikko.",
+  },
+
   hakone: {
     id: "hakone",
     name: "Hakone",
@@ -168,6 +179,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Explore Kanazawa's samurai streets, Kenroku-en garden, and gold leaf culture. A quieter alternative to Kyoto.",
   },
+  hakusan: {
+    id: "hakusan",
+    name: "Hakusan",
+    nameJapanese: "白山",
+    tagline: "Sacred peak and the head Shirayamahime shrine",
+    description:
+      "Hakusan sits at the foot of its namesake mountain — one of Japan's three sacred peaks alongside Fuji and Tateyama — and houses the head shrine of the Shirayamahime Hime Jinja network. The Tedori River cuts a gorge through town, and the Hakusan Geopark interprets the ridge's volcanic history. From here it's roughly 30 km southeast to Kanazawa.",
+    ogDescription:
+      "Visit the head Shirayamahime Hime Jinja shrine, walk the Tedori River gorge, and base for sacred Mt. Hakusan ridge hikes.",
+  },
   takayama: {
     id: "takayama",
     name: "Takayama",
@@ -197,6 +218,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
       "Japan's best rice grows here, and where the rice goes, sake follows. Over 90 breweries line the prefecture. Beyond the paddies, Sado Island preserves traditions the mainland forgot, and the Fuji Rock Festival draws crowds to the mountains each summer.",
     ogDescription:
       "Explore Niigata's sake breweries, rice paddies, and Sado Island. Japan's most underrated stretch of the Sea of Japan coast.",
+  },
+  nagaoka: {
+    id: "nagaoka",
+    name: "Nagaoka",
+    nameJapanese: "長岡",
+    tagline: "Coastal ports and Niigata's largest fireworks",
+    description:
+      "Nagaoka covers a long stretch of central Niigata coastline including Teradomari, an Edo-era kitamaebune merchant-ship port whose Shirayamahime shrine still holds 52 funa-ema votive tablets painted by 18th- and 19th-century captains. The Nagaoka Festival fireworks each August commemorate the city's WWII firebombing in three nights of memorials over the Shinano River.",
+    ogDescription:
+      "Walk Teradomari's old port, see Shirayamahime shrine's 18th-century votive tablets, and time a visit for the Nagaoka Fireworks in August.",
   },
 
   ise: {
@@ -240,6 +271,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
       "Built on steep hills overlooking a harbor, Nagasaki has been Japan's portal to the outside world for centuries. Dutch, Portuguese, and Chinese influences blend in the architecture, the food, and the festivals. The Peace Park stands as a quiet reminder of resilience.",
     ogDescription:
       "Visit Nagasaki's hillside harbor, Peace Park, and centuries of cross-cultural history. A city of resilience and beauty.",
+  },
+  omura: {
+    id: "omura",
+    name: "Omura",
+    nameJapanese: "大村",
+    tagline: "Castle-town quiet on Omura Bay",
+    description:
+      "Omura sits on the inland Omura Bay between Nagasaki and Sasebo, anchored by the ruins of Kushima Castle and the cherry-tree promenades of Omura Park. The Omura family ruled here for nearly 700 years before the Meiji Restoration — their teamLab-illuminated castle ruins and surviving sukiya-style residences sketch that long stewardship. The bay views and pace of life are the draw.",
+    ogDescription:
+      "Walk Kushima Castle's cherry-lined ruins and Omura Park, then trace 700 years of the Omura family's quiet rule along the bay.",
   },
   kumamoto: {
     id: "kumamoto",
@@ -588,6 +629,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
       "Korakuen is one of Japan's three great gardens. The black castle rises beside it. Kurashiki's canal district preserves white-walled warehouses turned galleries. Okayama bills itself as the 'Land of Sunshine'. And the weather usually agrees.",
     ogDescription:
       "Explore Okayama's Korakuen garden, black castle, and Kurashiki's canal district. Sunny gateway to the Seto Inland Sea.",
+  },
+  maniwa: {
+    id: "maniwa",
+    name: "Maniwa",
+    nameJapanese: "真庭",
+    tagline: "Highland pastures and three-peak ridge hikes",
+    description:
+      "Maniwa anchors the Hiruzen Highlands at the foot of three named peaks — Naka-Hiruzen, Kami-Hiruzen, Shimo-Hiruzen — set in Daisen-Oki National Park. Beyond the ridge trails, the area runs on dairy farming and a quiet onsen culture along the Yubara hot springs. Katsuyama's noren-curtain townscape is a short drive south.",
+    ogDescription:
+      "Hike the three Hiruzen peaks, soak at Yubara Onsen, and walk Katsuyama's noren townscape — Maniwa is northern Okayama's highland base.",
   },
   matsue: {
     id: "matsue",
