@@ -32,6 +32,7 @@ import {
   resolveCitySequence,
 } from "@/lib/routing/citySequence";
 import { pickLocationForTimeSlot } from "@/lib/selection/locationPicker";
+import { applyCanonicalCoverage } from "@/lib/selection/canonicalCoverage";
 import { fetchRelationshipLookup, reorderByTransitLine } from "@/lib/itinerary/relationshipBonus";
 import { formatRecommendationReason } from "@/lib/scoring/reasonFormatter";
 import { detectPlanningWarnings } from "@/lib/planning/tripWarnings";
@@ -75,6 +76,32 @@ export type GenerateItineraryOptions = {
    * Provides pinned locations, excluded categories, category weights, pacing hints.
    */
   intentConstraints?: IntentExtractionResult;
+  /**
+   * Persona id for the post-scoring canonical-coverage layer (Direction 4).
+   * When set + matched against `locations.canonical_for_personas`, swaps in
+   * editor-curated must-includes for the lowest-priority picks. Currently
+   * passed only by the simulation harness; production runtime leaves this
+   * undefined (no force-include fires).
+   */
+  personaId?: string;
+  /**
+   * Per-city force-include cap for the canonical-coverage layer. Defaults
+   * apply per persona — see `DEFAULT_PER_CITY_CAP_BY_PERSONA` below.
+   */
+  canonicalCoverageCap?: number;
+};
+
+/**
+ * UI/UX ceiling on force-includes per city. First-timer brand-promise needs
+ * 3-5 canonical icons per major city; honeymooner medium; repeat-traveler
+ * disabled by default (their algorithm output is already editorially sound).
+ * Family persona deferred. Unrecognized persona = 0 = no force-include.
+ */
+const DEFAULT_PER_CITY_CAP_BY_PERSONA: Record<string, number> = {
+  "first-timer": 5,
+  honeymooner: 3,
+  repeat: 0,
+  family: 0,
 };
 
 function resolveTotalDays(data: TripBuilderData): number {
@@ -984,6 +1011,23 @@ export async function generateItinerary(
   // keep the view layer decoupled from TripBuilderData.
   const planningWarnings = detectPlanningWarnings(data);
 
-  return { days, planningWarnings };
+  // Direction 4: post-scoring canonical coverage. No-op when personaId is
+  // undefined (production runtime), the cap is 0 (repeat-traveler default),
+  // or no canonical_for_personas matches exist for the trip's cities.
+  let finalDays = days;
+  if (options?.personaId) {
+    const cap = options.canonicalCoverageCap
+      ?? DEFAULT_PER_CITY_CAP_BY_PERSONA[options.personaId]
+      ?? 0;
+    const covered = applyCanonicalCoverage({
+      itinerary: { days, planningWarnings },
+      personaId: options.personaId,
+      allLocations,
+      perCityCap: cap,
+    });
+    finalDays = covered.days;
+  }
+
+  return { days: finalDays, planningWarnings };
 }
 

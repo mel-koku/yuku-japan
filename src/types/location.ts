@@ -450,6 +450,13 @@ export type Location = {
   tags?: string[];
 
   /**
+   * Editor-curated personas this location is "must-include" for. Read by the
+   * post-scoring force-include layer in src/lib/selection/canonicalCoverage.ts.
+   * Empty/null = no force-include (backwards-compat by construction).
+   */
+  canonicalForPersonas?: string[];
+
+  /**
    * Cuisine type for restaurant/bar/cafe/market locations (e.g., ramen, sushi, izakaya, kaiseki).
    */
   cuisineType?: string;
