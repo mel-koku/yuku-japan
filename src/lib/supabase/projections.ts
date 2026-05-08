@@ -91,6 +91,7 @@ export type LocationDbRow = {
   reservation_info: "required" | "recommended" | null;
   insider_tip: string | null;
   tags: string[] | null;
+  canonical_for_personas: string[] | null;
   cuisine_type: string | null;
   craft_type: string | null;
   // Source tracking
@@ -133,6 +134,7 @@ export const LOCATION_LISTING_COLUMNS = `
   dietary_options,
   service_options,
   tags,
+  canonical_for_personas,
   name_japanese,
   nearest_station,
   payment_types,
@@ -297,6 +299,7 @@ export const LOCATION_ITINERARY_COLUMNS = `
   accessibility_options,
   dietary_options,
   tags,
+  canonical_for_personas,
   cuisine_type,
   payment_types,
   dietary_flags,
@@ -511,6 +514,7 @@ export type LocationListingDbRow = Pick<LocationDbRow,
   | "dietary_options"
   | "service_options"
   | "tags"
+  | "canonical_for_personas"
   | "name_japanese"
   | "nearest_station"
   | "payment_types"

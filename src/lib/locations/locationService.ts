@@ -154,6 +154,9 @@ export function transformDbRowToLocation(row: LocationDbRow | LocationListingDbR
     dietaryOptions: "dietary_options" in r ? (r.dietary_options as Location["dietaryOptions"]) ?? undefined : undefined,
     serviceOptions: "service_options" in r ? (r.service_options as Location["serviceOptions"]) ?? undefined : undefined,
     tags: "tags" in r ? (r.tags as string[] | null) ?? undefined : undefined,
+    canonicalForPersonas: "canonical_for_personas" in r
+      ? ((r.canonical_for_personas as string[] | null) ?? undefined)
+      : undefined,
     insiderTip: "insider_tip" in r ? (r.insider_tip as string | null) ?? undefined : undefined,
     nameJapanese: "name_japanese" in r ? (r.name_japanese as string | null) ?? undefined : undefined,
     nearestStation: "nearest_station" in r ? (r.nearest_station as string | null) ?? undefined : undefined,
