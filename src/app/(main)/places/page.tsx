@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PlacesShellLazy } from "@/components/features/places/PlacesShellLazy";
+import { FEATURED_CITIES } from "@/data/featuredCities";
 import { getPagesContent } from "@/lib/sanity/contentService";
-import { getLocationCount } from "@/lib/locations/locationService";
+import { fetchCityHeroPhotoUrl, getLocationCount } from "@/lib/locations/locationService";
 import { DEFAULT_OG_IMAGES, DEFAULT_TWITTER_IMAGES } from "@/lib/seo/defaults";
 import { typography } from "@/lib/typography-system";
 import { cn } from "@/lib/cn";
@@ -38,10 +39,23 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function PlacesPage() {
-  const [content, totalCount] = await Promise.all([
+  const safeFetchHero = async (label: string) => {
+    try {
+      return await fetchCityHeroPhotoUrl(label);
+    } catch {
+      return undefined;
+    }
+  };
+  const [content, totalCount, cityHeroEntries] = await Promise.all([
     getPagesContent(),
     getLocationCount(),
+    Promise.all(
+      FEATURED_CITIES.map(async (c) => [c.slug, await safeFetchHero(c.label)] as const),
+    ),
   ]);
+  const cityHeroes = Object.fromEntries(
+    cityHeroEntries.filter(([, url]) => Boolean(url)) as Array<readonly [string, string]>,
+  );
 
   // The h1 lives here in SSR — PlacesShell mounts its UI behind a
   // `dynamic({ ssr: false })` boundary, so any heading rendered downstream
@@ -61,7 +75,7 @@ export default async function PlacesPage() {
           </p>
         )}
       </header>
-      <PlacesShellLazy content={content ?? undefined} />
+      <PlacesShellLazy content={content ?? undefined} cityHeroes={cityHeroes} />
     </ErrorBoundary>
   );
 }
