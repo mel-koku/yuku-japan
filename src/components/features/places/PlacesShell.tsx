@@ -79,9 +79,10 @@ const LocationEditorialGrid = dynamic(
 
 type PlacesShellProps = {
   content?: PagesContent;
+  cityHeroes?: Record<string, string>;
 };
 
-export function PlacesShell({ content }: PlacesShellProps) {
+export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
   const router = useRouter();
   const {
     locations,
@@ -504,6 +505,7 @@ export function PlacesShell({ content }: PlacesShellProps) {
       </PlacesIntro>
       <PlacesLanes
         locations={locations}
+        cityHeroes={cityHeroes}
         onSelect={handleSelectLocation}
         onCitySelect={handleCitySelect}
         onOpenSearch={handleOpenSearch}

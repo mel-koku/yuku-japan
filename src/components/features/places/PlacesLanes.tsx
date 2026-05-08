@@ -9,6 +9,7 @@ import { typography } from "@/lib/typography-system";
 import { easeReveal, durationBase } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import type { Location } from "@/types/location";
+import { FEATURED_CITIES } from "@/data/featuredCities";
 
 const ICONIC_CATEGORIES = new Set([
   "shrine",
@@ -20,23 +21,15 @@ const ICONIC_CATEGORIES = new Set([
   "tower",
 ]);
 
-const FEATURED_CITIES: Array<{ slug: string; label: string; region: string; image: string }> = [
-  { slug: "tokyo", label: "Tokyo", region: "Kanto", image: "/images/regions/kanto-hero.jpg" },
-  { slug: "kyoto", label: "Kyoto", region: "Kansai", image: "/images/regions/kansai-hero.jpg" },
-  { slug: "osaka", label: "Osaka", region: "Kansai", image: "/images/regions/kansai-hero.jpg" },
-  { slug: "kanazawa", label: "Kanazawa", region: "Chubu", image: "/images/regions/chubu-hero.jpg" },
-  { slug: "hiroshima", label: "Hiroshima", region: "Chugoku", image: "/images/regions/chugoku-hero.jpg" },
-  { slug: "naoshima", label: "Naoshima", region: "Shikoku", image: "/images/regions/shikoku-hero.jpg" },
-];
-
 type PlacesLanesProps = {
   locations: Location[];
+  cityHeroes?: Record<string, string>;
   onSelect: (location: Location) => void;
   onCitySelect: (citySlug: string) => void;
   onOpenSearch: () => void;
 };
 
-export function PlacesLanes({ locations, onSelect, onCitySelect, onOpenSearch }: PlacesLanesProps) {
+export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onOpenSearch }: PlacesLanesProps) {
   const prefersReducedMotion = useReducedMotion();
 
   // resizePhotoUrl strips legacy location-photos bucket URLs to undefined,
@@ -96,9 +89,16 @@ export function PlacesLanes({ locations, onSelect, onCitySelect, onOpenSearch }:
         motionProps={fadeIn}
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
-          {FEATURED_CITIES.map((city) => (
-            <CityTile key={city.slug} city={city} onSelect={onCitySelect} />
-          ))}
+          {FEATURED_CITIES.map((city) => {
+            const heroImage = cityHeroes?.[city.slug];
+            return (
+              <CityTile
+                key={city.slug}
+                city={heroImage ? { ...city, image: heroImage } : city}
+                onSelect={onCitySelect}
+              />
+            );
+          })}
         </div>
         <div className="mt-4 flex justify-end">
           <button

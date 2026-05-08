@@ -32,10 +32,16 @@ const PlacesShell = dynamic(
   }
 );
 
-export function PlacesShellLazy({ content }: { content?: PagesContent }) {
+export function PlacesShellLazy({
+  content,
+  cityHeroes,
+}: {
+  content?: PagesContent;
+  cityHeroes?: Record<string, string>;
+}) {
   return (
     <ErrorBoundary>
-      <PlacesShell content={content} />
+      <PlacesShell content={content} cityHeroes={cityHeroes} />
     </ErrorBoundary>
   );
 }
