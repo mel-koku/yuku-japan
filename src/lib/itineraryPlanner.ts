@@ -25,6 +25,7 @@ import {
   TRANSIT_DISTANCE_THRESHOLD_KM,
   SHORT_DISTANCE_TRAIN_THRESHOLD_MIN,
   LONG_DISTANCE_TRAIN_THRESHOLD_MIN,
+  MAX_INTER_STOP_WALK_FALLBACK_MIN,
 } from "@/lib/constants/planning";
 import { LAST_TRAIN_TIMES } from "@/lib/constants/lastTrainTimes";
 import { computeDayPace } from "@/lib/itinerary/energyBudget";
@@ -653,7 +654,12 @@ async function planItineraryDay(
   // Resolve final route for each pair
   const resolvedRouteByActivityId = new Map<
     string,
-    { route: Awaited<ReturnType<typeof requestRoute>>; travelMode: ItineraryTravelMode; skippedOverCustom?: boolean }
+    {
+      route: Awaited<ReturnType<typeof requestRoute>>;
+      travelMode: ItineraryTravelMode;
+      skippedOverCustom?: boolean;
+      isEstimated?: boolean;
+    }
   >();
 
   for (let i = 0; i < routingPairs.length; i++) {
@@ -683,15 +689,44 @@ async function planItineraryDay(
             skippedOverCustom,
           });
         } else {
-          resolvedRouteByActivityId.set(pair.activityId, {
-            route: phase1Result,
-            travelMode: "walk",
-            skippedOverCustom,
-          });
-          if (transitResult && !hasTransitSteps) {
-            logger.warn("NAVITIME returned walk-only for transit request, using walk", { distanceKm });
+          // Walk fallback: both providers failed to return real transit. The
+          // walk leg over a transit-distance pair is often unusable (e.g.
+          // 142-min walks for ~10km Hiroshima waterfront → dinner pairs that
+          // had no rail/bus answer). Cap inter-stop fallback walks: if the
+          // walk would render longer than MAX_INTER_STOP_WALK_FALLBACK_MIN,
+          // swap in a heuristic transit estimate so the cursor advances by a
+          // defensible amount and the UI shows "X min train (est.)" instead
+          // of an unreasonable walk. Genuine 30–45 min walks still render as
+          // walk; only the unusable long-fallback case gets rescued.
+          const walkDurationMin = Math.max(1, Math.round(phase1Result.durationSeconds / 60));
+          if (walkDurationMin > MAX_INTER_STOP_WALK_FALLBACK_MIN) {
+            const heuristicTransit = estimateHeuristicRoute({
+              origin: pair.origin,
+              destination: pair.destination,
+              mode: "transit",
+            });
+            resolvedRouteByActivityId.set(pair.activityId, {
+              route: heuristicTransit,
+              travelMode: "train",
+              skippedOverCustom,
+              isEstimated: true,
+            });
+            logger.warn("Walk fallback exceeded inter-stop ceiling; using heuristic transit estimate", {
+              distanceKm,
+              walkDurationMin,
+              heuristicMin: Math.round(heuristicTransit.durationSeconds / 60),
+            });
           } else {
-            logger.warn("No train route found for distance >= 1km, using walk", { distanceKm });
+            resolvedRouteByActivityId.set(pair.activityId, {
+              route: phase1Result,
+              travelMode: "walk",
+              skippedOverCustom,
+            });
+            if (transitResult && !hasTransitSteps) {
+              logger.warn("NAVITIME returned walk-only for transit request, using walk", { distanceKm });
+            } else {
+              logger.warn("No train route found for distance >= 1km, using walk", { distanceKm });
+            }
           }
         }
       } else {
@@ -848,6 +883,11 @@ async function planItineraryDay(
       // Mark the segment when it originated from a "last known location" (skipped over custom)
       if (resolved.skippedOverCustom) {
         travelSegment.skippedOverCustom = true;
+      }
+
+      // Surface heuristic-rescue segments to the UI so users see "(est.)"
+      if (resolved.isEstimated) {
+        travelSegment.isEstimated = true;
       }
 
       // Check if evening transit departs after last train
