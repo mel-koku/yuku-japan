@@ -41,7 +41,7 @@ export type TripStyle = "relaxed" | "balanced" | "fast";
  */
 export type KnownCityId =
   | "kyoto" | "osaka" | "nara" | "kobe" | "otsu" | "himeji" | "wakayama"  // Kansai
-  | "tokyo" | "yokohama" | "kamakura" | "nikko" | "nasushiobara" | "hakone" | "kawaguchiko"  // Kanto
+  | "tokyo" | "yokohama" | "kamakura" | "nikko" | "nasushiobara" | "hakone" | "kawaguchiko" | "kawagoe" | "narita" | "chichibu"  // Kanto
   | "nagoya" | "kanazawa" | "hakusan" | "takayama" | "nagano" | "niigata" | "nagaoka" | "ise" | "toyama"  // Chubu
   | "fukuoka" | "dazaifu" | "asakura" | "nagasaki" | "omura" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"
   | "arita" | "imari" | "kurokawa" | "takachiho"  // Kyushu

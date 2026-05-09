@@ -26,6 +26,9 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   nasushiobara: { lat: 36.9711, lon: 140.0440 },  // Nasushiobara station / Shiobara Onsen entry
   hakone:       { lat: 35.2324, lon: 139.1069 },
   kawaguchiko:  { lat: 35.5171, lon: 138.7519 },
+  kawagoe:      { lat: 35.9251, lon: 139.4858 },  // Kawagoe Station / Crea Mall — Koedo old town entry
+  narita:       { lat: 35.7771, lon: 140.3186 },  // Narita Station / approach to Naritasan Shinshoji
+  chichibu:     { lat: 35.9919, lon: 139.0855 },  // Chichibu Station / Chichibu Shrine vicinity
   // Chubu
   nagoya:    { lat: 35.1815, lon: 136.9066 },
   kanazawa:  { lat: 36.5613, lon: 136.6562 },
