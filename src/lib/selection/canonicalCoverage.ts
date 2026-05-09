@@ -23,6 +23,62 @@ import { logger } from "@/lib/logger";
 import { getLocationDurationMinutes } from "@/lib/generation/helpers";
 
 type PlaceActivity = Extract<ItineraryActivity, { kind: "place" }>;
+type TimeOfDay = "morning" | "afternoon" | "evening";
+
+const TIME_BUCKETS: Record<TimeOfDay, { startMin: number; endMin: number }> = {
+  morning: { startMin: 6 * 60, endMin: 12 * 60 },
+  afternoon: { startMin: 12 * 60, endMin: 17 * 60 },
+  evening: { startMin: 17 * 60, endMin: 21 * 60 },
+};
+
+function parseHHMM(s: string | undefined): number | null {
+  if (!s) return null;
+  const m = /^(\d{1,2}):(\d{2})$/.exec(s.trim());
+  if (!m) return null;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (!Number.isFinite(h) || !Number.isFinite(min)) return null;
+  return h * 60 + min;
+}
+
+/**
+ * Derive the buckets (morning/afternoon/evening) where `loc` is open enough
+ * to actually visit. Returns null when no preference applies — null hours,
+ * 24/7 venues, or hours that span all three buckets. The 30-min visit floor
+ * mirrors `planItinerary`'s out-of-hours skip threshold so a canonical we
+ * place is one the planner won't drop.
+ *
+ * Symptom this guards against: 17:00-close shrines (Meiji Jingu, Kinkaku-ji)
+ * and 14:00-close markets (Tsukiji Outer) inheriting an evening slot via
+ * Pass 2's latest-position pick, then getting silently skipped downstream.
+ */
+function deriveOpenBuckets(loc: Location): Set<TimeOfDay> | null {
+  const periods = loc.operatingHours?.periods;
+  if (!periods || periods.length === 0) return null;
+
+  const bucketsHit = new Set<TimeOfDay>();
+  const VISIT_FLOOR_MIN = 30;
+
+  for (const period of periods) {
+    const open = parseHHMM(period.open);
+    const close = parseHHMM(period.close);
+    if (open === null) continue;
+    if (close === null || (open === 0 && close === 0)) return null;
+    const effectiveClose = period.isOvernight ? close + 24 * 60 : close;
+    if (effectiveClose <= open) continue;
+    for (const [bucket, { startMin, endMin }] of Object.entries(TIME_BUCKETS) as [
+      TimeOfDay,
+      { startMin: number; endMin: number },
+    ][]) {
+      const overlap = Math.min(effectiveClose, endMin) - Math.max(open, startMin);
+      if (overlap >= VISIT_FLOOR_MIN) bucketsHit.add(bucket);
+    }
+  }
+
+  if (bucketsHit.size === 0) return null;
+  if (bucketsHit.size === 3) return null;
+  return bucketsHit;
+}
 
 export type CanonicalCoverageOptions = {
   itinerary: Itinerary;
@@ -175,21 +231,54 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
       }
 
       // Pass 2: lowest-priority swappable (only if Pass 1 didn't find one).
+      // Two-stage to keep daytime-only icons (Meiji Jingu 17:00, Kinkaku-ji
+      // 17:00, Tsukiji Outer 14:00) out of evening slots they'd be dropped
+      // from by `planItinerary`'s operating-hours pre-check.
+      //
+      //   2a) Prefer a swappable whose timeOfDay matches the canonical's
+      //       open-hours window (e.g. shrine open 09–17 → morning/afternoon).
+      //   2b) Fall back to plain "latest within-day index" if 2a found nothing.
+      //
+      // 24/7 / null-hours canonicals skip 2a entirely (no preference).
       if (!target) {
-        let targetWithinDayIdx = -1;
-        for (const dayIdx of dayIndices) {
-          const day = newDays[dayIdx];
-          if (!day) continue;
-          for (let i = day.activities.length - 1; i >= 0; i -= 1) {
-            const activity = day.activities[i];
-            if (!activity || activity.kind !== "place") continue;
-            if (!isSwappable(activity)) continue;
-            if (activity.locationId && injectedIds.has(activity.locationId)) continue;
-            if (i > targetWithinDayIdx) {
-              target = { dayIdx, activityIdx: i };
-              targetWithinDayIdx = i;
+        const openBuckets = deriveOpenBuckets(mustInclude);
+
+        if (openBuckets) {
+          let targetWithinDayIdx = -1;
+          for (const dayIdx of dayIndices) {
+            const day = newDays[dayIdx];
+            if (!day) continue;
+            for (let i = day.activities.length - 1; i >= 0; i -= 1) {
+              const activity = day.activities[i];
+              if (!activity || activity.kind !== "place") continue;
+              if (!isSwappable(activity)) continue;
+              if (activity.locationId && injectedIds.has(activity.locationId)) continue;
+              if (!openBuckets.has(activity.timeOfDay as TimeOfDay)) continue;
+              if (i > targetWithinDayIdx) {
+                target = { dayIdx, activityIdx: i };
+                targetWithinDayIdx = i;
+              }
+              break; // latest preferred-bucket swappable per day
             }
-            break; // only the latest swappable per day matters
+          }
+        }
+
+        if (!target) {
+          let targetWithinDayIdx = -1;
+          for (const dayIdx of dayIndices) {
+            const day = newDays[dayIdx];
+            if (!day) continue;
+            for (let i = day.activities.length - 1; i >= 0; i -= 1) {
+              const activity = day.activities[i];
+              if (!activity || activity.kind !== "place") continue;
+              if (!isSwappable(activity)) continue;
+              if (activity.locationId && injectedIds.has(activity.locationId)) continue;
+              if (i > targetWithinDayIdx) {
+                target = { dayIdx, activityIdx: i };
+                targetWithinDayIdx = i;
+              }
+              break; // only the latest swappable per day matters
+            }
           }
         }
       }
