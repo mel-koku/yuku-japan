@@ -517,6 +517,49 @@ describe("convertItineraryToTrip location lookup", () => {
     expect(trip.days[0]?.activities[0]?.location?.city).toBe("kyoto");
   });
 
+  it("propagates isCanonical from ItineraryActivity to TripActivity", () => {
+    // Regression guard: `refineTooBusy` reads `TripActivity.isCanonical` to
+    // protect editor-curated brand-promise icons. If this propagation is
+    // dropped from the mapper, the protection silently breaks even though
+    // canonicalCoverage.ts still sets the flag on the source side.
+    const itinerary = {
+      id: "it-canon",
+      days: [
+        {
+          id: "day-1",
+          cityId: "kyoto" as const,
+          activities: [
+            {
+              kind: "place" as const,
+              id: "kinkaku-ji-d1-canon",
+              title: "Kinkaku-ji",
+              timeOfDay: "morning" as const,
+              locationId: "kinkaku-ji",
+              isCanonical: true,
+            },
+            {
+              kind: "place" as const,
+              id: "filler",
+              title: "Filler",
+              timeOfDay: "afternoon" as const,
+              locationId: "filler-loc",
+            },
+          ],
+        },
+      ],
+    } as unknown as Itinerary;
+
+    const trip = convertItineraryToTrip(
+      itinerary,
+      makeBuilderData({ duration: 1 }),
+      "trip-canon",
+      [],
+    );
+    expect(trip.days[0]?.activities[0]?.isCanonical).toBe(true);
+    // Non-canonical activities must not pick up the flag.
+    expect(trip.days[0]?.activities[1]?.isCanonical).toBeUndefined();
+  });
+
   it("filters out non-place activities (notes)", () => {
     const itinerary = {
       id: "it-mixed",
