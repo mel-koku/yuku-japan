@@ -36,6 +36,7 @@ import { applyCanonicalCoverage } from "@/lib/selection/canonicalCoverage";
 import { fetchRelationshipLookup, reorderByTransitLine } from "@/lib/itinerary/relationshipBonus";
 import { formatRecommendationReason } from "@/lib/scoring/reasonFormatter";
 import { detectPlanningWarnings } from "@/lib/planning/tripWarnings";
+import { calculateDistance } from "@/lib/utils/geoUtils";
 
 // Import from generation sub-modules
 import {
@@ -1019,6 +1020,40 @@ export async function generateItinerary(
     const cap = options.canonicalCoverageCap
       ?? DEFAULT_PER_CITY_CAP_BY_PERSONA[options.personaId]
       ?? 0;
+
+    // Step 0 diagnostic for the canonical-coverage transit-awkwardness bug
+    // (smoke-test 2026-05-09). Logs per-day pre-swap geographic spread so we
+    // can decide whether the symptom is the swap layer (clean pre-swap, split
+    // post-swap) or the picker / zone expansion (already-split pre-swap).
+    // Same one-line passive-telemetry pattern as PR #201's persona log.
+    // No-op when cap is 0 (no swap will fire anyway).
+    if (cap > 0) {
+      for (let i = 0; i < days.length; i += 1) {
+        const day = days[i]!;
+        const placeCoords: { lat: number; lng: number }[] = [];
+        for (const activity of day.activities) {
+          if (activity.kind === "place" && activity.coordinates) {
+            placeCoords.push(activity.coordinates);
+          }
+        }
+        let maxPairwiseKm = 0;
+        for (let a = 0; a < placeCoords.length; a += 1) {
+          for (let b = a + 1; b < placeCoords.length; b += 1) {
+            const d = calculateDistance(placeCoords[a]!, placeCoords[b]!);
+            if (d > maxPairwiseKm) maxPairwiseKm = d;
+          }
+        }
+        logger.info("[canonical:preswap-spread]", {
+          dayIndex: i,
+          cityId: day.cityId ?? null,
+          activityCount: day.activities.length,
+          placeCount: placeCoords.length,
+          maxPairwiseKm: Math.round(maxPairwiseKm * 10) / 10,
+          personaId: options.personaId,
+        });
+      }
+    }
+
     const covered = applyCanonicalCoverage({
       itinerary: { days, planningWarnings },
       personaId: options.personaId,
