@@ -97,11 +97,22 @@ export async function refineDay(request: RefinementRequest): Promise<TripDay> {
  * Removes some activities to make the day less busy
  * Considers TravelerProfile pace preference when determining how many to remove
  */
+/**
+ * Activities placed by `applyCanonicalCoverage` use ids of the form
+ * `<locationId>-d<N>-canon` (see canonicalCoverage.ts). They represent
+ * editor-curated brand-promise icons (Sensoji, Fushimi Inari, Kinkaku-ji,
+ * etc.) and "too busy" should treat them as protected — the same first-timer
+ * who clicked refine still wants to visit Kinkaku-ji.
+ */
+function isCanonicalInjected(activity: { id?: string }): boolean {
+  return typeof activity.id === "string" && /-d\d+-canon$/.test(activity.id);
+}
+
 function refineTooBusy(day: TripDay, trip: Trip): TripDay {
   const activities = [...day.activities];
-  // Separate anchors (airport arrival/departure) from removable activities
-  const anchors = activities.filter((a) => a.isAnchor);
-  const removable = activities.filter((a) => !a.isAnchor);
+  // Separate protected (anchors + canonical-injected) from removable activities
+  const protectedActs = activities.filter((a) => a.isAnchor || isCanonicalInjected(a));
+  const removable = activities.filter((a) => !a.isAnchor && !isCanonicalInjected(a));
 
   if (removable.length <= 2) {
     return { ...day, message: "This day already has the minimum number of activities." };
@@ -123,8 +134,8 @@ function refineTooBusy(day: TripDay, trip: Trip): TripDay {
     removable[removable.length - 1],
   ].filter((a): a is typeof removable[0] => a !== undefined);
 
-  // Reconstruct: preserve original order by keeping anchors in position
-  const keptIds = new Set([...anchors.map((a) => a.id), ...keptRemovable.map((a) => a.id)]);
+  // Reconstruct: preserve original order by keeping protected activities in position
+  const keptIds = new Set([...protectedActs.map((a) => a.id), ...keptRemovable.map((a) => a.id)]);
   const newActivities = activities.filter((a) => keptIds.has(a.id));
 
   return {

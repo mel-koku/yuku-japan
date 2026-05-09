@@ -503,3 +503,151 @@ describe("applyCanonicalCoverage", () => {
     expect((result.days[0]!.activities[0]! as Extract<ItineraryActivity, { kind: "place" }>).title).toBe("Filler");
   });
 });
+
+// ── Placement-by-time-of-day ─────────────────────────────────────────────
+//
+// Regression guard for KOK-54 (Direction 4 prod smoke 7/10): canonicals with
+// daytime-only operating hours (Meiji Jingu close 17:00, Kinkaku-ji close
+// 17:00, Tsukiji Outer close 14:00) were inheriting evening slots via Pass
+// 2's "latest swappable" pick, then getting silently dropped by
+// `planItinerary`'s operating-hours pre-check.
+describe("applyCanonicalCoverage — placement by canonical's open hours", () => {
+  it("places a 17:00-close shrine into an afternoon slot when an evening alternative exists", () => {
+    const meijiWithHours = makeLocation({
+      id: "meiji-jingu-with-hours",
+      name: "Meiji Jingu",
+      city: "Tokyo",
+      planningCity: "tokyo",
+      canonicalForPersonas: ["first-timer"],
+      operatingHours: {
+        timezone: "Asia/Tokyo",
+        periods: [
+          { day: "monday", open: "09:00", close: "17:00" },
+          { day: "tuesday", open: "09:00", close: "17:00" },
+          { day: "wednesday", open: "09:00", close: "17:00" },
+          { day: "thursday", open: "09:00", close: "17:00" },
+          { day: "friday", open: "09:00", close: "17:00" },
+          { day: "saturday", open: "09:00", close: "17:00" },
+          { day: "sunday", open: "09:00", close: "17:00" },
+        ],
+      },
+    });
+
+    const itinerary = makeItinerary([
+      {
+        id: "day-1",
+        cityId: "tokyo",
+        activities: [
+          makePlace("morning-pick", "Morning Pick", { timeOfDay: "morning" }),
+          makePlace("afternoon-pick", "Afternoon Pick", { timeOfDay: "afternoon" }),
+          makePlace("evening-pick", "Evening Bar", { timeOfDay: "evening" }),
+        ],
+      },
+    ]);
+
+    const result = applyCanonicalCoverage({
+      itinerary,
+      personaId: "first-timer",
+      allLocations: [meijiWithHours],
+      perCityCap: 5,
+    });
+
+    const day1 = result.days[0]!;
+    const meijiActivity = day1.activities.find(
+      (a) => a.kind === "place" && a.title === "Meiji Jingu",
+    ) as Extract<ItineraryActivity, { kind: "place" }>;
+    expect(meijiActivity).toBeDefined();
+    expect(meijiActivity.timeOfDay).not.toBe("evening");
+    expect(["morning", "afternoon"]).toContain(meijiActivity.timeOfDay);
+
+    // Evening pick is preserved because we preferred the afternoon slot
+    expect(
+      day1.activities.some(
+        (a) => a.kind === "place" && a.title === "Evening Bar",
+      ),
+    ).toBe(true);
+  });
+
+  it("falls back to latest-position when no swappable in the canonical's open buckets", () => {
+    // Canonical is morning-only (closes 11:00); the day has only an
+    // evening swappable. We still place the canonical (brand-promise),
+    // accepting that downstream operating-hours checks may flag it —
+    // an evening placement is still better than no placement at all.
+    const morningOnly = makeLocation({
+      id: "early-market",
+      name: "Early Market",
+      city: "Tokyo",
+      planningCity: "tokyo",
+      canonicalForPersonas: ["first-timer"],
+      operatingHours: {
+        timezone: "Asia/Tokyo",
+        periods: [
+          { day: "monday", open: "05:00", close: "11:00" },
+          { day: "tuesday", open: "05:00", close: "11:00" },
+          { day: "wednesday", open: "05:00", close: "11:00" },
+          { day: "thursday", open: "05:00", close: "11:00" },
+          { day: "friday", open: "05:00", close: "11:00" },
+          { day: "saturday", open: "05:00", close: "11:00" },
+          { day: "sunday", open: "05:00", close: "11:00" },
+        ],
+      },
+    });
+
+    const itinerary = makeItinerary([
+      {
+        id: "day-1",
+        cityId: "tokyo",
+        activities: [
+          makePlace("evening-1", "Evening 1", { timeOfDay: "evening" }),
+          makePlace("evening-2", "Evening 2", { timeOfDay: "evening" }),
+        ],
+      },
+    ]);
+
+    const result = applyCanonicalCoverage({
+      itinerary,
+      personaId: "first-timer",
+      allLocations: [morningOnly],
+      perCityCap: 5,
+    });
+
+    const day1 = result.days[0]!;
+    expect(
+      day1.activities.some(
+        (a) => a.kind === "place" && a.title === "Early Market",
+      ),
+    ).toBe(true);
+  });
+
+  it("ignores time-of-day preference for 24/7 canonicals (no operating hours)", () => {
+    // Sensoji has null operating hours in our corpus — should fall through
+    // to plain latest-position semantics, identical to pre-fix behavior.
+    const itinerary = makeItinerary([
+      {
+        id: "day-1",
+        cityId: "tokyo",
+        activities: [
+          makePlace("morning-pick", "Morning Pick", { timeOfDay: "morning" }),
+          makePlace("afternoon-pick", "Afternoon Pick", { timeOfDay: "afternoon" }),
+          makePlace("evening-pick", "Evening Pick", { timeOfDay: "evening" }),
+        ],
+      },
+    ]);
+
+    const result = applyCanonicalCoverage({
+      itinerary,
+      personaId: "first-timer",
+      // sensoji fixture defined at top of file has no operatingHours
+      allLocations: [sensoji],
+      perCityCap: 5,
+    });
+
+    const day1 = result.days[0]!;
+    const sensojiActivity = day1.activities.find(
+      (a) => a.kind === "place" && a.title === "Sensoji Temple",
+    ) as Extract<ItineraryActivity, { kind: "place" }>;
+    expect(sensojiActivity).toBeDefined();
+    // Latest swappable was evening-pick → canonical inherits "evening"
+    expect(sensojiActivity.timeOfDay).toBe("evening");
+  });
+});

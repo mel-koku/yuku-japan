@@ -129,3 +129,53 @@ describe("refinementEngine no-op messages", () => {
     expect(result.message).toBe("This day already has minimal activities for adding rest time.");
   });
 });
+
+// Regression guard for KOK-54: canonical-injected activities (id suffix
+// `-d<N>-canon`) carry editor-curated brand-promise icons. Refine "too_busy"
+// should treat them as protected, the same way it protects airport anchors.
+describe("refinementEngine — too_busy protects canonical-injected activities", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should not remove activities whose id matches the canonical pattern", async () => {
+    const trip = makeTrip({
+      activities: [
+        // 5 picker activities + 1 canonical injected in middle. Plain
+        // refineTooBusy would drop middle (canonical) on a 5-activity day.
+        { id: "p1", locationId: "loc-p1", timeSlot: "morning", duration: 90 },
+        { id: "p2", locationId: "loc-p2", timeSlot: "morning", duration: 90 },
+        // Canonical injected on day index 1 (1-based: day 1)
+        { id: "meiji-jingu-shrine-kanto-3ef2fe4a-d1-canon", locationId: "meiji-jingu-shrine-kanto-3ef2fe4a", timeSlot: "afternoon", duration: 90 },
+        { id: "p3", locationId: "loc-p3", timeSlot: "afternoon", duration: 60 },
+        { id: "p4", locationId: "loc-p4", timeSlot: "evening", duration: 60 },
+        { id: "p5", locationId: "loc-p5", timeSlot: "evening", duration: 60 },
+      ],
+    });
+
+    const result = await refineDay({ trip, dayIndex: 0, type: "too_busy" });
+
+    const ids = result.activities.map((a) => a.id);
+    expect(ids).toContain("meiji-jingu-shrine-kanto-3ef2fe4a-d1-canon");
+    // Some non-canonical middle activities should be removed (otherwise
+    // we're not actually testing the refine path).
+    expect(result.activities.length).toBeLessThan(6);
+  });
+
+  it("should still surface the no-op message when only canonicals + anchors leave fewer than 3 removables", async () => {
+    const trip = makeTrip({
+      activities: [
+        { id: "anchor-arrival-hnd", locationId: "hnd", timeSlot: "morning", duration: 60, isAnchor: true },
+        { id: "fushimi-inari-d1-canon", locationId: "fushimi-inari", timeSlot: "morning", duration: 90 },
+        { id: "p1", locationId: "loc-p1", timeSlot: "afternoon", duration: 90 },
+        { id: "p2", locationId: "loc-p2", timeSlot: "evening", duration: 60 },
+      ],
+    });
+
+    const result = await refineDay({ trip, dayIndex: 0, type: "too_busy" });
+
+    // Removable count after excluding anchor + canonical = 2 → no-op.
+    expect(result.message).toBe("This day already has the minimum number of activities.");
+    expect(result.activities.map((a) => a.id)).toContain("fushimi-inari-d1-canon");
+  });
+});
