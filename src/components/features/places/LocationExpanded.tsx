@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { m } from "framer-motion";
 import { useEffect, useCallback, useState, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { easeReveal, durationFast } from "@/lib/motion";
 import type { Location } from "@/types/location";
 import { useLenis } from "@/providers/LenisProvider";
@@ -238,7 +239,9 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
     details?.internationalPhoneNumber ||
     (details?.googleMapsUri && isSafeUrl(details.googleMapsUri));
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <>
       {/* Backdrop */}
       <m.div
@@ -780,6 +783,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
         locationId={location.id}
         locationName={displayName}
       />
-    </>
+    </>,
+    document.body,
   );
 }
