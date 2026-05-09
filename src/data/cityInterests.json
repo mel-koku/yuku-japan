@@ -510,6 +510,23 @@
       "wellness": 1,
       "nature": 1,
       "culture": 1
+    },
+    "kawagoe": {
+      "history": 2,
+      "culture": 2,
+      "food": 1
+    },
+    "narita": {
+      "culture": 4,
+      "history": 4,
+      "nature": 1,
+      "wellness": 1
+    },
+    "chichibu": {
+      "nature": 7,
+      "culture": 1,
+      "history": 1,
+      "craft": 1
     }
   },
   "metadata": {
@@ -999,6 +1016,30 @@
       "coordinates": {
         "lat": 33.4234,
         "lng": 130.6657
+      }
+    },
+    "kawagoe": {
+      "locationCount": 5,
+      "region": "Kanto",
+      "coordinates": {
+        "lat": 35.9251,
+        "lng": 139.4858
+      }
+    },
+    "narita": {
+      "locationCount": 8,
+      "region": "Kanto",
+      "coordinates": {
+        "lat": 35.7771,
+        "lng": 140.3186
+      }
+    },
+    "chichibu": {
+      "locationCount": 9,
+      "region": "Kanto",
+      "coordinates": {
+        "lat": 35.9919,
+        "lng": 139.0855
       }
     }
   },
@@ -1645,18 +1686,14 @@
       "Asakusa",
       "Bunkyo",
       "Chiba",
-      "Chichibu",
       "Chiyoda",
       "Choshi",
       "Chuo",
       "Gyoda",
-      "Hanno",
-      "Hidaka",
       "Itako",
       "Kashima",
       "Kasugabe",
       "Katori",
-      "Kawagoe",
       "Kawasaki",
       "Kita",
       "Koto",
@@ -1665,13 +1702,9 @@
       "Meguro",
       "Minato",
       "Musashino",
-      "Nagatoro",
-      "Narita",
       "Noda",
-      "Ogawa",
       "Omiya",
       "Saitama",
-      "Sakae",
       "Satte",
       "Setagaya",
       "Shinjuku",
@@ -1895,6 +1928,9 @@
     "hakusan": [],
     "nagaoka": [],
     "dazaifu": [],
-    "asakura": []
+    "asakura": [],
+    "kawagoe": [],
+    "narita": ["Sakae"],
+    "chichibu": ["Hanno", "Hidaka", "Nagatoro", "Ogawa"]
   }
 }

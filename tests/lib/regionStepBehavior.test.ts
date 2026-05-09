@@ -1,7 +1,7 @@
 /**
  * Building-block tests for RegionStep's two fixes:
  *
- * 1. getRegionSelectionState resolves child cities (e.g. "narita") to their
+ * 1. getRegionSelectionState resolves child cities (e.g. "tsukuba") to their
  *    parent region (kanto) so the region row's selection indicator reflects
  *    a child-only pick.
  * 2. Augment-on-divergence's coverage check correctly identifies whether a
@@ -64,22 +64,22 @@ function regionHasDynamicSelected(
 }
 
 describe("Fix 1 — child cities flip parent region selection state", () => {
-  test("Narita (Tokyo child) resolves to Kanto via child mapping", () => {
+  test("Tsukuba (Tokyo child) resolves to Kanto via child mapping", () => {
     const childMap = getChildCityMapping();
-    const entry = childMap.get("narita");
+    const entry = childMap.get("tsukuba");
     expect(entry?.planningCity).toBe("tokyo");
     expect(getRegionForCity("tokyo" as CityId)).toBe("kanto");
   });
 
-  test("regionHasDynamicSelected: Kanto sees Narita as a child match", () => {
+  test("regionHasDynamicSelected: Kanto sees Tsukuba as a child match", () => {
     const childMap = getChildCityMapping();
-    const selected = new Set<CityId>(["osaka", "kyoto", "narita"] as CityId[]);
+    const selected = new Set<CityId>(["osaka", "kyoto", "tsukuba"] as CityId[]);
     expect(regionHasDynamicSelected(selected, "kanto", childMap)).toBe(true);
   });
 
   test("regionHasDynamicSelected: Kansai is unaffected by a Kanto-child pick", () => {
     const childMap = getChildCityMapping();
-    const selected = new Set<CityId>(["narita"] as CityId[]);
+    const selected = new Set<CityId>(["tsukuba"] as CityId[]);
     expect(regionHasDynamicSelected(selected, "kansai", childMap)).toBe(false);
   });
 
@@ -106,11 +106,11 @@ describe("Fix 2 — augment-on-divergence coverage check", () => {
     expect(isExitRegionCoveredBySelections(selected, "kanto", childMap)).toBe(true);
   });
 
-  test("Narita (child city) covers Kanto exit transitively", () => {
-    // This is the key case: a user who manually picks Narita via the search
-    // bar shouldn't get Tokyo auto-appended on top of it.
+  test("Tsukuba (child city) covers Kanto exit transitively", () => {
+    // The key case: a user who manually picks a child via the search bar
+    // shouldn't get Tokyo auto-appended on top of it.
     const childMap = getChildCityMapping();
-    const selected = new Set<CityId>(["osaka", "kyoto", "narita"] as CityId[]);
+    const selected = new Set<CityId>(["osaka", "kyoto", "tsukuba"] as CityId[]);
     expect(isExitRegionCoveredBySelections(selected, "kanto", childMap)).toBe(true);
   });
 
