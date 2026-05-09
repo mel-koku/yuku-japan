@@ -740,6 +740,57 @@ describe("planItinerary", () => {
       expect(secondActivity.travelFromPrevious?.mode).toBe("walk");
     }
   });
+
+  it("rescues unusable inter-stop walk fallback with a heuristic transit estimate", async () => {
+    // Repro for the Hiroshima-waterfront → dinner case where NAVITIME and the
+    // Google retry both returned walk-only for a ~10km transit-distance pair,
+    // and the planner rendered a 142-min walk between activity #5 and the
+    // dinner anchor. UX-breaking regardless of which venue triggered it; this
+    // test proves the cap holds across persona/scoring changes.
+    //
+    // Mock setup:
+    //   - walk fetch: 142 min over 10km (the "bad" fallback we never want)
+    //   - transit fetch: returns a transit shape with NO transit steps so the
+    //     resolution layer falls into the walk-fallback branch (mirroring the
+    //     airport→hotel test pattern at line 467+).
+    mockRequestRoute.mockImplementation((request: RoutingRequest) => {
+      switch (request.mode) {
+        case "walk":
+        case "walking":
+          // 142 min ≈ 8520 s. Distance > 1km so transit lookup IS triggered.
+          return Promise.resolve({
+            ...buildRoute("walk", 8520),
+            distanceMeters: 10_000,
+          });
+        case "transit":
+          // No instruction → no transit step → hasTransitSteps === false →
+          // planner walks unless the new cap+swap intervenes.
+          return Promise.resolve(buildRoute("transit", 1200));
+        default:
+          return Promise.resolve(buildRoute(request.mode, 1400));
+      }
+    });
+
+    const itinerary = createTestItinerary();
+
+    const result = await planItinerary(itinerary, {
+      defaultDayStart: "08:00",
+      transitionBufferMinutes: 10,
+    });
+
+    const secondActivity = result.days[0]?.activities[1];
+    expect(secondActivity?.kind).toBe("place");
+    if (secondActivity?.kind === "place") {
+      const segment = secondActivity.travelFromPrevious;
+      expect(segment).toBeDefined();
+      // Cap holds: under no circumstance should the user see a 142-min walk
+      // between two stops. 45 min is the inter-stop ceiling.
+      expect(segment!.durationMinutes).toBeLessThanOrEqual(45);
+      // Mode swapped to train, flagged as estimated so the UI shows "(est.)".
+      expect(segment!.mode).toBe("train");
+      expect(segment!.isEstimated).toBe(true);
+    }
+  });
 });
 
 describe("parseEstimatedDuration", () => {
