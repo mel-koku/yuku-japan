@@ -38,6 +38,8 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   toyama:    { lat: 36.6959, lon: 137.2137 },
   // Kyushu
   fukuoka:    { lat: 33.5904, lon: 130.4017 },
+  dazaifu:    { lat: 33.5128, lon: 130.5239 },  // Dazaifu city center / Tenmangu approach
+  asakura:    { lat: 33.4234, lon: 130.6657 },  // Asakura City Hall / upper Chikugo River
   nagasaki:   { lat: 32.7503, lon: 129.8777 },
   omura:      { lat: 32.9201, lon: 129.9617 },  // Kushima Castle Park / Omura station vicinity
   kumamoto:   { lat: 32.7898, lon: 130.7417 },
