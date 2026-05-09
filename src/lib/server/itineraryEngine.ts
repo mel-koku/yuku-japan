@@ -376,6 +376,19 @@ export async function generateTripFromBuilderData(
   // personaId activates the post-scoring canonical-coverage layer (Direction 4)
   // when shape is clearly diagnostic; undefined falls through to no-op.
   const personaId = inferPersonaId(builderData);
+  // Distribution telemetry. Lets us measure how often each persona infers vs
+  // falls through to `undefined` in real traffic, so we can decide whether
+  // undefined-shape coverage needs a UI fix (explicit persona selection) or
+  // is rare enough to leave alone. Inputs are non-PII trip-shape signals.
+  logger.info("[engine:persona]", {
+    tripId,
+    personaId: personaId ?? "undefined",
+    isFirstTimeVisitor: builderData.isFirstTimeVisitor === true,
+    groupType: builderData.group?.type ?? null,
+    duration: builderData.duration ?? null,
+    cities: [...(builderData.cities ?? [])].sort(),
+    vibes: [...(builderData.vibes ?? [])].sort(),
+  });
   const rawItinerary = await timeStage(
     "generateItinerary",
     generateItinerary(builderData, {
