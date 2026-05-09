@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Trip, TripDay } from "@/types/tripDomain";
+import type { Trip, TripActivity, TripDay } from "@/types/tripDomain";
 import { fetchLocationsByCity, fetchLocationsByCategories } from "@/lib/locations/locationService";
 import { scoreLocation, type LocationScoringCriteria } from "@/lib/scoring/locationScoring";
 import { parseTimeToMinutes } from "@/lib/utils/timeUtils";
@@ -98,14 +98,14 @@ export async function refineDay(request: RefinementRequest): Promise<TripDay> {
  * Considers TravelerProfile pace preference when determining how many to remove
  */
 /**
- * Activities placed by `applyCanonicalCoverage` use ids of the form
- * `<locationId>-d<N>-canon` (see canonicalCoverage.ts). They represent
- * editor-curated brand-promise icons (Sensoji, Fushimi Inari, Kinkaku-ji,
- * etc.) and "too busy" should treat them as protected — the same first-timer
- * who clicked refine still wants to visit Kinkaku-ji.
+ * Activities placed by `applyCanonicalCoverage` carry `isCanonical: true`
+ * (see canonicalCoverage.ts; propagated through `convertItineraryToTrip`).
+ * They represent editor-curated brand-promise icons (Sensoji, Fushimi Inari,
+ * Kinkaku-ji, etc.) and "too busy" should treat them as protected — the same
+ * first-timer who clicked refine still wants to visit Kinkaku-ji.
  */
-function isCanonicalInjected(activity: { id?: string }): boolean {
-  return typeof activity.id === "string" && /-d\d+-canon$/.test(activity.id);
+function isCanonicalInjected(activity: TripActivity): boolean {
+  return activity.isCanonical === true;
 }
 
 function refineTooBusy(day: TripDay, trip: Trip): TripDay {

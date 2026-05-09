@@ -110,6 +110,7 @@ export function convertItineraryToTrip(
           endTime: activity.schedule?.departureTime,
           mealType: activity.mealType ?? (activity.tags?.includes("dining") ? "lunch" : undefined),
           isAnchor: activity.isAnchor,
+          isCanonical: activity.isCanonical,
           coordinates: activity.coordinates,
         };
       });

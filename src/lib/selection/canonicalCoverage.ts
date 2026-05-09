@@ -312,6 +312,10 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
         replacementTags.push(canonicalCategoryTag);
       }
 
+      // `isCanonical: true` is the source of truth for downstream protection
+      // (see `refineTooBusy` in refinementEngine.ts). The `-d<N>-canon` id
+      // suffix is kept stable for log/analytics greps but must not be relied
+      // on by code — flag first, suffix decorative.
       const replacement: PlaceActivity = {
         kind: "place",
         id: `${mustInclude.id}-d${target.dayIdx + 1}-canon`,
@@ -322,6 +326,7 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
         coordinates: mustInclude.coordinates,
         neighborhood: mustInclude.neighborhood,
         tags: replacementTags.length > 0 ? replacementTags : undefined,
+        isCanonical: true,
         ...(mustInclude.description && { description: mustInclude.description }),
       };
 

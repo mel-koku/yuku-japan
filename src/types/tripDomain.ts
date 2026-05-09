@@ -166,6 +166,13 @@ export type TripActivity = {
    */
   isAnchor?: boolean;
   /**
+   * True when this activity was force-included by `applyCanonicalCoverage`
+   * (editor-curated brand-promise icon). Propagated from ItineraryActivity
+   * via `convertItineraryToTrip` and read by `refineTooBusy` to protect the
+   * activity from removal.
+   */
+  isCanonical?: boolean;
+  /**
    * Embedded coordinates for activities without a database location (e.g., airports).
    */
   coordinates?: { lat: number; lng: number };

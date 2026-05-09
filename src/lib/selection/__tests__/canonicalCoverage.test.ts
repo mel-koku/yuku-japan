@@ -559,6 +559,9 @@ describe("applyCanonicalCoverage — placement by canonical's open hours", () =>
     expect(meijiActivity).toBeDefined();
     expect(meijiActivity.timeOfDay).not.toBe("evening");
     expect(["morning", "afternoon"]).toContain(meijiActivity.timeOfDay);
+    // Canonical-injected activities must carry isCanonical=true so refineTooBusy
+    // can protect them. The id suffix is decorative; the flag is the contract.
+    expect(meijiActivity.isCanonical).toBe(true);
 
     // Evening pick is preserved because we preferred the afternoon slot
     expect(

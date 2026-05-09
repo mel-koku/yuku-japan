@@ -130,15 +130,17 @@ describe("refinementEngine no-op messages", () => {
   });
 });
 
-// Regression guard for KOK-54: canonical-injected activities (id suffix
-// `-d<N>-canon`) carry editor-curated brand-promise icons. Refine "too_busy"
-// should treat them as protected, the same way it protects airport anchors.
+// Regression guard for KOK-54: canonical-injected activities carry
+// `isCanonical: true` (set by `applyCanonicalCoverage`, propagated through
+// `convertItineraryToTrip`) and represent editor-curated brand-promise icons.
+// Refine "too_busy" should treat them as protected, the same way it protects
+// airport anchors. The flag — not the id suffix — is the contract.
 describe("refinementEngine — too_busy protects canonical-injected activities", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should not remove activities whose id matches the canonical pattern", async () => {
+  it("should not remove activities flagged isCanonical", async () => {
     const trip = makeTrip({
       activities: [
         // 5 picker activities + 1 canonical injected in middle. Plain
@@ -146,7 +148,7 @@ describe("refinementEngine — too_busy protects canonical-injected activities",
         { id: "p1", locationId: "loc-p1", timeSlot: "morning", duration: 90 },
         { id: "p2", locationId: "loc-p2", timeSlot: "morning", duration: 90 },
         // Canonical injected on day index 1 (1-based: day 1)
-        { id: "meiji-jingu-shrine-kanto-3ef2fe4a-d1-canon", locationId: "meiji-jingu-shrine-kanto-3ef2fe4a", timeSlot: "afternoon", duration: 90 },
+        { id: "meiji-jingu-shrine-kanto-3ef2fe4a-d1-canon", locationId: "meiji-jingu-shrine-kanto-3ef2fe4a", timeSlot: "afternoon", duration: 90, isCanonical: true },
         { id: "p3", locationId: "loc-p3", timeSlot: "afternoon", duration: 60 },
         { id: "p4", locationId: "loc-p4", timeSlot: "evening", duration: 60 },
         { id: "p5", locationId: "loc-p5", timeSlot: "evening", duration: 60 },
@@ -166,7 +168,7 @@ describe("refinementEngine — too_busy protects canonical-injected activities",
     const trip = makeTrip({
       activities: [
         { id: "anchor-arrival-hnd", locationId: "hnd", timeSlot: "morning", duration: 60, isAnchor: true },
-        { id: "fushimi-inari-d1-canon", locationId: "fushimi-inari", timeSlot: "morning", duration: 90 },
+        { id: "fushimi-inari-d1-canon", locationId: "fushimi-inari", timeSlot: "morning", duration: 90, isCanonical: true },
         { id: "p1", locationId: "loc-p1", timeSlot: "afternoon", duration: 90 },
         { id: "p2", locationId: "loc-p2", timeSlot: "evening", duration: 60 },
       ],

@@ -210,6 +210,14 @@ export type ItineraryActivity =
       /** Fixed activity (airport arrival/departure). Cannot be deleted, replaced, or reordered. */
       isAnchor?: boolean;
       /**
+       * True when this activity was force-included by `applyCanonicalCoverage`
+       * (editor-curated brand-promise icon for the persona+city). Source of
+       * truth for downstream protection (see `refineTooBusy`); the `-canon` id
+       * suffix is decorative/debug only and may be present on rows where this
+       * flag is unset.
+       */
+      isCanonical?: boolean;
+      /**
        * True when this activity was authored by the user (not from the catalog).
        * Custom activities may have no `coordinates` and no `locationId`.
        * Enrichment fields (phone, website, costEstimate, confirmationNumber)
