@@ -24,6 +24,7 @@ import { applyLateArrivalStrip } from "@/lib/itinerary/lateArrival";
 import { applyEarlyArrivalStrip } from "@/lib/itinerary/earlyArrival";
 import { parseTimeToMinutes, formatMinutesToTime } from "@/lib/utils/timeUtils";
 import { fetchCommunityRatings } from "@/lib/ratings/communityRatings";
+import { inferPersonaId } from "@/lib/selection/personaInference";
 import type { GeneratedGuide, GeneratedBriefings } from "@/types/llmConstraints";
 import { assembleBriefing } from "@/lib/briefing/briefingAssembler";
 import { getCulturalPillars } from "@/lib/sanity/contentService";
@@ -371,7 +372,10 @@ export async function generateTripFromBuilderData(
     : undefined;
 
   // Generate itinerary using existing generator, including saved locations
-  // Pass pre-fetched locations to avoid duplicate Supabase call inside generator
+  // Pass pre-fetched locations to avoid duplicate Supabase call inside generator.
+  // personaId activates the post-scoring canonical-coverage layer (Direction 4)
+  // when shape is clearly diagnostic; undefined falls through to no-op.
+  const personaId = inferPersonaId(builderData);
   const rawItinerary = await timeStage(
     "generateItinerary",
     generateItinerary(builderData, {
@@ -379,6 +383,7 @@ export async function generateTripFromBuilderData(
       locations: allLocations,
       communityRatings,
       intentConstraints: intentResult ?? undefined,
+      personaId,
     }),
   );
   const t2 = Date.now();
