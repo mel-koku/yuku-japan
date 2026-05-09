@@ -163,9 +163,9 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     nameJapanese: "川越",
     tagline: "Edo-period storehouses on a half-day ride from Shinjuku",
     description:
-      "Kawagoe — \"Little Edo\" — preserves a working merchant streetscape of clay-walled kura warehouses along Ichibangai, most rebuilt after the 1893 fire to a deliberately conservative Edo silhouette. The Toki no Kane bell tower rings four times daily. Kashiya Yokocho (Penny Candy Alley) keeps roughly two dozen confectioners turning out hard candies and hand-roasted senbei. Kitain Temple holds the only surviving Edo Castle interior rooms, relocated here by Tokugawa Iemitsu in 1638. About 30 minutes from Ikebukuro on the Tobu Tojo line — the easiest day trip out of Tokyo for travelers who want a different century without the Kyoto airfare.",
+      "Kawagoe — \"Little Edo\" — preserves a working merchant streetscape of clay-walled kura warehouses along Ichibangai, most rebuilt after the May 1893 fire using traditional kura construction. The Toki no Kane bell tower rings four times daily — 6 a.m., noon, 3 p.m., and 6 p.m. Kashiya Yokocho (Confectionery Row) keeps roughly a dozen old-fashioned candy shops turning out hard candies and senbei, most priced under 50 yen. Kitain Temple holds rooms transferred from Edo Castle after the 1638 Kitain fire, when Tokugawa Iemitsu had part of the castle relocated here. About 30 minutes from Ikebukuro on the Tobu Tojo line — the easiest day trip out of Tokyo for travelers who want a different century without the Kyoto airfare.",
     ogDescription:
-      "Kawagoe's clay-walled Edo merchant streets, Kashiya Yokocho's century-old candy shops, and the only surviving Edo Castle interior at Kitain — Tokyo's most accessible Edo day trip.",
+      "Kawagoe's clay-walled Edo merchant streets, Kashiya Yokocho's century-old candy shops, and the Edo Castle rooms transferred to Kitain Temple — Tokyo's most accessible Edo day trip.",
   },
   narita: {
     id: "narita",
@@ -173,9 +173,9 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     nameJapanese: "成田",
     tagline: "A 940-year-old Shingon temple two stops from the runway",
     description:
-      "Most travelers see Narita as a runway, not a town — but the Naritasan Shinshoji approach is one of the better airport-adjacent half-days in Japan. The Shingon-Buddhist temple was founded in 940 to enshrine a Fudo Myo-o image attributed to Kobo Daishi; the Daihondo (Great Main Hall) and three-story Komyodo see a steady current of pilgrims. The Omotesando approach runs uphill from Narita Station with about a kilometer of unagi specialists, sweet shops, and tsukudani makers — Kawatoyo Honten is the most-photographed eel restaurant. Naritasan Park behind the main hall is laid out around three ponds with a tea pavilion. A useful first-day or last-day stop that doesn't cost a Tokyo evening.",
+      "Most travelers see Narita as a runway, not a town — but the Naritasan Shinshoji approach is one of the better airport-adjacent half-days in Japan. The Shingon-Buddhist temple was founded in 940 by Kanchō Daisōjō, a disciple of Kōbō Daishi, around a Fudo Myo-o image. Among its Important Cultural Properties: the Kōmyō-dō (1701, dedicated to Dainichi Nyorai), the three-storied 25-meter pagoda (1712), and the Niōmon main gate (1830). The Omotesando approach runs uphill from Narita Station with about a kilometer of unagi specialists, sweet shops, and tsukudani makers. Naritasan Park behind the main hall is laid out around three ponds. A useful first-day or last-day stop that doesn't cost a Tokyo evening.",
     ogDescription:
-      "Naritasan Shinshoji's 940-year-old Fudo Myo-o, the Omotesando unagi street, and Naritasan Park — the half-day worth doing on either end of a Tokyo flight.",
+      "Naritasan Shinshoji's 940-year-old Fudo Myo-o, the Omotesando unagi street, and a 1712 three-storied pagoda — the half-day worth doing on either end of a Tokyo flight.",
   },
   chichibu: {
     id: "chichibu",
@@ -183,9 +183,9 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     nameJapanese: "秩父",
     tagline: "Saitama's mountain basin of shrines, gorges, and seasonal flowers",
     description:
-      "Chichibu sits in a mountain basin two hours northwest of Ikebukuro on the Seibu Red Arrow. The 1,300-year Chichibu Shrine anchors the old town. The Nagatoro River Gorge runs ten kilometers of class-2 rapids with traditional flat-bottomed boats from April through November, and Iwadatami's striated rock terraces appear at low water. Hitsujiyama Park's shibazakura (moss phlox) carpet covers 17,600 square meters in mid-April through early May; Hodosan Shrine's autumn leaves peak in mid-November. Reachable as a long day trip but better as one overnight — most ryokan are along the Arakawa River with riverside open-air baths.",
+      "Chichibu sits in a mountain basin about two hours northwest of Ikebukuro on the Seibu Red Arrow. Chichibu Shrine anchors the old town — the city's earlier name, Ōmiya, came from it. The Nagatoro River Gorge on the upper Arakawa is known for rapids and traditional flat-bottomed boat rides from spring through autumn, and Iwadatami's striated rock terraces appear at low water. Hitsujiyama Park's shibazakura (moss phlox) carpet typically peaks mid-April through early May; Hodosan Shrine's autumn leaves peak in mid-November. Reachable as a long day trip but better as one overnight — most ryokan are along the Arakawa with riverside open-air baths.",
     ogDescription:
-      "Chichibu's 1,300-year shrine, the Nagatoro gorge boat ride, Hitsujiyama's shibazakura carpet, and a riverside ryokan night — the rural day trip Saitama actually delivers.",
+      "Chichibu Shrine's old town, the Nagatoro gorge boat ride on the Arakawa, Hitsujiyama's shibazakura carpet, and a riverside ryokan night — the rural day trip Saitama actually delivers.",
   },
 
   // --- Chubu ---
