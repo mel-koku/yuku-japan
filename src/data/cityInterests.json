@@ -498,6 +498,18 @@
       "culture": 2,
       "food": 1,
       "nature": 1
+    },
+    "dazaifu": {
+      "history": 4,
+      "culture": 3,
+      "nature": 1,
+      "food": 1
+    },
+    "asakura": {
+      "history": 2,
+      "wellness": 1,
+      "nature": 1,
+      "culture": 1
     }
   },
   "metadata": {
@@ -971,6 +983,22 @@
       "coordinates": {
         "lat": 37.447,
         "lng": 138.8482
+      }
+    },
+    "dazaifu": {
+      "locationCount": 6,
+      "region": "Kyushu",
+      "coordinates": {
+        "lat": 33.5128,
+        "lng": 130.5239
+      }
+    },
+    "asakura": {
+      "locationCount": 3,
+      "region": "Kyushu",
+      "coordinates": {
+        "lat": 33.4234,
+        "lng": 130.6657
       }
     }
   },
@@ -1710,9 +1738,7 @@
     ],
     "amami": ["Kitadaitō", "Minamidaito", "Okinoerabujima", "Tokunoshima"],
     "fukuoka": [
-      "Asakura",
       "Bungo-Ono",
-      "Dazaifu",
       "Fukutsu",
       "Genkai",
       "Hita",
@@ -1867,6 +1893,8 @@
     "omura": [],
     "nasushiobara": [],
     "hakusan": [],
-    "nagaoka": []
+    "nagaoka": [],
+    "dazaifu": [],
+    "asakura": []
   }
 }

@@ -43,7 +43,7 @@ export type KnownCityId =
   | "kyoto" | "osaka" | "nara" | "kobe" | "otsu" | "himeji" | "wakayama"  // Kansai
   | "tokyo" | "yokohama" | "kamakura" | "nikko" | "nasushiobara" | "hakone" | "kawaguchiko"  // Kanto
   | "nagoya" | "kanazawa" | "hakusan" | "takayama" | "nagano" | "niigata" | "nagaoka" | "ise" | "toyama"  // Chubu
-  | "fukuoka" | "nagasaki" | "omura" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"
+  | "fukuoka" | "dazaifu" | "asakura" | "nagasaki" | "omura" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"
   | "arita" | "imari" | "kurokawa" | "takachiho"  // Kyushu
   | "sapporo" | "hakodate" | "asahikawa" | "kushiro" | "abashiri" | "wakkanai"
   | "toyako" | "noboribetsu" | "furano" | "shiretoko" | "niseko"  // Hokkaido

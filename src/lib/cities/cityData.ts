@@ -262,6 +262,26 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Discover Fukuoka's yatai street food, legendary ramen, and relaxed coastal lifestyle. Japan's most livable city awaits.",
   },
+  dazaifu: {
+    id: "dazaifu",
+    name: "Dazaifu",
+    nameJapanese: "太宰府",
+    tagline: "Seat of ancient Kyushu and Sugawara no Michizane's grave",
+    description:
+      "Dazaifu was the Yamato government's administrative seat for all of Kyushu in the seventh and eighth centuries, and the town today radiates from Dazaifu Tenmangu — built over the grave of the ninth-century scholar Sugawara no Michizane and ranked alongside Kyoto's Kitano Tenmangu among the country's principal Tenmangu shrines. The shrine's main hall is under major renovation through 2026, with worship redirected to a temporary offering hall on the grounds. From the torii, a short detour right leads to Komyozenji, a 1283 Rinzai Zen temple whose 1957 Mirei Shigemori karesansui garden is one of Kyushu's quieter pleasures. The Kyushu National Museum, Kiyonori Kikutake's 2005 building, sits a covered escalator ride uphill.",
+    ogDescription:
+      "Visit Dazaifu Tenmangu, Komyozenji's Mirei Shigemori karesansui garden, and the Kyushu National Museum — Kyushu's old administrative seat, less than an hour from Fukuoka.",
+  },
+  asakura: {
+    id: "asakura",
+    name: "Asakura",
+    nameJapanese: "朝倉",
+    tagline: "Castle-town wisteria and a 110-year onsen on the Chikugo",
+    description:
+      "Asakura sits about 40 km southeast of Fukuoka, draped over the upper Chikugo River. Akizuki Castle Town — sometimes called the Little Kyoto of Chikuzen — preserves a samurai street pattern around the Kamakura-era castle ruins, with cherry trees in spring and maples in autumn. Harazuru Onsen, on the riverbank since the Meiji era, runs alkaline and sulfur baths side by side at fourteen ryokan. The 100-year-old wisteria at Kamitakaba blooms over a 420-square-meter trellis each May. Pace and quiet are the draws here, not headline sights.",
+    ogDescription:
+      "Walk Akizuki's castle-town samurai streets, soak at the Meiji-era Harazuru Onsen, and time a May visit for Kamitakaba's century-old wisteria — Asakura is Fukuoka's quieter inland base.",
+  },
   nagasaki: {
     id: "nagasaki",
     name: "Nagasaki",
