@@ -950,17 +950,29 @@ async function planItineraryDay(
       if (!arrivalToHotelResolved) return;
       const { route, travelMode } = arrivalToHotelResolved;
 
-      // Bail when the resolution layer fell back to a long-distance walk
-      // because transit lookup failed (NAVITIME returned no transit steps for
-      // the synthetic airport→hotel pair — see resolution branch around the
-      // `hasTransitSteps` check). For a 30–70km airport→hotel, that walk is
-      // 6–14h, and materializing it as a real segment advances the cursor
-      // past midnight, wrapping every subsequent activity's arrivalTime via
-      // formatTime's modulo. Dropping the segment falls back to the existing
-      // prevCoords→hotel jump (still wired in the routing-pair loop), so
-      // next-stop routing is unaffected; we just don't visualize the
-      // airport→hotel transition for this trip. Genuinely walkable airport
-      // hotels (≤30min walk, ~2.5km) still render.
+      // Drop unrealistic walk fallbacks for the synthetic airport→hotel pair.
+      //
+      // Post-#208 this is narrow-band cleanup: the inter-stop cap
+      // (MAX_INTER_STOP_WALK_FALLBACK_MIN = 45 in the resolution loop around
+      // line 702) already swaps any walk fallback > 45min to a heuristic
+      // transit estimate upstream — including the airport→hotel pair, which
+      // shares that loop. So `travelMode === "walk"` only reaches here for
+      // routes ≤ 45min. The 31–45min sub-band is the only place this guard
+      // can still fire; we drop those rather than render them because a
+      // ~31–45min "walk" from an airport synthesized by the heuristic-walk
+      // fallback (4.5 km/h × distance) is usually a misclassified transit
+      // segment, not a genuine walkable hotel. The guard preserves the
+      // conservative "show nothing" UX: dropping the segment falls back to
+      // the existing prevCoords→hotel jump in the routing-pair loop, so
+      // next-stop routing is unaffected. Genuinely walkable airport hotels
+      // (≤30min walk, ~2.5km) still render.
+      //
+      // Verified 2026-05-10: the existing airport→hotel regression tests all
+      // pass with this `if` block bypassed (the cap path catches them first),
+      // so this branch is reachable only in the 31–45min sub-band — there is
+      // no test fixture exercising that band today. If you're touching this,
+      // consider adding one OR consolidating both thresholds into a single
+      // per-pair-type table in the resolution loop.
       const segmentDurationMin = Math.max(1, Math.round(route.durationSeconds / 60));
       const MAX_AIRPORT_HOTEL_WALK_MIN = 30;
       if (travelMode === "walk" && segmentDurationMin > MAX_AIRPORT_HOTEL_WALK_MIN) {
