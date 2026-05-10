@@ -480,6 +480,70 @@ describe("applyCanonicalCoverage", () => {
     expect(titles).toContain("Filler 2");
   });
 
+  it("does not evict an organically-picked canonical to make room for another canonical", () => {
+    // Regression guard: Itsukushima Jinja (canonical, picker-organic) was
+    // evicted by Pass 2 to make room for Hiroshima Castle (canonical,
+    // not-yet-injected) on the same day — net zero canonicals, since we
+    // dropped one to gain one. Sim 2026-05-10 reproduced this 3-4/30 runs
+    // before the fix; 0/30 after. Pass 2 must skip organic-canonical
+    // activities for the active persona+city when picking swap-out targets.
+    const itsukushima = makeLocation({
+      id: "itsukushima-jinja",
+      name: "Itsukushima Jinja",
+      city: "Hatsukaichi",
+      planningCity: "hiroshima",
+      category: "shrine",
+      canonicalForPersonas: ["first-timer"],
+    });
+    const hiroshimaCastle = makeLocation({
+      id: "hiroshima-castle",
+      name: "Hiroshima Castle",
+      city: "Hiroshima",
+      planningCity: "hiroshima",
+      category: "landmark",
+      canonicalForPersonas: ["first-timer"],
+    });
+    const filler = makeLocation({
+      id: "filler",
+      name: "Filler Cafe",
+      city: "Hiroshima",
+      planningCity: "hiroshima",
+      category: "cafe",
+    });
+
+    // Picker organically placed Itsukushima last (lowest-priority slot),
+    // with a filler in the middle. Hiroshima Castle is canonical but
+    // wasn't picked organically — it must land via Pass 2 swap-in.
+    const itinerary = makeItinerary([
+      {
+        id: "day-1",
+        cityId: "hiroshima",
+        activities: [
+          makePlace("anchor", "Hotel"),
+          makePlace(filler.id, filler.name, { timeOfDay: "afternoon" }),
+          makePlace(itsukushima.id, itsukushima.name, { timeOfDay: "afternoon" }),
+        ],
+      },
+    ]);
+
+    const result = applyCanonicalCoverage({
+      itinerary,
+      personaId: "first-timer",
+      allLocations: [itsukushima, hiroshimaCastle, filler],
+      perCityCap: 6,
+    });
+
+    const titles = result.days[0]!.activities.map((a) =>
+      a.kind === "place" ? a.title : "",
+    );
+    // Both canonicals must remain — Castle injected, Itsukushima preserved.
+    expect(titles).toContain("Hiroshima Castle");
+    expect(titles).toContain("Itsukushima Jinja");
+    // Filler was the only non-canonical swappable, so it should be the one
+    // evicted to make room for Hiroshima Castle.
+    expect(titles).not.toContain("Filler Cafe");
+  });
+
   it("returns the original itinerary reference unchanged when no canonical fires", () => {
     const itinerary = makeItinerary([
       {
