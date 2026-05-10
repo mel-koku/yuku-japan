@@ -83,6 +83,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Explore Wakayama's Kumano Kodo pilgrimage, Koyasan monasteries, and Shirahama coastal onsen. Southern Kansai's spiritual heartland.",
   },
+  iga: {
+    id: "iga",
+    name: "Iga",
+    nameJapanese: "伊賀",
+    tagline: "Ninja country and Bashō's birthplace, an hour-and-a-half from Osaka or Nagoya",
+    description:
+      "Iga Ueno is the home of the Iga-ryū school of ninjutsu and the birthplace of haiku master Matsuo Bashō, born here in 1644. Iga Ueno Castle — also called Hakuhō (White Phoenix) Castle — was rebuilt by Tōdō Takatora after 1611 with stone ramparts ~30 meters high, among the tallest of any Japanese castle, and has been a National Historic Site since 1967. Immediately alongside sits the Iga-ryū Ninja Museum, with a working ninja trick house, a weapons exhibit, and live demonstrations. Within Ueno Park, the Bashō Memorial Museum and the hat-shaped Haiseiden Hall (built for the 300th anniversary of Bashō's birth) collect scrolls and travel maps; Bashō's birth house stands a kilometer east. Aizen-in (Henkōzan Ganjōji), the Matsuo family temple, holds the Kokyōzuka mound where the poet's hair is buried. Reachable in about 90 minutes from Osaka or Nagoya on the Kintetsu line.",
+    ogDescription:
+      "Iga Ueno's ninja museum, Iga Ueno Castle's record stone walls, the Bashō Memorial Museum and birth house, and Aizen-in's Kokyōzuka — Mie's ninja-and-haiku heartland.",
+  },
 
   // --- Kanto ---
   tokyo: {

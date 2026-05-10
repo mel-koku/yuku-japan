@@ -527,6 +527,12 @@
       "culture": 1,
       "history": 1,
       "craft": 1
+    },
+    "iga": {
+      "history": 4,
+      "culture": 3,
+      "craft": 2,
+      "food": 1
     }
   },
   "metadata": {
@@ -1041,6 +1047,14 @@
         "lat": 35.9919,
         "lng": 139.0855
       }
+    },
+    "iga": {
+      "locationCount": 7,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 34.7689,
+        "lng": 136.1335
+      }
     }
   },
   "childCities": {
@@ -1449,7 +1463,6 @@
       "Aisho",
       "Higashiomi",
       "Hikone",
-      "Iga",
       "Kameyama",
       "Koka",
       "Mihama",
@@ -1466,7 +1479,6 @@
       "Gose",
       "Hashimoto",
       "Heguri",
-      "Iga",
       "Ikaruga",
       "Ikoma",
       "Kasagi",
@@ -1474,7 +1486,6 @@
       "Kashihara",
       "Katano",
       "Katsuragi",
-      "Nabari",
       "Sakurai",
       "Takatori",
       "Tenkawa",
@@ -1931,6 +1942,7 @@
     "asakura": [],
     "kawagoe": [],
     "narita": ["Sakae"],
-    "chichibu": ["Hanno", "Hidaka", "Nagatoro", "Ogawa"]
+    "chichibu": ["Hanno", "Hidaka", "Nagatoro", "Ogawa"],
+    "iga": ["Nabari"]
   }
 }
