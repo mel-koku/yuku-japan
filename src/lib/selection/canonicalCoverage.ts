@@ -171,6 +171,23 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
   const injectedIds = new Set<string>();
 
   for (const [cityId, dayIndices] of dayIndicesByCity) {
+    // Pass 2 swap-OUT protection: any canonical for this persona+city the
+    // picker placed organically must not be evicted by a later canonical's
+    // swap-target search. Symptom this guards against: Itsukushima Jinja
+    // picker-placed in latest within-day index, then Pass 2a evicts it to
+    // make room for Hiroshima Castle (also canonical, no organic placement).
+    // Net 0 canonicals — we lost one to gain one.
+    //
+    // Pass 1 (name-collision) intentionally still allowed to overwrite an
+    // organic canonical: that path eliminates orphan-duplicate rows where
+    // the picker chose a corpus-dup of the canonical we're injecting.
+    const protectedCanonicalIds = new Set<string>();
+    for (const loc of allLocations) {
+      if (!loc.canonicalForPersonas?.includes(personaId)) continue;
+      if (locationCityKey(loc) !== cityId) continue;
+      if (usedIds.has(loc.id)) protectedCanonicalIds.add(loc.id);
+    }
+
     // Resolve must-includes: canonical for this persona, in this city,
     // not already in the itinerary.
     const candidates = allLocations.filter((loc) => {
@@ -253,6 +270,7 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
               if (!activity || activity.kind !== "place") continue;
               if (!isSwappable(activity)) continue;
               if (activity.locationId && injectedIds.has(activity.locationId)) continue;
+              if (activity.locationId && protectedCanonicalIds.has(activity.locationId)) continue;
               if (!openBuckets.has(activity.timeOfDay as TimeOfDay)) continue;
               if (i > targetWithinDayIdx) {
                 target = { dayIdx, activityIdx: i };
@@ -273,6 +291,7 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
               if (!activity || activity.kind !== "place") continue;
               if (!isSwappable(activity)) continue;
               if (activity.locationId && injectedIds.has(activity.locationId)) continue;
+              if (activity.locationId && protectedCanonicalIds.has(activity.locationId)) continue;
               if (i > targetWithinDayIdx) {
                 target = { dayIdx, activityIdx: i };
                 targetWithinDayIdx = i;
