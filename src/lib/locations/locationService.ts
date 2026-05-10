@@ -598,10 +598,13 @@ export async function fetchAllLocations(
     .order("name", { ascending: true });
 
   if (cities && cities.length > 0) {
-    // Use planning_city (coordinate-snapped KnownCityId) for planner queries,
-    // with fallback to city field for locations without planning_city
+    // Strict planner picker: planning_city is authoritative when set;
+    // city.ilike only fires for rows where planning_city IS NULL (legacy bridge,
+    // ~35 rows corpus-wide as of 2026-05-10). Surface divergence: city pages
+    // (fetchLocationsByCity / fetchCityHeroPhotoUrl) intentionally keep the
+    // wider OR-fallback for browse breadth + PR #195 diacritic resolution.
     const planningFilters = cities.map((c) => `planning_city.eq.${c.toLowerCase()}`).join(",");
-    const cityFilters = cities.map((c) => `city.ilike.${c}`).join(",");
+    const cityFilters = cities.map((c) => `and(planning_city.is.null,city.ilike.${c})`).join(",");
     baseQuery = baseQuery.or(`${planningFilters},${cityFilters}`);
   }
 
@@ -633,8 +636,9 @@ export async function fetchAllLocations(
             .order("name", { ascending: true });
 
           if (cities && cities.length > 0) {
+            // Strict planner picker; matches the rule applied above on the first page.
             const planningFilters = cities.map((c) => `planning_city.eq.${c.toLowerCase()}`).join(",");
-            const cityFilters = cities.map((c) => `city.ilike.${c}`).join(",");
+            const cityFilters = cities.map((c) => `and(planning_city.is.null,city.ilike.${c})`).join(",");
             query = query.or(`${planningFilters},${cityFilters}`);
           }
 

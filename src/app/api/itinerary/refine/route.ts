@@ -71,9 +71,14 @@ const VALID_REFINEMENT_TYPES: RefinementType[] = [
 /**
  * Fetches locations from Supabase database, optionally filtered by cities.
  *
+ * Exported (rather than file-local) so the OR-fallback strict-clause shape
+ * can be guarded by `__tests__/refineFetchAllLocationsStrict.test.ts`. The
+ * Next.js router only treats HTTP-verb exports as handlers; named exports
+ * like this one are ignored by the routing layer.
+ *
  * @param cities - Optional array of city names to filter by (reduces memory usage)
  */
-async function fetchAllLocations(cities?: string[]): Promise<Location[]> {
+export async function fetchAllLocations(cities?: string[]): Promise<Location[]> {
   const supabase = await createClient();
   const pageSize = 1000; // Larger pages = fewer round trips
 
@@ -86,8 +91,15 @@ async function fetchAllLocations(cities?: string[]): Promise<Location[]> {
       .order("name", { ascending: true });
 
     if (cities && cities.length > 0) {
-      const cityFilters = cities.map((c) => `city.ilike.${escapePostgrestValue(c)}`).join(",");
-      query = query.or(cityFilters);
+      // Strict planner picker (mirrors locationService.fetchAllLocations as of 2026-05-10):
+      // planning_city is authoritative; city.ilike only fires for planning_city IS NULL rows.
+      const planningFilters = cities
+        .map((c) => `planning_city.eq.${escapePostgrestValue(c.toLowerCase())}`)
+        .join(",");
+      const cityFilters = cities
+        .map((c) => `and(planning_city.is.null,city.ilike.${escapePostgrestValue(c)})`)
+        .join(",");
+      query = query.or(`${planningFilters},${cityFilters}`);
     }
     return query;
   };
