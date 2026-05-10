@@ -94,12 +94,13 @@ export type GenerateItineraryOptions = {
 
 /**
  * UI/UX ceiling on force-includes per city. First-timer brand-promise needs
- * 3-5 canonical icons per major city; honeymooner medium; repeat-traveler
- * disabled by default (their algorithm output is already editorially sound).
- * Family persona deferred. Unrecognized persona = 0 = no force-include.
+ * 3-6 canonical icons per major city (Hiroshima has 6 essentials post
+ * parent-dedup); honeymooner medium; repeat-traveler disabled by default
+ * (their algorithm output is already editorially sound). Family persona
+ * deferred. Unrecognized persona = 0 = no force-include.
  */
 const DEFAULT_PER_CITY_CAP_BY_PERSONA: Record<string, number> = {
-  "first-timer": 5,
+  "first-timer": 6,
   honeymooner: 3,
   repeat: 0,
   family: 0,
