@@ -118,10 +118,12 @@ describe("canonical_for_personas — generateItinerary call-site contract", () =
       expect.objectContaining({
         personaId: "first-timer",
         // DEFAULT_PER_CITY_CAP_BY_PERSONA["first-timer"] is the load-bearing
-        // editorial decision — 5 first-timer canonicals per major city.
-        // If a future PR drops the cap to 0 (which would silently disable
-        // force-include for all first-timer trips), this assertion fails.
-        perCityCap: 5,
+        // editorial decision — 6 first-timer canonicals per major city
+        // (raised from 5 in PR #209 to fire Hiroshima Shukkeien post
+        // parent-dedup). If a future PR drops the cap to 0 (which would
+        // silently disable force-include for all first-timer trips), this
+        // assertion fails.
+        perCityCap: 6,
       }),
     );
   });
