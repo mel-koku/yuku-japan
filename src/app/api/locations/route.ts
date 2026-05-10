@@ -42,7 +42,9 @@ export const GET = withApiHandler(
     const search = searchParams.get("search");
     const featured = searchParams.get("featured");
     const city = searchParams.get("city");
-    // Match fetchAllLocations: prefer planning_city, fall back to city.
+    // /places browse: keeps the wider OR-fallback (planning_city OR city.ilike).
+    // Diverges from fetchAllLocations (planner picker) which is strict on
+    // planning_city — the planner's leakage was harm; browse breadth is desired UX.
     const cityFilter = city
       ? `planning_city.eq.${city.toLowerCase()},city.ilike.${city}`
       : null;
