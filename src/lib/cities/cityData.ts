@@ -103,6 +103,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Two UNESCO World Heritage sites, the oldest tea shop in Japan (1160), and Ōbaku Zen's Chinese-Ming-style Manpuku-ji — half a day from Kyoto Station.",
   },
+  kurama: {
+    id: "kurama",
+    name: "Kurama",
+    nameJapanese: "鞍馬",
+    tagline: "A mountain temple, a water shrine, and Kyoto's summer riverside-dining valley",
+    description:
+      "The Kurama-Kibune valley climbs into the cedars north of Kyoto, half an hour from Demachiyanagi on the Eizan Railway. Kurama-dera was founded in 770 and enshrines the Sonten trinity — Bishamonten, Senju Kannon, and Mao-son. A 30-minute mountain trail crosses the ridge from Kurama-dera to Kifune Shrine, the head shrine of Japan's roughly 450 Kifune shrines, dedicated to the rain-and-water deity Takaokami-no-Kami. From June through September, Kibune's restaurants build kawadoko platforms directly over the river, dining tables suspended above the running water — the original Kyoto summer escape, with the river replacing air conditioning. Yuki-jinja, moved to Kurama in 940 to guard the northern approach to the capital, hosts the Kurama Fire Festival every October 22. The valley reads as one extended overnight: most of the kawadoko ryokan offer dinner-on-the-river plus tatami rooms.",
+    ogDescription:
+      "Kurama-dera's mountain temple, Kifune Shrine's water deity, and Kibune's kawadoko platforms over the river — the cedar valley north of Kyoto where Kyoto goes to escape the summer.",
+  },
 
   // --- Kanto ---
   tokyo: {

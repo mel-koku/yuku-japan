@@ -545,6 +545,12 @@
       "culture": 3,
       "nature": 3,
       "food": 1
+    },
+    "kurama": {
+      "culture": 4,
+      "history": 2,
+      "nature": 1,
+      "wellness": 1
     }
   },
   "metadata": {
@@ -1082,6 +1088,14 @@
       "coordinates": {
         "lat": 35.4956,
         "lng": 135.7424
+      }
+    },
+    "kurama": {
+      "locationCount": 7,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 35.1194,
+        "lng": 135.7672
       }
     }
   },
@@ -1884,7 +1898,6 @@
       "Ine",
       "Kameoka",
       "Keihoku",
-      "Kibune",
       "Kora",
       "Maizuru",
       "Miyazu",
@@ -1968,6 +1981,7 @@
     "chichibu": ["Hanno", "Hidaka", "Nagatoro", "Ogawa"],
     "iga": ["Nabari"],
     "uji": [],
-    "obama": ["Mikatakaminaka", "Oi"]
+    "obama": ["Mikatakaminaka", "Oi"],
+    "kurama": []
   }
 }
