@@ -10,23 +10,37 @@ const PlacesShell = dynamic(
     ssr: false,
     loading: () => (
       <div className="min-h-[100dvh] bg-background">
-        <div className="flex flex-col items-center justify-center py-24 px-6">
-          <p className="font-serif text-2xl sm:text-3xl text-foreground text-center">
-            Places in Japan
+        <section
+          aria-busy="true"
+          aria-live="polite"
+          className="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12"
+        >
+          <p className="text-center text-sm text-foreground-secondary">
+            Loading places&hellip;
           </p>
-          <p className="mt-3 text-sm text-stone">Finding places\u2026</p>
-        </div>
-        <div className="px-4">
-          <div className="h-10 w-full rounded shimmer mb-4" />
-          <div className="flex flex-col lg:flex-row lg:gap-4">
-            <div className="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="aspect-[4/3] rounded-lg shimmer" />
-              ))}
-            </div>
-            <div className="hidden lg:block lg:w-1/2 h-[calc(100dvh-176px)] rounded-lg shimmer" />
+          {/* City tiles skeleton — mirrors PlacesIntro grid */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-[4/5] rounded-lg shimmer" />
+            ))}
           </div>
-        </div>
+          {/* Lane skeletons — mirrors PlacesLanes horizontal rows */}
+          {Array.from({ length: 2 }).map((_, laneIdx) => (
+            <div key={laneIdx} className="space-y-4">
+              <div className="h-5 w-48 rounded shimmer" />
+              <div className="-mx-4 overflow-hidden px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                <div className="flex gap-3 sm:gap-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="aspect-[4/5] w-44 shrink-0 rounded-lg shimmer sm:w-56"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
       </div>
     ),
   }
