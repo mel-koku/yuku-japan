@@ -533,6 +533,18 @@
       "culture": 3,
       "craft": 2,
       "food": 1
+    },
+    "uji": {
+      "culture": 4,
+      "history": 3,
+      "craft": 2,
+      "food": 1
+    },
+    "obama": {
+      "history": 5,
+      "culture": 3,
+      "nature": 3,
+      "food": 1
     }
   },
   "metadata": {
@@ -1055,6 +1067,22 @@
         "lat": 34.7689,
         "lng": 136.1335
       }
+    },
+    "uji": {
+      "locationCount": 10,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 34.8841,
+        "lng": 135.7991
+      }
+    },
+    "obama": {
+      "locationCount": 12,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 35.4956,
+        "lng": 135.7424
+      }
     }
   },
   "childCities": {
@@ -1471,7 +1499,6 @@
       "Omihachiman",
       "Takashima",
       "Tsuruga",
-      "Uji",
       "Wakasa"
     ],
     "nara": [
@@ -1860,12 +1887,8 @@
       "Kibune",
       "Kora",
       "Maizuru",
-      "Mikatakaminaka",
       "Miyazu",
       "Nantan",
-      "Obama",
-      "Oi",
-      "Uji",
       "Wakasa"
     ],
     "ishigaki": ["Iriomote", "Taketomi", "Yaeyama", "Yonaguni"],
@@ -1943,6 +1966,8 @@
     "kawagoe": [],
     "narita": ["Sakae"],
     "chichibu": ["Hanno", "Hidaka", "Nagatoro", "Ogawa"],
-    "iga": ["Nabari"]
+    "iga": ["Nabari"],
+    "uji": [],
+    "obama": ["Mikatakaminaka", "Oi"]
   }
 }

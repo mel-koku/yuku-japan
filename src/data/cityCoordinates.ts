@@ -19,6 +19,7 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   himeji:     { lat: 34.8151, lon: 134.6854 },
   wakayama:   { lat: 34.2261, lon: 135.1675 },
   iga:        { lat: 34.7689, lon: 136.1335 },  // Iga-Ueno Station / castle approach
+  uji:        { lat: 34.8841, lon: 135.7991 },  // Uji Station / Byōdōin approach
   // Kanto
   tokyo:        { lat: 35.6762, lon: 139.6503 },
   yokohama:     { lat: 35.4437, lon: 139.6380 },
@@ -40,6 +41,7 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   nagaoka:   { lat: 37.4470, lon: 138.8482 },  // Nagaoka station
   ise:       { lat: 34.4875, lon: 136.7090 },
   toyama:    { lat: 36.6959, lon: 137.2137 },
+  obama:     { lat: 35.4956, lon: 135.7424 },  // Obama old-town preservation district / Saba Kaido terminus
   // Kyushu
   fukuoka:    { lat: 33.5904, lon: 130.4017 },
   dazaifu:    { lat: 33.5128, lon: 130.5239 },  // Dazaifu city center / Tenmangu approach
