@@ -18,6 +18,7 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   otsu:       { lat: 35.0045, lon: 135.8686 },
   himeji:     { lat: 34.8151, lon: 134.6854 },
   wakayama:   { lat: 34.2261, lon: 135.1675 },
+  iga:        { lat: 34.7689, lon: 136.1335 },  // Iga-Ueno Station / castle approach
   // Kanto
   tokyo:        { lat: 35.6762, lon: 139.6503 },
   yokohama:     { lat: 35.4437, lon: 139.6380 },
