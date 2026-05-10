@@ -36,9 +36,6 @@ type FilterPanelProps = {
   durationOptions: readonly { value: string; label: string }[];
   selectedDuration: string | null;
   onDurationChange: (duration: string | null) => void;
-  // Open Now filter
-  openNow: boolean;
-  onOpenNowChange: (value: boolean) => void;
   // Accessibility filter
   wheelchairAccessible: boolean;
   onWheelchairAccessibleChange: (value: boolean) => void;
@@ -91,8 +88,6 @@ export function FilterPanel({
   durationOptions,
   selectedDuration,
   onDurationChange,
-  openNow,
-  onOpenNowChange: _onOpenNowChange,
   wheelchairAccessible,
   onWheelchairAccessibleChange,
   vegetarianFriendly,
@@ -187,7 +182,6 @@ export function FilterPanel({
     selectedVibes.length > 0 ||
     selectedPriceLevel !== null ||
     selectedDuration ||
-    openNow ||
     wheelchairAccessible ||
     vegetarianFriendly ||
     featuredOnly ||

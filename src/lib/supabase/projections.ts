@@ -150,15 +150,16 @@ export const LOCATION_LISTING_COLUMNS = `
 /**
  * Slimmed projection for the places /api/locations/all endpoint.
  *
- * Carries the lanes/grid/card render set + the three live filter
- * predicates whose checkboxes are exposed in `FilterPanel`
- * (open-now → operating_hours, wheelchair → accessibility_options,
- * vegetarian → dietary_options). Drawer/detail full record arrives
- * separately via `/api/locations/[id]` (LOCATION_DETAIL_COLUMNS), so
- * fields used only there (meal_options, service_options, reservation_info,
- * payment_types, cash_only, dietary_flags, insider_tip, name_japanese,
- * nearest_station, good_for_children, good_for_groups) are intentionally
- * absent from this listing payload.
+ * Carries the lanes/grid/card render set + the two live filter predicates
+ * whose checkboxes are exposed in `FilterPanel` (wheelchair →
+ * accessibility_options, vegetarian → dietary_options). Drawer/detail full
+ * record arrives separately via `/api/locations/[id]`
+ * (LOCATION_DETAIL_COLUMNS), so fields used only there (operating_hours,
+ * meal_options, service_options, reservation_info, payment_types, cash_only,
+ * dietary_flags, insider_tip, name_japanese, nearest_station,
+ * good_for_children, good_for_groups) are intentionally absent from this
+ * listing payload. Itinerary "Open Now" continues to work via
+ * `/api/locations/nearby` (LOCATION_NEARBY_COLUMNS).
  */
 export const LOCATION_EXPLORE_COLUMNS = `
   id,
@@ -180,7 +181,6 @@ export const LOCATION_EXPLORE_COLUMNS = `
   dietary_options,
   is_hidden_gem,
   is_featured,
-  operating_hours,
   tags,
   cuisine_type,
   craft_type,
@@ -374,7 +374,6 @@ export type LocationExploreDbRow = Pick<LocationDbRow,
   | "dietary_options"
   | "is_hidden_gem"
   | "is_featured"
-  | "operating_hours"
   | "tags"
   | "cuisine_type"
   | "craft_type"
