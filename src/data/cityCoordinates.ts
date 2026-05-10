@@ -21,6 +21,10 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   iga:        { lat: 34.7689, lon: 136.1335 },  // Iga-Ueno Station / castle approach
   uji:        { lat: 34.8841, lon: 135.7991 },  // Uji Station / Byōdōin approach
   kurama:     { lat: 35.1194, lon: 135.7672 },  // Kurama-Kibune valley / midway between Kurama-dera and Kifune Shrine
+  amanohashidate: { lat: 35.5698, lon: 135.1918 },  // Amanohashidate sandbar / Monju gateway (Miyazu City)
+  ine:            { lat: 35.6757, lon: 135.2875 },  // Ine no Funaya boathouse cluster (Yosa District)
+  maizuru:        { lat: 35.4747, lon: 135.3854 },  // Maizuru Brick Park / Higashi-Maizuru harbor
+  miyama:         { lat: 35.3105, lon: 135.6216 },  // Miyama Kayabuki no Sato (Kita village, Nantan City)
   // Kanto
   tokyo:        { lat: 35.6762, lon: 139.6503 },
   yokohama:     { lat: 35.4437, lon: 139.6380 },
