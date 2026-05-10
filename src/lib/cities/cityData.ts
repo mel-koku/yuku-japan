@@ -93,6 +93,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Iga Ueno's ninja museum, Iga Ueno Castle's record stone walls, the Bashō Memorial Museum and birth house, and Aizen-in's Kokyōzuka — Mie's ninja-and-haiku heartland.",
   },
+  uji: {
+    id: "uji",
+    name: "Uji",
+    nameJapanese: "宇治",
+    tagline: "Two UNESCO sites and the oldest tea shop in Japan, half an hour from Kyoto Station",
+    description:
+      "Uji sits on the river of the same name a short ride south of Kyoto Station, and packs three of the heaviest single-stop entries in Kansai into a half-day. Byōdōin's Phoenix Hall (built 1053) is the building on the back of the 10-yen coin. Ujigami Shrine (built 1060) is one of the oldest surviving shrine structures in Japan. Both are part of the Historic Monuments of Ancient Kyoto World Heritage listing. Tsuen Tea Shop has been serving Uji's matcha continuously since 1160 — the oldest tea shop in Japan still operating. Across the river, Manpuku-ji (1661) is the head temple of Ōbaku Zen, built in Chinese Ming style and unlike any other Zen complex in Japan. Uji is the second-largest city in Kyoto Prefecture by population but reads as a quiet riverside town once you walk past the station.",
+    ogDescription:
+      "Two UNESCO World Heritage sites, the oldest tea shop in Japan (1160), and Ōbaku Zen's Chinese-Ming-style Manpuku-ji — half a day from Kyoto Station.",
+  },
 
   // --- Kanto ---
   tokyo: {
@@ -289,6 +299,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
       "The Tateyama Kurobe Alpine Route carves through 20-meter snow walls in spring. Toyama Bay delivers some of Japan's freshest sushi, especially the translucent white shrimp found nowhere else. The city itself is compact and modern, with a world-class glass art museum and a tram network that makes everything walkable.",
     ogDescription:
       "Explore Toyama's Alpine Route snow walls, Toyama Bay sushi, and glass art. Gateway to the Japanese Alps' most dramatic scenery.",
+  },
+  obama: {
+    id: "obama",
+    name: "Obama",
+    nameJapanese: "小浜",
+    tagline: "Wakasa Bay's ancient port, due north of Kyoto on the Mackerel Road",
+    description:
+      "Obama sits on Wakasa Bay due north of Kyoto, served as capital of Wakasa Province through the Nara and Heian periods, and bills itself \"Nara by the sea\" — a fishing port that fed the imperial court for over a thousand years. Salted Wakasa mackerel travelled the Saba Kaido (Mackerel Road) network of mountain routes south to Kyoto, seasoning in its briny containers along the way. Myōtsū-ji, founded by tradition in 806, holds two National Treasures: the Hondō (1258–1265) and the 22-meter three-story pagoda (1270). Wakasahiko Shrine is the ichinomiya — highest-ranking shrine — of old Wakasa Province. The old town's preservation district keeps a quiet streetscape of latticed merchant houses, and Obama's small museums interpret the trade-route history that runs through every block.",
+    ogDescription:
+      "Wakasa Bay's ancient port, Myōtsū-ji's two Kamakura-era National Treasures, and the Saba Kaido mountain routes that carried mackerel south to Kyoto for a thousand years.",
   },
 
   // --- Kyushu ---
