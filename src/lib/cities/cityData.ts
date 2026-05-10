@@ -113,6 +113,46 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Kurama-dera's mountain temple, Kifune Shrine's water deity, and Kibune's kawadoko platforms over the river — the cedar valley north of Kyoto where Kyoto goes to escape the summer.",
   },
+  amanohashidate: {
+    id: "amanohashidate",
+    name: "Amanohashidate",
+    nameJapanese: "天橋立",
+    tagline: "One of the Three Views of Japan, a pine-covered sandbar at the head of Miyazu Bay",
+    description:
+      "Amanohashidate is a 3.6-kilometer sandbar lined with around 8,000 pines that stretches across the mouth of Miyazu Bay in northern Kyoto Prefecture, paired in tradition with Matsushima and Miyajima as the Three Views of Japan. The signature view is the upside-down look — bend forward and peer between your legs from Kasamatsu Park or Amanohashidate View Land, and the sandbar appears to float in the sky. At the northern end stands Motoise Kono Jinja, once the highest-ranking shrine of Tango Province and home to the Amabe genealogy, Japan's oldest surviving family record and a designated National Treasure. A short cable car from there reaches Nariai-ji, the 28th temple on the 33-stop Saigoku Kannon Pilgrimage, founded in 704. The JR Hashidate Limited Express runs direct from Kyoto Station in 2 hours 10 minutes; the area reads as an overnight stay, with onsen ryokan including the 320-year-old Seikiro and the bayfront Monjusou.",
+    ogDescription:
+      "One of the Three Views of Japan — a pine-covered sandbar at Miyazu Bay, with Motoise Kono Jinja's National Treasure genealogy and Nariai-ji's Kannon pilgrimage temple. 2 hours 10 minutes direct from Kyoto Station.",
+  },
+  ine: {
+    id: "ine",
+    name: "Ine",
+    nameJapanese: "伊根",
+    tagline: "230 funaya boathouses ringing a calm bay on the Sea of Japan, an hour past Amanohashidate",
+    description:
+      "Ine is a fishing village on the north shore of the Tango Peninsula where roughly 230 funaya — two-story wooden boathouses with the ground floor open at the waterline — line a 5-kilometer arc around Ine Bay. The lower floor garages a fishing boat and tackle directly on the water; the upper floor is the family's living quarters. The Funaya district is designated an Important Preservation District for Groups of Traditional Buildings, the federal designation usually reserved for samurai quarters and post-towns. Sightseeing boats from Ine Bay loop through the inlet so the boathouses can be read from the water side. Several funaya have been converted to overnight inns — Acchan and Ine no Funaya Miyabi Bettei among them — serving Tango-coast kaiseki built around morning-caught yellowtail, oysters, and Sea of Japan crab. Reach via JR Hashidate Limited Express to Amanohashidate Station, then about an hour by Tankai bus.",
+    ogDescription:
+      "Around 230 funaya boathouses lining Ine Bay, several converted to ryokan, with kaiseki built on yellowtail and Sea of Japan crab — an Important Preservation District on the Tango Peninsula.",
+  },
+  maizuru: {
+    id: "maizuru",
+    name: "Maizuru",
+    nameJapanese: "舞鶴",
+    tagline: "Eight Meiji-era brick warehouses on a deep-water harbor with a Siberian-internment memorial",
+    description:
+      "Maizuru is a deep-water naval port on the Sea of Japan that the Imperial Navy opened as its fourth major base in 1901. Twelve brick warehouses were raised along the Higashi-Maizuru waterfront between 1901 and 1921 — eight survive today, all designated Important Cultural Properties, and five are open to the public as Maizuru Red Brick Park. Inside the warehouses are a café, exhibition space, and event halls; the buildings themselves are the attraction, single-stack rows of British-bonded brick the length of a football field. On the hill above the port, the Maizuru Repatriation Memorial Museum tells the story of the 664,531 Japanese — most of them Siberian internees — who came home through this harbor between 1945 and 1958. The collection of letters, drawings, and memorial objects is registered with UNESCO's Memory of the World programme. Down the coast, Yoshihara — sometimes called the Venice of Japan — is a fishing canal-town where boats moor at the back doors of the houses. Reachable from Kyoto in about 2 hours via the JR Maizuru Line through Ayabe.",
+    ogDescription:
+      "Eight Meiji-era brick warehouses, a UNESCO-registered Repatriation Memorial Museum, and the canal-fishing village of Yoshihara — Maizuru's deep harbor on the Sea of Japan, 2 hours from Kyoto.",
+  },
+  miyama: {
+    id: "miyama",
+    name: "Miyama",
+    nameJapanese: "美山",
+    tagline: "A thatched-roof preservation village in the cedar mountains north of Kyoto",
+    description:
+      "Miyama is a mountain valley in Nantan City, north of central Kyoto, where Kayabuki no Sato — the thatched village — preserves around 38 farmhouses with kayabuki roofs of densely packed susuki grass, the highest concentration of intact thatched architecture in Japan. The village was named an Important Preservation District in 1993 and remains a working farming community. Twice a year, in May and December, a fire-prevention drill turns the entire village into a fountain of water as 62 hidden hydrants — concealed inside small thatched-roof shelters that match the houses — fire simultaneously to coat every roof. The drill draws crowds for the brief rainbow it throws over the houses. The Little Indigo Museum (Hiroyuki Shindo's private indigo collection in a 1796 thatched farmhouse) and Chii Hachiman Shrine, founded in 1071 and the main shrine of nine villages in the Chii District, round out the day. About ten of the thatched houses operate as overnight minshuku. From Kyoto Station, take JR to Hiyoshi Station, then Nantan City Bus to Kita — budget around 2 hours each way.",
+    ogDescription:
+      "Kayabuki no Sato — Japan's most intact thatched-roof village, with around 38 farmhouses, the Little Indigo Museum, and minshuku stays in the Nantan mountains north of Kyoto.",
+  },
 
   // --- Kanto ---
   tokyo: {

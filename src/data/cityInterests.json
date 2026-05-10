@@ -551,6 +551,29 @@
       "history": 2,
       "nature": 1,
       "wellness": 1
+    },
+    "amanohashidate": {
+      "nature": 4,
+      "culture": 3,
+      "history": 2,
+      "wellness": 1
+    },
+    "ine": {
+      "culture": 4,
+      "nature": 3,
+      "food": 2,
+      "history": 1
+    },
+    "maizuru": {
+      "history": 4,
+      "culture": 3,
+      "nature": 1
+    },
+    "miyama": {
+      "culture": 4,
+      "nature": 3,
+      "history": 2,
+      "craft": 1
     }
   },
   "metadata": {
@@ -1096,6 +1119,38 @@
       "coordinates": {
         "lat": 35.1194,
         "lng": 135.7672
+      }
+    },
+    "amanohashidate": {
+      "locationCount": 5,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 35.5698,
+        "lng": 135.1918
+      }
+    },
+    "ine": {
+      "locationCount": 2,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 35.6757,
+        "lng": 135.2875
+      }
+    },
+    "maizuru": {
+      "locationCount": 5,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 35.4747,
+        "lng": 135.3854
+      }
+    },
+    "miyama": {
+      "locationCount": 2,
+      "region": "Kansai",
+      "coordinates": {
+        "lat": 35.3105,
+        "lng": 135.6216
       }
     }
   },
@@ -1893,17 +1948,7 @@
       "Tsurugi",
       "Yoshinogawa"
     ],
-    "kyoto": [
-      "Fushimi",
-      "Ine",
-      "Kameoka",
-      "Keihoku",
-      "Kora",
-      "Maizuru",
-      "Miyazu",
-      "Nantan",
-      "Wakasa"
-    ],
+    "kyoto": ["Fushimi", "Kameoka", "Keihoku", "Kora", "Wakasa"],
     "ishigaki": ["Iriomote", "Taketomi", "Yaeyama", "Yonaguni"],
     "miyako": ["Miyakojima"],
     "toyama": [
@@ -1982,6 +2027,10 @@
     "iga": ["Nabari"],
     "uji": [],
     "obama": ["Mikatakaminaka", "Oi"],
-    "kurama": []
+    "kurama": [],
+    "amanohashidate": [],
+    "ine": [],
+    "maizuru": [],
+    "miyama": []
   }
 }
