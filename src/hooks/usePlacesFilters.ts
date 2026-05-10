@@ -5,7 +5,6 @@ import type { Location } from "@/types/location";
 import type { ActiveFilter, FilterMetadata } from "@/types/filters";
 import { locationMatchesVibes } from "@/data/vibeFilterMapping";
 import { VIBES, type VibeId } from "@/data/vibes";
-import { getOpenStatus } from "@/lib/availability/isOpenNow";
 import { useLocationSearchQuery } from "@/hooks/useLocationsQuery";
 import { locationHasSeasonalTag, getCurrentMonth, getActiveSeasonalHighlight } from "@/lib/utils/seasonUtils";
 import { parseSearchQuery } from "@/lib/search/queryParser";
@@ -111,7 +110,6 @@ export function usePlacesFilters(
   const [selectedPriceLevel, setSelectedPriceLevel] = useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [selectedVibes, setSelectedVibes] = useState<VibeId[]>([]);
-  const [openNow, setOpenNow] = useState(false);
   const [wheelchairAccessible, setWheelchairAccessible] = useState(false);
   const [vegetarianFriendly, setVegetarianFriendly] = useState(false);
   const [featuredOnly, setFeaturedOnly] = useState(false);
@@ -144,7 +142,6 @@ export function usePlacesFilters(
     selectedPriceLevel,
     selectedDuration,
     selectedVibes,
-    openNow,
     wheelchairAccessible,
     vegetarianFriendly,
     featuredOnly,
@@ -269,10 +266,6 @@ export function usePlacesFilters(
 
       const matchesVibe = locationMatchesVibes(location, selectedVibes);
 
-      const matchesOpenNow = !openNow
-        ? true
-        : getOpenStatus(location.operatingHours).state === "open";
-
       const matchesWheelchair = !wheelchairAccessible
         ? true
         : location.accessibilityOptions?.wheelchairAccessibleEntrance === true;
@@ -312,7 +305,6 @@ export function usePlacesFilters(
         matchesPriceLevel &&
         matchesDuration &&
         matchesVibe &&
-        matchesOpenNow &&
         matchesWheelchair &&
         matchesVegetarian &&
         matchesFeatured &&
@@ -323,7 +315,7 @@ export function usePlacesFilters(
         matchesUnesco
       );
     });
-  }, [enhancedLocations, query, selectedPrefectures, selectedPriceLevel, selectedDuration, selectedVibes, openNow, wheelchairAccessible, vegetarianFriendly, featuredOnly, savedOnly, savedPlaceIds, yukuIds, selectedCity, selectedCategory, jtaApprovedOnly, unescoOnly, serverMatchIds]);
+  }, [enhancedLocations, query, selectedPrefectures, selectedPriceLevel, selectedDuration, selectedVibes, wheelchairAccessible, vegetarianFriendly, featuredOnly, savedOnly, savedPlaceIds, yukuIds, selectedCity, selectedCategory, jtaApprovedOnly, unescoOnly, serverMatchIds]);
 
   // Sort
   const sortedLocations = useMemo(() => {
@@ -432,10 +424,6 @@ export function usePlacesFilters(
       });
     }
 
-    if (openNow) {
-      filters.push({ type: "openNow", value: "true", label: "Open now" });
-    }
-
     if (wheelchairAccessible) {
       filters.push({ type: "wheelchair", value: "true", label: "Wheelchair accessible" });
     }
@@ -480,7 +468,6 @@ export function usePlacesFilters(
     selectedVibes,
     selectedDuration,
     selectedPriceLevel,
-    openNow,
     wheelchairAccessible,
     vegetarianFriendly,
     featuredOnly,
@@ -509,9 +496,6 @@ export function usePlacesFilters(
         break;
       case "priceLevel":
         setSelectedPriceLevel(null);
-        break;
-      case "openNow":
-        setOpenNow(false);
         break;
       case "wheelchair":
         setWheelchairAccessible(false);
@@ -546,7 +530,6 @@ export function usePlacesFilters(
     setSelectedPriceLevel(null);
     setSelectedDuration(null);
     setSelectedVibes([]);
-    setOpenNow(false);
     setWheelchairAccessible(false);
     setVegetarianFriendly(false);
     setFeaturedOnly(false);
@@ -570,7 +553,6 @@ export function usePlacesFilters(
     selectedPriceLevel, setSelectedPriceLevel,
     selectedDuration, setSelectedDuration,
     selectedVibes, setSelectedVibes,
-    openNow, setOpenNow,
     wheelchairAccessible, setWheelchairAccessible,
     vegetarianFriendly, setVegetarianFriendly,
     featuredOnly, setFeaturedOnly,

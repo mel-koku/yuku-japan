@@ -176,6 +176,7 @@ export function transformDbRowToLocation(row: LocationDbRow | LocationListingDbR
     phoneNumber: "phone_number" in r ? (r.phone_number as string | null) ?? undefined : undefined,
     googleMapsUri: "google_maps_uri" in r ? (r.google_maps_uri as string | null) ?? undefined : undefined,
     craftType: "craft_type" in r ? (r.craft_type as string | null) ?? undefined : undefined,
+    cuisineType: "cuisine_type" in r ? (r.cuisine_type as string | null) ?? undefined : undefined,
   };
 
   // Fields that only exist on the full LocationDbRow projection.

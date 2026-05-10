@@ -64,7 +64,7 @@ export type CategoryHierarchy = {
  */
 export type ActiveFilter = {
   /** Type of filter (e.g., "prefecture", "category", "subType") */
-  type: "search" | "prefecture" | "category" | "subType" | "vibe" | "duration" | "priceLevel" | "wheelchair" | "vegetarian" | "hideClosed" | "openNow" | "craftType" | "experienceType" | "featured" | "city" | "jta" | "unesco" | "saved";
+  type: "search" | "prefecture" | "category" | "subType" | "vibe" | "duration" | "priceLevel" | "wheelchair" | "vegetarian" | "hideClosed" | "craftType" | "experienceType" | "featured" | "city" | "jta" | "unesco" | "saved";
   /** Filter value (e.g., "Tokyo", "culture", "shrine") */
   value: string;
   /** Display label for the chip (e.g., "Tokyo", "Culture", "Shrine") */

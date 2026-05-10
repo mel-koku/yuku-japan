@@ -109,7 +109,6 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
     selectedPriceLevel, setSelectedPriceLevel,
     selectedDuration, setSelectedDuration,
     selectedVibes, setSelectedVibes,
-    openNow, setOpenNow,
     wheelchairAccessible, setWheelchairAccessible,
     vegetarianFriendly, setVegetarianFriendly,
     featuredOnly, setFeaturedOnly,
@@ -200,7 +199,6 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
     setSelectedPriceLevel(priceParam !== null && priceParam !== "" ? Number(priceParam) : null);
 
     setSelectedDuration(params.get("duration"));
-    setOpenNow(params.get("openNow") === "true");
     setWheelchairAccessible(params.get("wheelchair") === "true");
     setVegetarianFriendly(params.get("vegetarian") === "true");
     setFeaturedOnly(params.get("featured") === "true");
@@ -218,7 +216,7 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
     // Decide modal state from URL — open whenever any filter intent is present.
     const FILTER_KEYS = [
       "q", "city", "category", "jta", "sort", "prefectures", "vibes",
-      "price", "duration", "openNow", "wheelchair", "vegetarian",
+      "price", "duration", "wheelchair", "vegetarian",
       "featured", "unesco", "saved", "yuku", "view",
     ];
     const hasFilter = FILTER_KEYS.some((k) => {
@@ -229,7 +227,7 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
   }, [
     setYukuIds, setSelectedCity, setSelectedCategory, setJtaApprovedOnly,
     setSelectedSort, setSelectedPrefectures, setSelectedVibes,
-    setSelectedPriceLevel, setSelectedDuration, setOpenNow,
+    setSelectedPriceLevel, setSelectedDuration,
     setWheelchairAccessible, setVegetarianFriendly, setFeaturedOnly,
     setUnescoOnly, setSavedOnly, setPage,
   ]);
@@ -473,7 +471,6 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
       if (selectedVibes.length > 0) params.set("vibes", selectedVibes.join(","));
       if (selectedPriceLevel !== null) params.set("price", String(selectedPriceLevel));
       if (selectedDuration) params.set("duration", selectedDuration);
-      if (openNow) params.set("openNow", "true");
       if (wheelchairAccessible) params.set("wheelchair", "true");
       if (vegetarianFriendly) params.set("vegetarian", "true");
       if (featuredOnly) params.set("featured", "true");
@@ -489,7 +486,7 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
   }, [
     viewMode, query, selectedCity, selectedCategory, jtaApprovedOnly,
     selectedSort, selectedPrefectures, selectedVibes, selectedPriceLevel,
-    selectedDuration, openNow, wheelchairAccessible, vegetarianFriendly,
+    selectedDuration, wheelchairAccessible, vegetarianFriendly,
     featuredOnly, unescoOnly, savedOnly, yukuIds, locationParam, router, page,
   ]);
 
@@ -720,8 +717,6 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
         }))}
         selectedDuration={selectedDuration}
         onDurationChange={setSelectedDuration}
-        openNow={openNow}
-        onOpenNowChange={setOpenNow}
         wheelchairAccessible={wheelchairAccessible}
         onWheelchairAccessibleChange={setWheelchairAccessible}
         vegetarianFriendly={vegetarianFriendly}
