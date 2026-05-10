@@ -40,7 +40,7 @@ export type TripStyle = "relaxed" | "balanced" | "fast";
  * may have additional IDs not in this union.
  */
 export type KnownCityId =
-  | "kyoto" | "osaka" | "nara" | "kobe" | "otsu" | "himeji" | "wakayama" | "iga" | "uji"  // Kansai
+  | "kyoto" | "osaka" | "nara" | "kobe" | "otsu" | "himeji" | "wakayama" | "iga" | "uji" | "kurama"  // Kansai
   | "tokyo" | "yokohama" | "kamakura" | "nikko" | "nasushiobara" | "hakone" | "kawaguchiko" | "kawagoe" | "narita" | "chichibu"  // Kanto
   | "nagoya" | "kanazawa" | "hakusan" | "takayama" | "nagano" | "niigata" | "nagaoka" | "ise" | "toyama" | "obama"  // Chubu
   | "fukuoka" | "dazaifu" | "asakura" | "nagasaki" | "omura" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"

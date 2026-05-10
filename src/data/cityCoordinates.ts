@@ -20,6 +20,7 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   wakayama:   { lat: 34.2261, lon: 135.1675 },
   iga:        { lat: 34.7689, lon: 136.1335 },  // Iga-Ueno Station / castle approach
   uji:        { lat: 34.8841, lon: 135.7991 },  // Uji Station / Byōdōin approach
+  kurama:     { lat: 35.1194, lon: 135.7672 },  // Kurama-Kibune valley / midway between Kurama-dera and Kifune Shrine
   // Kanto
   tokyo:        { lat: 35.6762, lon: 139.6503 },
   yokohama:     { lat: 35.4437, lon: 139.6380 },
