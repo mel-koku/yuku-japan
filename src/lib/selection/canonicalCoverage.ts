@@ -158,6 +158,23 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
   const locationById = new Map<string, Location>();
   for (const loc of allLocations) locationById.set(loc.id, loc);
 
+  // Picker-placed canonicals for this persona. Protected from being clobbered
+  // as Pass-2 swap targets — without this, a later must-include can land on a
+  // slot the picker already filled with a canonical, silently undoing
+  // organic coverage. Symptom: Hiroshima first-timer 4/30 runs lost
+  // Itsukushima Jinja because Hiroshima Castle's Pass-2 picked its slot
+  // (verified empirically pre-fix, 2026-05-10).
+  const protectedCanonicalIds = new Set<string>();
+  for (const day of itinerary.days) {
+    for (const activity of day.activities) {
+      if (activity.kind !== "place" || !activity.locationId) continue;
+      const loc = locationById.get(activity.locationId);
+      if (loc?.canonicalForPersonas?.includes(personaId)) {
+        protectedCanonicalIds.add(activity.locationId);
+      }
+    }
+  }
+
   // Clone the days array so the caller's reference isn't mutated.
   const newDays: ItineraryDay[] = itinerary.days.map((day) => ({
     ...day,
@@ -253,6 +270,7 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
               if (!activity || activity.kind !== "place") continue;
               if (!isSwappable(activity)) continue;
               if (activity.locationId && injectedIds.has(activity.locationId)) continue;
+              if (activity.locationId && protectedCanonicalIds.has(activity.locationId)) continue;
               if (!openBuckets.has(activity.timeOfDay as TimeOfDay)) continue;
               if (i > targetWithinDayIdx) {
                 target = { dayIdx, activityIdx: i };
@@ -273,6 +291,7 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
               if (!activity || activity.kind !== "place") continue;
               if (!isSwappable(activity)) continue;
               if (activity.locationId && injectedIds.has(activity.locationId)) continue;
+              if (activity.locationId && protectedCanonicalIds.has(activity.locationId)) continue;
               if (i > targetWithinDayIdx) {
                 target = { dayIdx, activityIdx: i };
                 targetWithinDayIdx = i;
@@ -285,7 +304,9 @@ export function applyCanonicalCoverage(opts: CanonicalCoverageOptions): Itinerar
 
       if (!target) {
         // No swappable slot in this city — force-include can't land. Editor
-        // probably curated more than the days can hold. Log and move on.
+        // probably curated more than the days can hold, or every swappable
+        // slot is itself a picker-placed canonical we're protecting from
+        // clobber. Log and move on; the day is already canonical-saturated.
         logger.warn(
           `Canonical coverage: no swappable slot for "${mustInclude.name}" in city "${cityId}"`,
           { personaId, mustIncludeId: mustInclude.id, cityId },

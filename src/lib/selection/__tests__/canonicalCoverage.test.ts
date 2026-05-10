@@ -480,6 +480,76 @@ describe("applyCanonicalCoverage", () => {
     expect(titles).toContain("Filler 2");
   });
 
+  it("does not clobber a picker-placed canonical when a later must-include picks Pass 2 swap target", () => {
+    // Regression for the Itsukushima Pass-2 clobber bug (2026-05-10).
+    //
+    // Mechanism: the picker organically places canonical A. The candidate
+    // filter excludes A from must-includes (`usedIds.has(A.id)`), so A is
+    // never iterated as a `mustInclude`. But it's still in the day's
+    // activities — and Pass 2 picks the latest swappable slot. If A sits at
+    // that slot, the next must-include B silently overwrites A.
+    //
+    // Empirical signature pre-fix: 4/30 Hiroshima first-timer runs lost
+    // Itsukushima Jinja because Hiroshima Castle's Pass-2 picked its slot.
+    //
+    // Bypass test (kept honest per feedback memory): comment out both Pass-2
+    // `protectedCanonicalIds` checks and this test must go red.
+    const itsukushima = makeLocation({
+      id: "itsukushima-jinja-chugoku-6ecfc117",
+      name: "Itsukushima Jinja",
+      city: "Hiroshima",
+      planningCity: "hiroshima",
+      category: "shrine",
+      canonicalForPersonas: ["first-timer"],
+    });
+    const hiroshimaCastle = makeLocation({
+      id: "hiroshima-castle-chugoku-607c86d5",
+      name: "Hiroshima Castle",
+      city: "Hiroshima",
+      planningCity: "hiroshima",
+      category: "landmark",
+      canonicalForPersonas: ["first-timer"],
+    });
+
+    // Picker placed Itsukushima at index 5 (latest swappable). A filler at
+    // index 4 also exists but is earlier. Without the protection, Pass 2
+    // would prefer index 5 (highest) → clobber Itsukushima. With it,
+    // Pass 2 falls back to index 4.
+    const itinerary = makeItinerary([
+      {
+        id: "day-1",
+        cityId: "hiroshima",
+        activities: [
+          makePlace("filler-1", "Filler 1"),
+          makePlace("filler-2", "Filler 2"),
+          makePlace("filler-3", "Filler 3"),
+          makePlace("filler-4", "Filler 4"),
+          makePlace("filler-5-clobber-target", "Filler Clobber Target"),
+          makePlace(itsukushima.id, itsukushima.name),
+        ],
+      },
+    ]);
+
+    const result = applyCanonicalCoverage({
+      itinerary,
+      personaId: "first-timer",
+      allLocations: [itsukushima, hiroshimaCastle],
+      perCityCap: 5,
+    });
+
+    const titles = result.days[0]!.activities.map((a) =>
+      a.kind === "place" ? a.title : "",
+    );
+    // Itsukushima must still be in the day (picker-placed, protected).
+    expect(titles).toContain("Itsukushima Jinja");
+    // Hiroshima Castle was force-included; it should land on the next-latest
+    // swappable, NOT clobber Itsukushima at index 5.
+    expect(titles).toContain("Hiroshima Castle");
+    // The clobber-target filler at index 4 should be replaced (not the
+    // protected canonical at index 5).
+    expect(titles).not.toContain("Filler Clobber Target");
+  });
+
   it("returns the original itinerary reference unchanged when no canonical fires", () => {
     const itinerary = makeItinerary([
       {
