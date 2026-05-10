@@ -42,7 +42,11 @@ export const GET = withApiHandler(
     const search = searchParams.get("search");
     const featured = searchParams.get("featured");
     const city = searchParams.get("city");
-    // Match fetchAllLocations: prefer planning_city, fall back to city.
+    // Browse-page filter — intentionally loose OR-fallback for /places breadth
+    // (a Daigo-ji row with `pc='otsu'` and `city='Kyoto'` should still appear
+    // when browsing by Kyoto). The planner picker (`fetchAllLocations`) uses
+    // strict semantics; surfaces deliberately diverge per scope doc
+    // docs/superpowers/handoffs/2026-05-10-locationservice-or-fallback-scope.md
     const cityFilter = city
       ? `planning_city.eq.${city.toLowerCase()},city.ilike.${city}`
       : null;

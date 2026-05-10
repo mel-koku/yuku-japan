@@ -598,11 +598,14 @@ export async function fetchAllLocations(
     .order("name", { ascending: true });
 
   if (cities && cities.length > 0) {
-    // Use planning_city (coordinate-snapped KnownCityId) for planner queries,
-    // with fallback to city field for locations without planning_city
+    // planning_city authoritative when set; city-field fallback only for NULL_PC
+    // rows (the original-intent "legacy bridge" — see commit 1c5d5fdc, March 6).
+    // Strict semantics close cross-tag leak (e.g., Sakyō-ward `pc='kurama'` rows
+    // bleeding into `kyoto` picker via `city='Kyoto'` admin field). Scope:
+    // docs/superpowers/handoffs/2026-05-10-locationservice-or-fallback-scope.md
     const planningFilters = cities.map((c) => `planning_city.eq.${c.toLowerCase()}`).join(",");
-    const cityFilters = cities.map((c) => `city.ilike.${c}`).join(",");
-    baseQuery = baseQuery.or(`${planningFilters},${cityFilters}`);
+    const nullPcFallback = cities.map((c) => `and(planning_city.is.null,city.ilike.${c})`).join(",");
+    baseQuery = baseQuery.or(`${planningFilters},${nullPcFallback}`);
   }
 
   const { data: firstPage, error: firstError } = await baseQuery.range(0, effectivePageSize - 1);
@@ -633,9 +636,10 @@ export async function fetchAllLocations(
             .order("name", { ascending: true });
 
           if (cities && cities.length > 0) {
+            // Strict semantics — see comment on baseQuery above.
             const planningFilters = cities.map((c) => `planning_city.eq.${c.toLowerCase()}`).join(",");
-            const cityFilters = cities.map((c) => `city.ilike.${c}`).join(",");
-            query = query.or(`${planningFilters},${cityFilters}`);
+            const nullPcFallback = cities.map((c) => `and(planning_city.is.null,city.ilike.${c})`).join(",");
+            query = query.or(`${planningFilters},${nullPcFallback}`);
           }
 
           const { data, error } = await query.range(
