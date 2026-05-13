@@ -574,6 +574,22 @@
       "nature": 3,
       "history": 2,
       "craft": 1
+    },
+    "iwakuni": {
+      "culture": 2,
+      "history": 1,
+      "nature": 1
+    },
+    "onomichi": {
+      "nature": 3,
+      "culture": 2,
+      "history": 2,
+      "food": 1
+    },
+    "kure": {
+      "culture": 4,
+      "nature": 2,
+      "history": 1
     }
   },
   "metadata": {
@@ -1152,6 +1168,30 @@
         "lat": 35.3105,
         "lng": 135.6216
       }
+    },
+    "iwakuni": {
+      "locationCount": 4,
+      "region": "Chugoku",
+      "coordinates": {
+        "lat": 34.1675,
+        "lng": 132.1784
+      }
+    },
+    "onomichi": {
+      "locationCount": 8,
+      "region": "Chugoku",
+      "coordinates": {
+        "lat": 34.4036,
+        "lng": 133.1937
+      }
+    },
+    "kure": {
+      "locationCount": 7,
+      "region": "Chugoku",
+      "coordinates": {
+        "lat": 34.2424,
+        "lng": 132.565
+      }
     }
   },
   "childCities": {
@@ -1679,10 +1719,8 @@
       "Iyo",
       "Kamijima",
       "Kumakogen",
-      "Kure",
       "Matsuno",
       "Niihama",
-      "Onomichi",
       "Ozu",
       "Saijo",
       "Seiyo",
@@ -1845,14 +1883,11 @@
       "Hatsukaichi",
       "Higashihiroshima",
       "Hikari",
-      "Iwakuni",
       "Kumano",
-      "Kure",
       "Masuda",
       "Mihara",
       "Miyoshi",
       "Oda",
-      "Onomichi",
       "Otake",
       "Ounanchou",
       "Sera",
@@ -2031,6 +2066,9 @@
     "amanohashidate": [],
     "ine": [],
     "maizuru": [],
-    "miyama": []
+    "miyama": [],
+    "iwakuni": [],
+    "onomichi": [],
+    "kure": []
   }
 }

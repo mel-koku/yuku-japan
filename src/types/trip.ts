@@ -50,7 +50,8 @@ export type KnownCityId =
   | "toyako" | "noboribetsu" | "furano" | "shiretoko" | "niseko"  // Hokkaido
   | "sendai" | "morioka" | "aomori" | "akita" | "yamagata" | "aizuwakamatsu"
   | "ginzan" | "zao" | "tazawako" | "hiraizumi" | "hachimantai"  // Tohoku
-  | "hiroshima" | "okayama" | "maniwa" | "matsue" | "tottori" | "shimonoseki"  // Chugoku
+  | "hiroshima" | "okayama" | "maniwa" | "matsue" | "tottori" | "shimonoseki"
+  | "iwakuni" | "onomichi" | "kure"  // Chugoku (Hiroshima sub-region cluster)
   | "matsuyama" | "takamatsu" | "tokushima" | "kochi" | "iyavalley"  // Shikoku
   | "naha" | "ishigaki" | "miyako" | "amami";  // Okinawa
 

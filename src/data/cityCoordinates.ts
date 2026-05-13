@@ -94,6 +94,9 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   matsue:       { lat: 35.4723, lon: 133.0505 },
   tottori:      { lat: 35.5011, lon: 134.2351 },
   shimonoseki:  { lat: 33.9578, lon: 130.9414 },
+  iwakuni:      { lat: 34.1675, lon: 132.1784 },  // Kintaikyō Bridge centerpoint, Yamaguchi
+  onomichi:     { lat: 34.4036, lon: 133.1937 },  // JR Onomichi Station / Senkō-ji gateway
+  kure:         { lat: 34.2424, lon: 132.5650 },  // JR Kure Station / Yamato Museum gateway
   // Shikoku
   matsuyama:  { lat: 33.8392, lon: 132.7657 },
   takamatsu:  { lat: 34.3428, lon: 134.0466 },
