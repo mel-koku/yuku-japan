@@ -101,6 +101,7 @@ export async function sendInquiryConfirmation(
 type ConciergeInquiryEmailData = {
   name: string;
   email: string;
+  message: string | null;
   createdAt: string;
 };
 
@@ -134,6 +135,7 @@ export async function sendConciergeInquiryNotification(
         `Name: ${data.name}`,
         `Email: ${data.email}`,
         `Submitted: ${data.createdAt}`,
+        ...(data.message ? [``, `Message:`, data.message] : []),
         ``,
         `Reply to this email to contact them directly.`,
       ].join("\n"),

@@ -18,6 +18,10 @@ export function ConciergeInquiryForm({ content }: Props) {
   const body =
     content?.formBody ??
     "Leave your name and email. We’ll be in touch within 2 business days.";
+  const messageLabel = content?.formMessageLabel ?? "Anything you'd like us to know?";
+  const messagePlaceholder =
+    content?.formMessagePlaceholder ??
+    "Trip dates, group size, interests — whatever helps us help you.";
   const ctaText = content?.formCtaText ?? "Send my info";
   const finePrint =
     content?.formFinePrint ??
@@ -29,6 +33,7 @@ export function ConciergeInquiryForm({ content }: Props) {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -43,7 +48,11 @@ export function ConciergeInquiryForm({ content }: Props) {
       const res = await fetch("/api/concierge/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          message: message.trim() || undefined,
+        }),
       });
 
       if (!res.ok) {
@@ -132,6 +141,26 @@ export function ConciergeInquiryForm({ content }: Props) {
                       className="h-12 w-full rounded-md border border-border bg-surface px-4 text-base text-foreground placeholder:text-stone focus:border-brand-primary focus:outline-none focus:ring-[3px] focus:ring-brand-primary/20 disabled:opacity-50"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="concierge-message"
+                    className={cn(typography({ intent: "utility-label" }), "mb-1.5 block")}
+                  >
+                    {messageLabel}{" "}
+                    <span className="font-normal normal-case opacity-50">(optional)</span>
+                  </label>
+                  <textarea
+                    id="concierge-message"
+                    rows={4}
+                    maxLength={1500}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={messagePlaceholder}
+                    disabled={status === "submitting"}
+                    className="w-full resize-none rounded-md border border-border bg-surface px-4 py-3 text-base text-foreground placeholder:text-stone focus:border-brand-primary focus:outline-none focus:ring-[3px] focus:ring-brand-primary/20 disabled:opacity-50"
+                  />
                 </div>
 
                 {status === "error" && errorMessage && (

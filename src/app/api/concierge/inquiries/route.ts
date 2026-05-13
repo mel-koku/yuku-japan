@@ -10,6 +10,12 @@ import { logger } from "@/lib/logger";
 const conciergeInquirySchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   email: z.string().trim().email("Please enter a valid email"),
+  message: z
+    .string()
+    .trim()
+    .max(1500, "Message must be 1500 characters or fewer")
+    .optional()
+    .transform((v) => v || null),
 });
 
 /**
@@ -39,6 +45,7 @@ export const POST = withApiHandler(
       .insert({
         name: body.name,
         email: body.email.toLowerCase(),
+        message: body.message ?? null,
         user_agent: userAgent,
       })
       .select("id, created_at")
@@ -59,6 +66,7 @@ export const POST = withApiHandler(
     sendConciergeInquiryNotification({
       name: body.name,
       email: body.email.toLowerCase(),
+      message: body.message ?? null,
       createdAt: data.created_at,
     }).catch((err) =>
       logger.error(

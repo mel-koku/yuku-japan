@@ -236,6 +236,21 @@ export const conciergePage = defineType({
       initialValue: "Leave your name and email. We’ll be in touch within 2 business days.",
     }),
     defineField({
+      name: "formMessageLabel",
+      title: "Message Field Label",
+      type: "string",
+      fieldset: "form",
+      initialValue: "Anything you'd like us to know?",
+    }),
+    defineField({
+      name: "formMessagePlaceholder",
+      title: "Message Field Placeholder",
+      type: "string",
+      fieldset: "form",
+      initialValue:
+        "Trip dates, group size, interests — whatever helps us help you.",
+    }),
+    defineField({
       name: "formCtaText",
       title: "Submit Button Text",
       type: "string",

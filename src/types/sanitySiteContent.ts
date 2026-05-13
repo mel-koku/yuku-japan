@@ -335,6 +335,8 @@ export type ConciergePageContent = {
   }>;
   formHeading?: string;
   formBody?: string;
+  formMessageLabel?: string;
+  formMessagePlaceholder?: string;
   formCtaText?: string;
   formFinePrint?: string;
   formSuccessHeading?: string;
