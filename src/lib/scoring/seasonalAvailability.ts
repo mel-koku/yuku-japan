@@ -8,6 +8,7 @@
  */
 
 import type { Location, LocationAvailability } from "@/types/location";
+import { GATING_SEASONAL_TYPES } from "@/lib/scoring/seasonalTypes";
 import { formatLocalDateISO } from "@/lib/utils/dateUtils";
 
 export type AvailabilityCheckResult = {
@@ -233,10 +234,16 @@ export function isLocationAvailableOnDate(
   // Get availability rules
   const rules = availability ?? location.availability ?? [];
 
-  // If no availability rules, fall back to valid_months check
+  // If no availability rules, fall back to valid_months only for real gates.
+  // Hero-marker types (cherry_blossom, autumn_foliage, etc.) are year-round venues
+  // whose valid_months were cleared; any residual is ignored here.
   if (rules.length === 0) {
-    if (location.validMonths && location.validMonths.length > 0) {
-      const month = date.getMonth() + 1; // 1-indexed
+    if (
+      location.validMonths &&
+      location.validMonths.length > 0 &&
+      GATING_SEASONAL_TYPES.has(location.seasonalType ?? "")
+    ) {
+      const month = date.getMonth() + 1;
       if (location.validMonths.includes(month)) {
         return { available: true, reason: `Available in month ${month}` };
       }
@@ -245,10 +252,8 @@ export function isLocationAvailableOnDate(
         reason: `${location.name} not available in month ${month} (operates ${location.validMonths.join(", ")})`,
       };
     }
-    return {
-      available: false,
-      reason: `${location.name} is a seasonal location but has no availability rules defined`,
-    };
+    // No availability rules and not a real gate — treat as available.
+    return { available: true };
   }
 
   // Check each rule

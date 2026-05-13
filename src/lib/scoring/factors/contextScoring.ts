@@ -3,6 +3,7 @@ import type { LocationScoringCriteria, ScoringResult, ScoringAdjustmentResult } 
 import { MONTH_TO_SEASON_TAGS } from "@/lib/utils/seasonUtils";
 import { getCrowdLevel } from "@/data/crowdPatterns";
 import { DIETARY_CATEGORIES as DIETARY_CATEGORIES_LIST } from "@/data/mealCategories";
+import { GATING_SEASONAL_TYPES } from "@/lib/scoring/seasonalTypes";
 
 /**
  * Food-related categories where dietary preferences apply.
@@ -10,8 +11,10 @@ import { DIETARY_CATEGORIES as DIETARY_CATEGORIES_LIST } from "@/data/mealCatego
 const DIETARY_CATEGORIES = new Set<string>(DIETARY_CATEGORIES_LIST);
 
 /**
- * Score seasonal match: +5 when location has a seasonal tag matching the trip month,
+ * Score seasonal match: +7 when location has a seasonal tag matching the trip month,
  * -3 when location has a seasonal tag that doesn't match, 0 for year-round.
+ * For real availability gates (snow_winter, seasonal_attraction, winter_festival),
+ * valid_months is enforced as a -15 penalty when out of window.
  */
 export function scoreSeasonalMatch(
   location: Location,
@@ -21,10 +24,14 @@ export function scoreSeasonalMatch(
     return { scoreAdjustment: 0, reasoning: "No seasonal data" };
   }
 
-  // Hard filter: if validMonths is set, the location only operates in those months.
-  // Apply a steep penalty (-15) to effectively exclude it from selection without
-  // breaking the scoring contract (still returns a number, not a boolean).
-  if (location.validMonths && location.validMonths.length > 0) {
+  // Only apply the hard gate for seasonal types that represent real closures.
+  // Hero-marker types (cherry_blossom, autumn_foliage, etc.) had valid_months
+  // cleared in the 2026-05-13 batch; any residual is safe to ignore here.
+  if (
+    location.validMonths &&
+    location.validMonths.length > 0 &&
+    GATING_SEASONAL_TYPES.has(location.seasonalType ?? "")
+  ) {
     if (!location.validMonths.includes(tripMonth)) {
       return {
         scoreAdjustment: -15,

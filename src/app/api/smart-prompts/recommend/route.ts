@@ -97,6 +97,7 @@ async function filterBySeasonalAvailability(
       tripStart,
       tripEnd,
       location.validMonths,
+      location.seasonalType,
     );
   });
 

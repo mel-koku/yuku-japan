@@ -6,6 +6,7 @@
  */
 
 import type { LocationAvailability, AvailabilityType } from "@/types/location";
+import { GATING_SEASONAL_TYPES } from "@/lib/scoring/seasonalTypes";
 
 /**
  * Database row type for location_availability table
@@ -264,6 +265,7 @@ export function isSeasonalLocationRelevant(
   tripStart: string | undefined,
   tripEnd: string | undefined,
   validMonths?: number[] | null,
+  seasonalType?: string | null,
 ): boolean {
   // Non-seasonal locations are always relevant
   if (!isSeasonal) return true;
@@ -272,22 +274,27 @@ export function isSeasonalLocationRelevant(
   // (we can't determine if they're relevant)
   if (!tripStart || !tripEnd) return false;
 
-  // If no availability rules, fall back to valid_months check
+  // If no availability rules, fall back to valid_months only for real gates.
+  // Hero-marker types (cherry_blossom, autumn_foliage, etc.) are year-round venues
+  // whose valid_months were cleared; any residual is ignored here.
   if (!availability || availability.length === 0) {
-    if (validMonths && validMonths.length > 0) {
+    if (
+      validMonths &&
+      validMonths.length > 0 &&
+      GATING_SEASONAL_TYPES.has(seasonalType ?? "")
+    ) {
       const startMonth = new Date(tripStart).getMonth() + 1;
       const endMonth = new Date(tripEnd).getMonth() + 1;
-      // Check if any trip month falls within valid_months
       if (startMonth === endMonth) {
         return validMonths.includes(startMonth);
       }
-      // Multi-month trip: check each month in range
       for (let m = startMonth; m <= endMonth; m++) {
         if (validMonths.includes(m)) return true;
       }
       return false;
     }
-    return false;
+    // No availability rules and not a real gate — treat as year-round relevant.
+    return true;
   }
 
   // Check each availability rule
@@ -370,6 +377,7 @@ export function filterByTripDates<
     isSeasonal?: boolean | null;
     availability?: LocationAvailability[] | null;
     validMonths?: number[] | null;
+    seasonalType?: string | null;
   }
 >(locations: T[], tripStart: string | undefined, tripEnd: string | undefined): T[] {
   return locations.filter((location) =>
@@ -379,6 +387,7 @@ export function filterByTripDates<
       tripStart,
       tripEnd,
       location.validMonths,
+      location.seasonalType,
     )
   );
 }
