@@ -591,6 +591,11 @@
       "nature": 2,
       "history": 1
     },
+    "tsuwano": {
+      "history": 4,
+      "culture": 3,
+      "nature": 1
+    },
     "shizuoka": {
       "history": 4,
       "culture": 3,
@@ -1214,6 +1219,14 @@
       "coordinates": {
         "lat": 34.2424,
         "lng": 132.565
+      }
+    },
+    "tsuwano": {
+      "locationCount": 8,
+      "region": "Chugoku",
+      "coordinates": {
+        "lat": 34.4744,
+        "lng": 131.7702
       }
     },
     "shizuoka": {
@@ -1940,8 +1953,7 @@
       "Otake",
       "Ounanchou",
       "Sera",
-      "Takehara",
-      "Tsuwano"
+      "Takehara"
     ],
     "sendai": [
       "Hachinohe",
@@ -2119,6 +2131,7 @@
     "iwakuni": [],
     "onomichi": [],
     "kure": [],
+    "tsuwano": [],
     "shizuoka": [],
     "fujinomiya": [],
     "okuoi": [],
