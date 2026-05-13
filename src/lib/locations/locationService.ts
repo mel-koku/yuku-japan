@@ -714,6 +714,14 @@ export async function fetchSeasonalLocations(
  * Single-row fetch, no payload duplication with the full city page query.
  * Returns `undefined` if the city has no rated, photographed locations.
  */
+// Categories that produce editorial hero photos (landmarks, nature, culture).
+// Excludes restaurants, bars, cafes, entertainment — high-rated venue photos
+// frequently out-rank iconic locations when sorting by rating alone.
+const HERO_PHOTO_CATEGORIES = [
+  "shrine", "temple", "castle", "landmark", "historic_site",
+  "viewpoint", "tower", "park", "garden", "museum", "aquarium", "nature",
+];
+
 export async function fetchCityHeroPhotoUrl(
   cityName: string,
   slug?: string,
@@ -723,7 +731,8 @@ export async function fetchCityHeroPhotoUrl(
     .from("locations")
     .select("primary_photo_url")
     .eq("is_active", true)
-    .not("primary_photo_url", "is", null);
+    .not("primary_photo_url", "is", null)
+    .in("category", HERO_PHOTO_CATEGORIES);
 
   // Match on planning_city (KnownCityId slug) when provided so cities with
   // diacritic display names (Nikkō → city='Nikko' in DB) still resolve.
@@ -733,9 +742,11 @@ export async function fetchCityHeroPhotoUrl(
     query = query.eq("city", cityName);
   }
 
+  // Order by review_count first: more reviews = more famous landmark.
+  // Rating alone is gamed by small high-rated venues (bars, cafes, pop-ups).
   const { data, error } = await query
-    .order("rating", { ascending: false, nullsFirst: false })
     .order("review_count", { ascending: false, nullsFirst: false })
+    .order("rating", { ascending: false, nullsFirst: false })
     .limit(1)
     .maybeSingle();
 
