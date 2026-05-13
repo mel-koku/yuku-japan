@@ -3,37 +3,73 @@ import type { CityId } from "@/types/trip";
 import { logger } from "@/lib/logger";
 import { parseLocalDate, formatLocalDateISO } from "@/lib/utils/dateUtils";
 import { fetchWithTimeout } from "@/lib/api/fetchWithTimeout";
+import { resolveCityCoordinates } from "@/data/cityCoordinates";
+import { Redis } from "@upstash/redis";
+import { env } from "@/lib/env";
 
 /** Weather API timeout — 4s is plenty; mock data is fine if it's slower */
 const WEATHER_TIMEOUT_MS = 4_000;
 
-/** In-memory cache for weather forecasts. Key: "cityId:startDate:endDate" */
-const weatherCache = new Map<string, { data: Map<string, WeatherForecast>; fetchedAt: number }>();
-/** Cache forecasts for 6 hours (weather changes slowly) */
-const WEATHER_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+/** Cache forecasts for 6 hours */
+const WEATHER_CACHE_TTL_SECONDS = 6 * 60 * 60;
 
-/**
- * City coordinates for weather API calls
- */
-const CITY_COORDINATES: Record<CityId, { lat: number; lng: number }> = {
-  kyoto: { lat: 35.0116, lng: 135.7681 },
-  osaka: { lat: 34.6937, lng: 135.5023 },
-  nara: { lat: 34.6851, lng: 135.8048 },
-  tokyo: { lat: 35.6762, lng: 139.6503 },
-  yokohama: { lat: 35.4437, lng: 139.638 },
-  nagoya: { lat: 35.1815, lng: 136.9066 },
-  sapporo: { lat: 43.0618, lng: 141.3545 },
-  fukuoka: { lat: 33.5904, lng: 130.4017 },
-  hiroshima: { lat: 34.3853, lng: 132.4553 },
-  sendai: { lat: 38.2682, lng: 140.8694 },
-  kanazawa: { lat: 36.5613, lng: 136.6562 },
-  naha: { lat: 26.2124, lng: 127.6792 },
-  hakodate: { lat: 41.7686, lng: 140.7288 },
-  matsuyama: { lat: 33.8416, lng: 132.7656 },
-  takamatsu: { lat: 34.3428, lng: 134.0468 },
-  nagasaki: { lat: 32.7503, lng: 129.8779 },
-  kobe: { lat: 34.6901, lng: 135.1956 },
-};
+/** Redis key prefix for weather cache */
+const WEATHER_CACHE_KEY_PREFIX = "@yuku-japan/weather";
+
+/** Redis client (initialized lazily) */
+let redisClient: Redis | null = null;
+let redisInitialized = false;
+let redisAvailable = false;
+
+function initializeRedis(): void {
+  if (redisInitialized) return;
+  redisInitialized = true;
+
+  const redisUrl = env.upstashRedisRestUrl;
+  const redisToken = env.upstashRedisRestToken;
+
+  if (redisUrl && redisToken) {
+    try {
+      redisClient = new Redis({ url: redisUrl, token: redisToken });
+      redisAvailable = true;
+    } catch (error) {
+      logger.warn("Failed to initialize Redis for weather cache", { error: String(error) });
+      redisAvailable = false;
+    }
+  } else {
+    redisAvailable = false;
+  }
+}
+
+async function getCachedForecasts(
+  cacheKey: string,
+): Promise<Map<string, WeatherForecast> | null> {
+  initializeRedis();
+  if (!redisAvailable || !redisClient) return null;
+
+  try {
+    const raw = await redisClient.get<Record<string, WeatherForecast>>(cacheKey);
+    if (!raw) return null;
+    return new Map(Object.entries(raw));
+  } catch {
+    return null;
+  }
+}
+
+async function setCachedForecasts(
+  cacheKey: string,
+  forecasts: Map<string, WeatherForecast>,
+): Promise<void> {
+  initializeRedis();
+  if (!redisAvailable || !redisClient) return;
+
+  try {
+    const plain = Object.fromEntries(forecasts);
+    await redisClient.set(cacheKey, plain, { ex: WEATHER_CACHE_TTL_SECONDS });
+  } catch {
+    // Non-fatal: forecasts still returned to caller
+  }
+}
 
 /**
  * Map OpenWeatherMap condition codes to our WeatherCondition type
@@ -62,30 +98,32 @@ export async function fetchWeatherForecast(
   startDate: string, // ISO date string (yyyy-mm-dd)
   endDate: string, // ISO date string (yyyy-mm-dd)
 ): Promise<Map<string, WeatherForecast>> {
-  // Check in-memory cache first
-  const cacheKey = `${cityId}:${startDate}:${endDate}`;
-  const cached = weatherCache.get(cacheKey);
-  if (cached && Date.now() - cached.fetchedAt < WEATHER_CACHE_TTL_MS) {
-    return cached.data;
-  }
+  const cacheKey = `${WEATHER_CACHE_KEY_PREFIX}:${cityId}:${startDate}:${endDate}`;
 
-  const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+  const cached = await getCachedForecasts(cacheKey);
+  if (cached) return cached;
+
+  const apiKey = process.env.OPENWEATHER_API_KEY;
 
   if (!apiKey) {
     logger.warn("OpenWeatherMap API key not configured, returning mock weather data");
     return getMockWeatherForecast(startDate, endDate);
   }
 
-  const coords = CITY_COORDINATES[cityId];
+  const coords = resolveCityCoordinates(cityId);
   if (!coords) {
-    logger.warn(`Unknown city ID: ${cityId}, returning mock weather data`);
-    return getMockWeatherForecast(startDate, endDate);
+    logger.error(
+      `Weather forecast requested for unknown city: ${cityId} — no coordinates found`,
+      new Error(`Unknown cityId: ${cityId}`),
+      { cityId, startDate, endDate },
+    );
+    return new Map();
   }
 
   try {
     // OpenWeatherMap 5-day forecast API
-    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lng}&appid=${apiKey}&units=metric`;
-    
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&appid=${apiKey}&units=metric`;
+
     const response = await fetchWithTimeout(url, {}, WEATHER_TIMEOUT_MS);
     if (!response.ok) {
       throw new Error(`Weather API error: ${response.status}`);
@@ -135,7 +173,7 @@ export async function fetchWeatherForecast(
       const temps = dayForecasts.map((f) => f.temp);
       const minTemp = Math.min(...temps);
       const maxTemp = Math.max(...temps);
-      
+
       // Use most common condition, or rain if any rain exists
       const hasRain = dayForecasts.some((f) => f.condition === "rain" || f.condition === "drizzle");
       const condition = hasRain
@@ -148,7 +186,7 @@ export async function fetchWeatherForecast(
       // reduce() rather than Math.max(...spread) so a future refactor that
       // passes an empty array won't silently return -Infinity.
       const maxWind = dayForecasts.reduce((m, f) => Math.max(m, f.wind), 0);
-      
+
       // Get description from condition
       const conditionDescriptions: Record<string, string> = {
         clear: "Clear sky",
@@ -180,8 +218,7 @@ export async function fetchWeatherForecast(
       });
     }
 
-    // Cache the result
-    weatherCache.set(cacheKey, { data: forecasts, fetchedAt: Date.now() });
+    await setCachedForecasts(cacheKey, forecasts);
 
     return forecasts;
   } catch (error) {
@@ -266,4 +303,3 @@ function getMockWeatherForecast(
 
   return forecasts;
 }
-
