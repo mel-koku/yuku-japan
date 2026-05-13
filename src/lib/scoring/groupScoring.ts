@@ -19,8 +19,8 @@ const GROUP_PREFERENCES: Record<
     avoided: [],
   },
   family: {
-    preferred: ["park", "museum", "garden", "entertainment"],
-    avoided: ["bar", "shrine"], // May be less engaging for children
+    preferred: ["park", "museum", "garden", "entertainment", "shrine"],
+    avoided: ["bar"],
   },
   friends: {
     preferred: ["restaurant", "bar", "entertainment", "shopping", "market"],
