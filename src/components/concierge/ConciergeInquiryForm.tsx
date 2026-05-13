@@ -151,7 +151,7 @@ export function ConciergeInquiryForm({ content, source = "concierge-landing" }: 
                     className={cn(typography({ intent: "utility-label" }), "mb-1.5 block")}
                   >
                     {messageLabel}{" "}
-                    <span className="font-normal normal-case opacity-50">(optional)</span>
+                    <span className="font-normal normal-case text-stone">(optional)</span>
                   </label>
                   <textarea
                     id="concierge-message"
