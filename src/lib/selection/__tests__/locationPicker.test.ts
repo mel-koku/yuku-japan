@@ -193,3 +193,116 @@ describe("pickLocationForTimeSlot evening category filter", () => {
     expect(result).toBeUndefined();
   });
 });
+
+describe("pickLocationForTimeSlot morning category filter", () => {
+  const onsen = makeLocation({
+    id: "spa-world-osaka-kansai-8d862a67",
+    name: "Spa World Osaka",
+    category: "onsen",
+  });
+
+  const sento = makeLocation({
+    id: "some-sento-kansai-abc123",
+    name: "Local Sento",
+    category: "sento",
+  });
+
+  const bar = makeLocation({
+    id: "izakaya-bar-kanto-xyz789",
+    name: "Izakaya Bar",
+    category: "bar",
+  });
+
+  const shrine = makeLocation({
+    id: "fushimi-inari-kansai-abc",
+    name: "Fushimi Inari",
+    category: "shrine",
+  });
+
+  it("filters onsen from morning slot (regression: Spa World at 11:24)", () => {
+    const result = pickLocationForTimeSlot(
+      [onsen],
+      "wellness",
+      new Set(),
+      180,
+      10,
+      undefined, [], "balanced", ["wellness"],
+      undefined, undefined, undefined, undefined,
+      "morning", "2024-01-01",
+    );
+    expect(result).toBeUndefined();
+  });
+
+  it("filters sento from morning slot", () => {
+    const result = pickLocationForTimeSlot(
+      [sento],
+      "wellness",
+      new Set(),
+      180,
+      10,
+      undefined, [], "balanced", ["wellness"],
+      undefined, undefined, undefined, undefined,
+      "morning", "2024-01-01",
+    );
+    expect(result).toBeUndefined();
+  });
+
+  it("filters bar from morning slot", () => {
+    const result = pickLocationForTimeSlot(
+      [bar],
+      "nightlife",
+      new Set(),
+      180,
+      10,
+      undefined, [], "balanced", ["nightlife"],
+      undefined, undefined, undefined, undefined,
+      "morning", "2024-01-01",
+    );
+    expect(result).toBeUndefined();
+  });
+
+  it("admits onsen in afternoon slot", () => {
+    const result = pickLocationForTimeSlot(
+      [onsen],
+      "wellness",
+      new Set(),
+      300,
+      10,
+      undefined, [], "balanced", ["wellness"],
+      undefined, undefined, undefined, undefined,
+      "afternoon",
+    );
+    expect(result).toBeDefined();
+    expect(result?.id).toBe("spa-world-osaka-kansai-8d862a67");
+  });
+
+  it("admits onsen in evening slot", () => {
+    const result = pickLocationForTimeSlot(
+      [onsen],
+      "wellness",
+      new Set(),
+      240,
+      10,
+      undefined, [], "balanced", ["wellness"],
+      undefined, undefined, undefined, undefined,
+      "evening", "2024-01-01",
+    );
+    expect(result).toBeDefined();
+    expect(result?.id).toBe("spa-world-osaka-kansai-8d862a67");
+  });
+
+  it("admits shrine in morning slot (non-blocked category)", () => {
+    const result = pickLocationForTimeSlot(
+      [shrine],
+      "culture",
+      new Set(),
+      180,
+      10,
+      undefined, [], "balanced", ["culture"],
+      undefined, undefined, undefined, undefined,
+      "morning",
+    );
+    expect(result).toBeDefined();
+    expect(result?.id).toBe("fushimi-inari-kansai-abc");
+  });
+});
