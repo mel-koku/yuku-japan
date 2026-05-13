@@ -801,6 +801,36 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Discover Shimonoseki's fugu cuisine, Karato Market, and the Kanmon Strait. Where Honshu meets Kyushu at Japan's western tip.",
   },
+  iwakuni: {
+    id: "iwakuni",
+    name: "Iwakuni",
+    nameJapanese: "岩国",
+    tagline: "Kintaikyō's five wooden arches and a hillside castle 45 minutes west of Hiroshima",
+    description:
+      "Iwakuni sits across the Yamaguchi border, anchored by Kintaikyō — five sequential wooden arch spans on stone piers, 175 meters across the Nishiki River, built in 1673 by the third lord of Iwakuni Domain and designated a National Treasure in 1922. The current bridge dates to a 1953 reconstruction after a 1950 typhoon flood; the wooden parts are renewed every 20 years through a kakekae tradition that keeps the form, not the timber, original. Above the bridge, Iwakuni Castle reads as a 1962 reconstruction of the 1608 Kikkawa-clan hilltop fortress dismantled in 1615 under the Tokugawa one-castle-per-province edict; a ropeway climbs to it from Kikko Park. The Iwakuni White Snake House holds the albino Japanese rat snakes designated a National Natural Monument in 1972 — found only in Iwakuni and treated as messengers of the goddess Benzaiten. Iwakuni-zushi, a layered pressed sushi cut into squares, is the regional food. Reach via JR Sanyō Line from Hiroshima Station (~50 minutes to Iwakuni Station) or Shinkansen to Shin-Iwakuni.",
+    ogDescription:
+      "Kintaikyō's five wooden arches (National Treasure 1922), Iwakuni Castle on the hill, and the albino white snakes designated a National Natural Monument in 1972 — 50 minutes west of Hiroshima Station.",
+  },
+  onomichi: {
+    id: "onomichi",
+    name: "Onomichi",
+    nameJapanese: "尾道",
+    tagline: "Hillside temples, Cat Alley, and the Honshu start of the Shimanami Kaidō cycling route",
+    description:
+      "Onomichi rises in tiers above the Seto Inland Sea, a port town of stone steps, alley shrines, and temple courtyards layered up the slopes of Mt. Senkō and Mt. Daihō. Senkō-ji, founded in 806 in the first year of the Daidō era, sits high enough that the Seto Inland Sea reads as a map of islands; reach it via a ropeway from Nagaeguchi and the Path of Literature past stone-carved poems. Below, Neko no Hosomichi (Cat Alley) is a 200-meter lane near Ushitora Shrine where artist Shunji Sonoyama painted 108 fukuishi-neko good-luck stones starting in 1998. Onomichi ramen is its own register — clear soy-sauce broth over Seto seafood and chicken stock, finished with crumbles of seabura (cured pork back-fat). The Shimanami Kaidō opens out from here — 70 kilometers across six islands to Imabari on Shikoku, dedicated cycling and pedestrian lanes alongside the expressway since May 1999. Reach via JR Sanyō Line from Hiroshima Station (~1h 30m to Onomichi) or San'yō Shinkansen to Shin-Onomichi.",
+    ogDescription:
+      "Senkō-ji's hilltop temples (806), Cat Alley's 108 hand-painted fukuishi-neko, signature soy-sauce ramen, and the Shimanami Kaidō's 70-kilometer cycling route across six islands to Shikoku.",
+  },
+  kure: {
+    id: "kure",
+    name: "Kure",
+    nameJapanese: "呉",
+    tagline: "The Imperial Navy's home port — Yamato Museum and a real submarine you can walk through",
+    description:
+      "Kure was headquarters of the Kure Naval District from 1889 to 1945 and built the battleship Yamato in 1940 — the largest warship of its era. The Yamato Museum (officially the Kure Maritime Museum), opened 23 April 2005 on the site where the battleship was completed, anchors its main hall around a 1:10 scale Yamato about 26 meters long; the collection includes a Mitsubishi A6M Zero Model 62, a Kaiten human torpedo, a Kairyū-class midget submarine, and the original Kure Naval Arsenal lathe used to machine Yamato's 46cm main guns. Across the plaza, the JMSDF Kure Museum (locally Tetsu no Kujirakan, 'Iron Whale Hall') is built around the Akishio, a 76.2-meter Yūshio-class submarine decommissioned in 2007 and now walked through bow-to-stern at deck level. Kure's other current is everyday: kaigun-curry served at restaurants licensed to the Navy's original recipe, and ferries to Etajima where the JMSDF Officer Candidate School preserves the brick Imperial Naval Academy buildings. Reach via JR Kure Line from Hiroshima Station (~35 minutes by rapid, ~45 by local).",
+    ogDescription:
+      "Yamato Museum (1:10 scale battleship, opened 2005), the Akishio submarine you can walk through at JMSDF Kure Museum, kaigun-curry restaurants, and the Etajima naval academy — 35 minutes east of Hiroshima Station.",
+  },
 
   // --- Shikoku ---
   matsuyama: {
