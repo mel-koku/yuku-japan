@@ -160,7 +160,7 @@ export function SignInClient({ content }: SignInClientProps) {
             transition={{ duration: durationBase, delay: 0.5 }}
             className="mt-8"
           >
-            <GoogleSignInButton />
+            <GoogleSignInButton redirectTo={getRedirectUrl()} />
           </m.div>
 
           <m.div
