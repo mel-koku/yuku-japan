@@ -80,9 +80,10 @@ const LocationEditorialGrid = dynamic(
 type PlacesShellProps = {
   content?: PagesContent;
   cityHeroes?: Record<string, string>;
+  lanesData?: { iconic: Location[]; containers: Location[] };
 };
 
-export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
+export function PlacesShell({ content, cityHeroes, lanesData }: PlacesShellProps) {
   const router = useRouter();
   const {
     locations,
@@ -506,6 +507,7 @@ export function PlacesShell({ content, cityHeroes }: PlacesShellProps) {
         onSelect={handleSelectLocation}
         onCitySelect={handleCitySelect}
         onOpenSearch={handleOpenSearch}
+        lanesData={lanesData}
       />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 text-center">
         <button

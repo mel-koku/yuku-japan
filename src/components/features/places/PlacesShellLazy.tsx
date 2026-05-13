@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { PagesContent } from "@/types/sanitySiteContent";
+import type { Location } from "@/types/location";
 
 const PlacesShell = dynamic(
   () => import("./PlacesShell").then((m) => ({ default: m.PlacesShell })),
@@ -49,13 +50,15 @@ const PlacesShell = dynamic(
 export function PlacesShellLazy({
   content,
   cityHeroes,
+  lanesData,
 }: {
   content?: PagesContent;
   cityHeroes?: Record<string, string>;
+  lanesData?: { iconic: Location[]; containers: Location[] };
 }) {
   return (
     <ErrorBoundary>
-      <PlacesShell content={content} cityHeroes={cityHeroes} />
+      <PlacesShell content={content} cityHeroes={cityHeroes} lanesData={lanesData} />
     </ErrorBoundary>
   );
 }
