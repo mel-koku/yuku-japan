@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { easeReveal, durationFast } from "@/lib/motion";
 import { typography } from "@/lib/typography-system";
 import { GoogleSignInButton } from "@/components/ui/GoogleSignInButton";
+import { createClient } from "@/lib/supabase/client";
+import { env } from "@/lib/env";
 import type { TripBuilderConfig } from "@/types/sanitySiteContent";
 
 const DEFAULT_STATUS_MESSAGES = [
@@ -25,8 +28,42 @@ type GeneratingOverlayProps = {
   onSkipSignIn?: () => void;
 };
 
+function getMagicLinkRedirectUrl(tripId?: string): string {
+  const base = env.siteUrl ?? (typeof window !== "undefined" ? window.location.origin : "");
+  const callbackUrl = `${base}/auth/callback`;
+  if (tripId) {
+    const next = `/itinerary?trip=${tripId}`;
+    return `${callbackUrl}?next=${encodeURIComponent(next)}`;
+  }
+  return callbackUrl;
+}
+
 export function GeneratingOverlay({ sanityConfig, successData, onSuccessComplete, isGuest, onSkipSignIn }: GeneratingOverlayProps) {
   const [messageIndex, setMessageIndex] = useState(0);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailStatus, setEmailStatus] = useState<{ message: string; isError: boolean } | null>(null);
+  const supabase = createClient();
+
+  async function sendMagicLink(e: FormEvent) {
+    e.preventDefault();
+    if (!supabase) {
+      setEmailStatus({ message: "Sign-in is temporarily unavailable.", isError: true });
+      return;
+    }
+    setEmailStatus({ message: "Sending your sign-in link…", isError: false });
+    const redirectUrl = getMagicLinkRedirectUrl(successData?.tripId);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: redirectUrl },
+    });
+    setEmailStatus(
+      error
+        ? { message: `Error: ${error.message}`, isError: true }
+        : { message: "Sign-in link sent. Check your inbox.", isError: false },
+    );
+  }
+
   const messages = sanityConfig?.generatingMessages?.length
     ? sanityConfig.generatingMessages
     : DEFAULT_STATUS_MESSAGES;
@@ -130,6 +167,58 @@ export function GeneratingOverlay({ sanityConfig, successData, onSuccessComplete
                     label={process.env.NEXT_PUBLIC_FREE_FULL_ACCESS === "true" ? "Sign in to unlock all days free" : "Sign in to save it everywhere"}
                     redirectTo={successData?.tripId ? `/itinerary?trip=${successData.tripId}` : undefined}
                   />
+
+                  {/* Magic link toggle */}
+                  <div className="flex items-center gap-3">
+                    <span className="h-px flex-1 bg-border" />
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailForm((v) => !v)}
+                      className="text-xs text-stone transition-colors hover:text-foreground-secondary"
+                    >
+                      or use email
+                    </button>
+                    <span className="h-px flex-1 bg-border" />
+                  </div>
+
+                  <AnimatePresence>
+                    {showEmailForm && (
+                      <m.form
+                        key="email-form"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2, ease: easeReveal }}
+                        className="overflow-hidden"
+                        onSubmit={sendMagicLink}
+                      >
+                        <div className="space-y-2 pt-1">
+                          <input
+                            type="email"
+                            required
+                            disabled={!supabase}
+                            placeholder="name@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="block w-full h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-stone focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                          />
+                          <button
+                            type="submit"
+                            disabled={!supabase}
+                            className="w-full h-10 rounded-lg border border-border bg-background px-4 text-xs font-semibold text-foreground transition-all hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Send sign-in link
+                          </button>
+                          {emailStatus && (
+                            <p className={`text-xs ${emailStatus.isError ? "text-error" : "text-success"}`} role="alert">
+                              {emailStatus.message}
+                            </p>
+                          )}
+                        </div>
+                      </m.form>
+                    )}
+                  </AnimatePresence>
+
                   <button
                     type="button"
                     onClick={onSkipSignIn}
