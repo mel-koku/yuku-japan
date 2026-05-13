@@ -755,6 +755,59 @@ export async function fetchCityHeroPhotoUrl(
   return typeof url === "string" && url.length > 0 ? url : undefined;
 }
 
+const LANES_ICONIC_CATEGORIES = [
+  "shrine",
+  "temple",
+  "castle",
+  "landmark",
+  "historic_site",
+  "viewpoint",
+  "tower",
+];
+
+// Columns needed to render PlacesLanes tiles (name, photo, city/region for subtitle)
+const LANES_COLUMNS = `id,name,region,city,category,image,primary_photo_url,rating,review_count,is_featured,is_unesco_site,parent_mode,planning_city,prefecture`;
+
+/**
+ * Fetches the two data slices needed to render PlacesLanes at SSR time:
+ * - iconic: top 16 shrine/temple/castle/landmark/etc. + UNESCO + featured, sorted by popularity
+ * - containers: top 20 container locations (districts / walking neighbourhoods)
+ *
+ * Over-fetches relative to the displayed 8/12 because PlacesLanes' client-side
+ * hasResolvablePhoto guard may discard rows whose photo URL fails to resolve.
+ */
+export async function fetchPlacesLanesData(): Promise<{
+  iconic: Location[];
+  containers: Location[];
+}> {
+  const supabase = await createClient();
+
+  const categoryFilter = LANES_ICONIC_CATEGORIES.map((c) => `category.eq.${c}`).join(",");
+
+  const [iconicResult, containersResult] = await Promise.all([
+    supabase
+      .from("locations")
+      .select(LANES_COLUMNS)
+      .eq("is_active", true)
+      .not("primary_photo_url", "is", null)
+      .or(`${categoryFilter},is_unesco_site.eq.true,is_featured.eq.true`)
+      .order("rating", { ascending: false, nullsFirst: false })
+      .order("review_count", { ascending: false, nullsFirst: false })
+      .limit(16),
+    supabase
+      .from("locations")
+      .select(LANES_COLUMNS)
+      .eq("is_active", true)
+      .eq("parent_mode", "container")
+      .not("primary_photo_url", "is", null)
+      .limit(20),
+  ]);
+
+  const iconic = (iconicResult.data ?? []).map((r) => transformDbRowToLocation(r as unknown as LocationDbRow));
+  const containers = (containersResult.data ?? []).map((r) => transformDbRowToLocation(r as unknown as LocationDbRow));
+  return { iconic, containers };
+}
+
 export type SitemapLocationEntry = {
   id: string;
   /** ISO timestamp; `null` if the row never had `updated_at` populated. */

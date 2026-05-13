@@ -27,9 +27,10 @@ type PlacesLanesProps = {
   onSelect: (location: Location) => void;
   onCitySelect: (citySlug: string) => void;
   onOpenSearch: () => void;
+  lanesData?: { iconic: Location[]; containers: Location[] };
 };
 
-export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onOpenSearch }: PlacesLanesProps) {
+export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onOpenSearch, lanesData }: PlacesLanesProps) {
   const prefersReducedMotion = useReducedMotion();
 
   // resizePhotoUrl strips legacy location-photos bucket URLs to undefined,
@@ -39,7 +40,7 @@ export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onO
   const hasResolvablePhoto = (l: Location) =>
     Boolean(resizePhotoUrl(l.primaryPhotoUrl ?? l.image, 600));
 
-  const iconic = useMemo(() => {
+  const iconicFromLocations = useMemo(() => {
     return locations
       .filter((l) => ICONIC_CATEGORIES.has(l.category) || l.isUnescoSite || l.isFeatured)
       .filter(hasResolvablePhoto)
@@ -51,14 +52,24 @@ export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onO
       .slice(0, 8);
   }, [locations]);
 
-  const containers = useMemo(() => {
+  const containersFromLocations = useMemo(() => {
     return locations
       .filter((l) => l.parentMode === "container")
       .filter(hasResolvablePhoto)
       .slice(0, 12);
   }, [locations]);
 
-  if (locations.length === 0) return null;
+  // Use SSR-provided lanesData when available; fall back to deriving from the
+  // full client-side locations once it loads. This keeps the lanes visible
+  // immediately on first paint without waiting for the ~400-600 KB fetch.
+  const iconic = lanesData
+    ? lanesData.iconic.filter(hasResolvablePhoto).slice(0, 8)
+    : iconicFromLocations;
+  const containers = lanesData
+    ? lanesData.containers.filter(hasResolvablePhoto).slice(0, 12)
+    : containersFromLocations;
+
+  if (!lanesData && locations.length === 0) return null;
 
   const fadeIn = prefersReducedMotion
     ? undefined
