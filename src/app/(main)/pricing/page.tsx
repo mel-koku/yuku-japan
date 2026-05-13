@@ -240,7 +240,7 @@ export default async function PricingPage() {
                   "mb-3 text-center",
                 )}
               >
-                Honest scope
+                Good to know
               </p>
               <h3
                 className={cn(
