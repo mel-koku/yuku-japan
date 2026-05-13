@@ -47,6 +47,10 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   ise:       { lat: 34.4875, lon: 136.7090 },
   toyama:    { lat: 36.6959, lon: 137.2137 },
   obama:     { lat: 35.4956, lon: 135.7424 },  // Obama old-town preservation district / Saba Kaido terminus
+  shizuoka:  { lat: 34.9789, lon: 138.3831 },  // Sumpu Castle Park / Aoi Ward central — Tokugawa Ieyasu's retirement seat
+  fujinomiya:{ lat: 35.2274, lon: 138.6100 },  // Fujisan Hongū Sengen Taisha — head shrine of 1,300+ Sengen shrines, Mt. Fuji south approach
+  okuoi:     { lat: 35.1810, lon: 138.1500 },  // Okuoi Rainbow Bridge / Senzu — deep Oi River valley, Oigawa Railway Ikawa Line
+  kakegawa:  { lat: 34.7755, lon: 138.0142 },  // Kakegawa Castle / Ninomaru Tea House — Shizuoka tea-country anchor
   // Kyushu
   fukuoka:    { lat: 33.5904, lon: 130.4017 },
   dazaifu:    { lat: 33.5128, lon: 130.5239 },  // Dazaifu city center / Tenmangu approach

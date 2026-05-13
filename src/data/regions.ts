@@ -71,6 +71,10 @@ export const REGIONS: readonly Region[] = [
       { id: "ise", name: "Ise" },
       { id: "toyama", name: "Toyama" },
       { id: "obama", name: "Obama" },
+      { id: "shizuoka", name: "Shizuoka" },
+      { id: "fujinomiya", name: "Fujinomiya" },
+      { id: "okuoi", name: "Okuoi" },
+      { id: "kakegawa", name: "Kakegawa" },
     ],
   },
   {

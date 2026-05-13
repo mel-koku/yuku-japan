@@ -360,6 +360,46 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Wakasa Bay's ancient port, Myōtsū-ji's two Kamakura-era National Treasures, and the Saba Kaido mountain routes that carried mackerel south to Kyoto for a thousand years.",
   },
+  shizuoka: {
+    id: "shizuoka",
+    name: "Shizuoka",
+    nameJapanese: "静岡",
+    tagline: "Sumpu Castle, Suruga Bay's sakura-shrimp, and Tokugawa Ieyasu's retirement seat",
+    description:
+      "Shizuoka City — old Sumpu — was Tokugawa Ieyasu's chosen base in childhood, in the years between his shogunal abdication and his death in 1616. The stone foundation of Sumpu Castle's main keep, excavated again from 2016, is the largest castle-keep foundation ever built in Japan; the surrounding park keeps the moats and rebuilt Tatsumi-yagura turret. Inside the inner bailey, Momijiyama Garden recreates four landscapes of old Suruga Province — village, sea, mountain hamlet, mountain path — around a central pond. Out toward Shimizu Port, S-Pulse Dream Plaza and the Dream Plaza Ferris Wheel face Suruga Bay; on clear winter days the view reaches Mt. Fuji. Yui Port, on the Shimizu-Ward coast, is the only place in Japan licensed to fish sakura-ebi — the translucent pink shrimp of Suruga Bay, harvested twice yearly in spring and autumn and served raw, deep-fried as kakiage, or sun-dried on bayside racks. Above the harbor, the Shizuoka Prefectural Museum of Art sits on the Nihondaira foothills, a sculpture-lined promenade leading to a permanent collection that pairs Eastern and Western landscape painting.",
+    ogDescription:
+      "Sumpu Castle's record-largest keep foundation, Momijiyama Garden's miniature Suruga, sakura-shrimp at Yui Port, and Nihondaira's hillside museum overlooking Suruga Bay.",
+  },
+  fujinomiya: {
+    id: "fujinomiya",
+    name: "Fujinomiya",
+    nameJapanese: "富士宮",
+    tagline: "Mt. Fuji's south approach and the head shrine of 1,300 Sengen shrines",
+    description:
+      "Fujinomiya is the south-side gateway to Mt. Fuji and the spiritual headquarters of mountain worship. Fujisan Hongū Sengen Taisha is the head shrine of more than 1,300 Sengen shrines across Japan; its grounds enclose Wakutama-ike, a pond fed directly by Mt. Fuji's snowmelt percolating through volcanic strata. The shrine traditionally marks the starting point for Fuji pilgrim climbs via the Fujinomiya Trail, the shortest of the four official routes to the summit. A few kilometers north, Yamamiya Sengen Shrine is one of the oldest Sengen shrines and unique in that it has no main hall — the altar is aligned directly with Mt. Fuji, worshipping the mountain itself as the deity. Tall cedar trees naturally frame the view, and the site is registered as part of Mt. Fuji's UNESCO World Heritage inscription (2013). Fujinomiya yakisoba — a regional noodle dish with lard-cracklings and chilled mince — is the local food, served at neighborhood stalls near the shrine.",
+    ogDescription:
+      "Fujisan Hongū Sengen Taisha (head shrine of 1,300+ Sengen shrines, Wakutama Pond), Yamamiya Sengen Shrine's altar aligned to Mt. Fuji, and the south-side Fujinomiya climbing route.",
+  },
+  okuoi: {
+    id: "okuoi",
+    name: "Okuoi",
+    nameJapanese: "奥大井",
+    tagline: "Turquoise reservoirs and a vintage railway through the Oi River gorges",
+    description:
+      "Okuoi is the deep-mountain backcountry of northern Shizuoka, where the Oi River cuts through gorges of cedar and cypress forest and the Oigawa Railway's Ikawa Line — Japan's only commercial Abt-rack route — climbs into terrain you cannot reach by road. The Okuoi Rainbow Bridge spans a turquoise reservoir to the remote Okuoikojo Station, perched on a narrow strip of land where the line turns sharply back over the water. Further upstream, the Ikawa Yume-no-Tsuribashi suspension bridge sways 200 meters above the gorge, threading hikers across narrow ironwood planks above the Oi's signature mineral-blue water. Sumatakyō, a side gorge, holds another suspension bridge over a 90-meter-deep ravine where the water shifts from emerald to deep blue with the season. Steam locomotives of the Oigawa Main Line run vintage rolling stock through tea-growing valleys downstream — the route is one of the only places in Japan where you can still ride a regular daily-service steam train. Access via Kawanehon and Senzu.",
+    ogDescription:
+      "Okuoi Rainbow Bridge's turquoise reservoir crossing, Ikawa Yume-no-Tsuribashi suspension above the Oi gorge, Sumatakyō's mineral-blue water, and the Oigawa Railway's Abt-rack mountain line.",
+  },
+  kakegawa: {
+    id: "kakegawa",
+    name: "Kakegawa",
+    nameJapanese: "掛川",
+    tagline: "Kakegawa Castle's wooden keep, Japanese tea connoisseurs, and the Shiseido museum",
+    description:
+      "Kakegawa is one of the few places in Japan where you can climb a wooden castle keep — Kakegawa Castle was rebuilt in 1994 using traditional joinery and the same hinoki-cypress and earthen-wall techniques used in the 1621 original. The Ninomaru Tea House on the castle grounds serves matcha sourced from Kakegawa's surrounding tea estates, themselves part of the broader Shizuoka tea belt that produces about 40 percent of Japan's tea. Kakegawa's deep-steamed (fukamushi) sencha — the local style, with leaves steamed twice as long as standard sencha — yields a thicker, sweeter brew and is sold at small roasters across the city. North of town, the Shiseido Corporate Museum at the company's Kakegawa factory traces Japan's most iconic cosmetics brand from its 1872 founding as a Western-style pharmacy in Ginza through its current global form, with archival packaging, advertising posters, and Showa-era beauty culture. The Oigawa Railway's vintage steam locomotives run nearby through the Kanaya tea hills.",
+    ogDescription:
+      "Kakegawa Castle's traditional wooden keep (1994 reconstruction), Ninomaru Tea House on the castle grounds, deep-steamed fukamushi sencha, and the Shiseido Corporate Museum.",
+  },
 
   // --- Kyushu ---
   fukuoka: {
