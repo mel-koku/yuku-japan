@@ -9,11 +9,12 @@ import type { ConciergePageContent } from "@/types/sanitySiteContent";
 
 type Props = {
   content?: ConciergePageContent;
+  source?: string;
 };
 
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
 
-export function ConciergeInquiryForm({ content }: Props) {
+export function ConciergeInquiryForm({ content, source = "concierge-landing" }: Props) {
   const heading = content?.formHeading ?? "Reach out. We’d love to hear from you.";
   const body =
     content?.formBody ??
@@ -52,6 +53,7 @@ export function ConciergeInquiryForm({ content }: Props) {
           name: name.trim(),
           email: email.trim(),
           message: message.trim() || undefined,
+          source,
         }),
       });
 
