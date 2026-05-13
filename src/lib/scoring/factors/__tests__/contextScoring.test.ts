@@ -16,7 +16,7 @@ describe("scoreSeasonalMatch — valid_months gating predicate", () => {
     const loc: Location = {
       ...base,
       isSeasonal: true,
-      seasonalType: "snow_winter",
+      seasonalType: "winter_closure",
       validMonths: [12, 1, 2, 3],
     };
     const result = scoreSeasonalMatch(loc, 7);
@@ -27,22 +27,22 @@ describe("scoreSeasonalMatch — valid_months gating predicate", () => {
     const loc: Location = {
       ...base,
       isSeasonal: true,
-      seasonalType: "snow_winter",
+      seasonalType: "winter_closure",
       validMonths: [12, 1, 2, 3],
     };
     const result = scoreSeasonalMatch(loc, 1);
     expect(result.scoreAdjustment).toBeGreaterThanOrEqual(0);
   });
 
-  it("ignores residual valid_months on a hero-marker type (cherry_blossom)", () => {
-    // A cherry_blossom row that still has validMonths set must NOT get -15 in June.
+  it("ignores residual valid_months on a hero-marker type (festival)", () => {
+    // A festival row that still has validMonths set must NOT get -15 outside its window.
     const loc: Location = {
       ...base,
       isSeasonal: true,
-      seasonalType: "cherry_blossom",
+      seasonalType: "festival",
       validMonths: [1, 2, 3, 4, 5],
     };
     const result = scoreSeasonalMatch(loc, 6);
-    expect(result.scoreAdjustment).toBeGreaterThan(-15);
+    expect(result.scoreAdjustment).toBeGreaterThanOrEqual(0);
   });
 });
