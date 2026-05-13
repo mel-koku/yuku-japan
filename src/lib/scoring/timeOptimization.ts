@@ -23,6 +23,21 @@ export const EVENING_APPROPRIATE_CATEGORIES = new Set([
 ]);
 
 /**
+ * Categories that must not be placed in morning slots.
+ * These are bath/nightlife venues where morning placement is
+ * editorially wrong regardless of opening hours.
+ *
+ * `wellness` is intentionally excluded — the corpus contains
+ * morning-appropriate wellness rows (forest walks, yoga retreats,
+ * artesian springs) that should not be suppressed.
+ */
+export const MORNING_BLOCKED_CATEGORIES = new Set([
+  "onsen",
+  "sento",
+  "bar",
+]);
+
+/**
  * Per-location allowlist for famous evening exceptions whose category
  * (landmark / viewpoint / shrine / temple) would otherwise be filtered
  * out of evening slots. Slugs verified against Supabase 2026-05-07.

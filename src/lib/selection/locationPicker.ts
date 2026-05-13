@@ -10,7 +10,7 @@ import type { InterestId, TripBuilderData } from "@/types/trip";
 import type { WeatherForecast } from "@/types/weather";
 import { scoreLocation, type LocationScoringCriteria, type ScoreBreakdown } from "@/lib/scoring/locationScoring";
 import { applyDiversityFilter, type DiversityContext } from "@/lib/scoring/diversityRules";
-import { checkOpeningHoursFit, EVENING_APPROPRIATE_CATEGORIES, isNightFriendly, hasGenuineEveningHours } from "@/lib/scoring/timeOptimization";
+import { checkOpeningHoursFit, EVENING_APPROPRIATE_CATEGORIES, MORNING_BLOCKED_CATEGORIES, isNightFriendly, hasGenuineEveningHours } from "@/lib/scoring/timeOptimization";
 import { isLocationAvailableOnDate } from "@/lib/scoring/seasonalAvailability";
 import { logger } from "@/lib/logger";
 
@@ -162,6 +162,25 @@ export function pickLocationForTimeSlot(
         before: beforeCount,
         after: candidates.length,
         availableMinutes,
+      });
+    }
+    if (candidates.length === 0) {
+      return undefined;
+    }
+  }
+
+  // Morning slot: hard-exclude bath/bar categories that are never editorially
+  // appropriate before noon, regardless of opening hours.
+  if (timeSlot === "morning") {
+    const beforeCount = candidates.length;
+    candidates = candidates.filter((loc) => {
+      const cat = loc.category?.toLowerCase() ?? "";
+      return !MORNING_BLOCKED_CATEGORIES.has(cat);
+    });
+    if (beforeCount > candidates.length) {
+      logger.info("Filtered morning-inappropriate categories from morning slot", {
+        before: beforeCount,
+        after: candidates.length,
       });
     }
     if (candidates.length === 0) {
