@@ -30,7 +30,7 @@ const tiers: { tier: UnlockTier; label: string; days: string; bestFor: string }[
 
 const features = [
   "Multi-day routing",
-  "Transit directions with lines and platforms",
+  "Transit directions with line names and stops",
   "Daily briefings",
   "Editorial picks for each stop",
   "Unlimited refinements",
