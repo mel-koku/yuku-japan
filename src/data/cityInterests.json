@@ -590,6 +590,29 @@
       "culture": 4,
       "nature": 2,
       "history": 1
+    },
+    "shizuoka": {
+      "history": 4,
+      "culture": 3,
+      "food": 2,
+      "nature": 1
+    },
+    "fujinomiya": {
+      "nature": 4,
+      "culture": 3,
+      "history": 2,
+      "wellness": 1
+    },
+    "okuoi": {
+      "nature": 4,
+      "culture": 2,
+      "history": 1
+    },
+    "kakegawa": {
+      "culture": 3,
+      "food": 3,
+      "history": 2,
+      "craft": 1
     }
   },
   "metadata": {
@@ -1192,6 +1215,38 @@
         "lat": 34.2424,
         "lng": 132.565
       }
+    },
+    "shizuoka": {
+      "locationCount": 8,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 34.9789,
+        "lng": 138.3831
+      }
+    },
+    "fujinomiya": {
+      "locationCount": 2,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 35.2274,
+        "lng": 138.61
+      }
+    },
+    "okuoi": {
+      "locationCount": 3,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 35.181,
+        "lng": 138.15
+      }
+    },
+    "kakegawa": {
+      "locationCount": 3,
+      "region": "Chubu",
+      "coordinates": {
+        "lat": 34.7755,
+        "lng": 138.0142
+      }
     }
   },
   "childCities": {
@@ -1222,7 +1277,6 @@
       "Fujikawa",
       "Fujikawaguchiko",
       "Fujimi",
-      "Fujinomiya",
       "Fujioka",
       "Fujiyoshida",
       "Gotenba",
@@ -1232,8 +1286,6 @@
       "Iida",
       "Ina",
       "Kai",
-      "Kakegawa",
-      "Kawanehon",
       "Kofu",
       "Koshu",
       "Matsukawa",
@@ -1248,8 +1300,6 @@
       "Otsuki",
       "Oyama",
       "Sagamihara",
-      "Shimada",
-      "Shizuoka",
       "Susono",
       "Tsuru",
       "Yamanakako"
@@ -1481,7 +1531,6 @@
       "Omaezaki",
       "Oshima",
       "Shimoda",
-      "Shizuoka",
       "Susono"
     ],
     "aomori": [
@@ -2069,6 +2118,10 @@
     "miyama": [],
     "iwakuni": [],
     "onomichi": [],
-    "kure": []
+    "kure": [],
+    "shizuoka": [],
+    "fujinomiya": [],
+    "okuoi": [],
+    "kakegawa": []
   }
 }

@@ -43,7 +43,8 @@ export type KnownCityId =
   | "kyoto" | "osaka" | "nara" | "kobe" | "otsu" | "himeji" | "wakayama" | "iga" | "uji" | "kurama"
   | "amanohashidate" | "ine" | "maizuru" | "miyama"  // Kansai (coastal Tango + Miyama Kayabuki)
   | "tokyo" | "yokohama" | "kamakura" | "nikko" | "nasushiobara" | "hakone" | "kawaguchiko" | "kawagoe" | "narita" | "chichibu"  // Kanto
-  | "nagoya" | "kanazawa" | "hakusan" | "takayama" | "nagano" | "niigata" | "nagaoka" | "ise" | "toyama" | "obama"  // Chubu
+  | "nagoya" | "kanazawa" | "hakusan" | "takayama" | "nagano" | "niigata" | "nagaoka" | "ise" | "toyama" | "obama"
+  | "shizuoka" | "fujinomiya" | "okuoi" | "kakegawa"  // Chubu (+ Shizuoka sub-region cluster)
   | "fukuoka" | "dazaifu" | "asakura" | "nagasaki" | "omura" | "kumamoto" | "kagoshima" | "oita" | "yakushima" | "miyazaki" | "kitakyushu"
   | "arita" | "imari" | "kurokawa" | "takachiho"  // Kyushu
   | "sapporo" | "hakodate" | "asahikawa" | "kushiro" | "abashiri" | "wakkanai"
