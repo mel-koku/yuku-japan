@@ -235,23 +235,31 @@ function CityTile({
   city: { slug: string; label: string; region: string; image: string };
   onSelect: (citySlug: string) => void;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = Boolean(city.image) && !imageFailed;
+
   return (
     <button
       type="button"
       onClick={() => onSelect(city.slug)}
       className="group relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface text-left shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
     >
-      <Image
-        src={city.image}
-        alt={city.label}
-        fill
-        sizes="(min-width:1024px) 200px, 50vw"
-        className="object-cover transition-transform duration-500 ease-cinematic group-hover:scale-[1.04]"
-      />
-      <div className="absolute inset-0 scrim-60" />
+      {showImage ? (
+        <Image
+          src={city.image}
+          alt={city.label}
+          fill
+          sizes="(min-width:1024px) 200px, 50vw"
+          className="object-cover transition-transform duration-500 ease-cinematic group-hover:scale-[1.04]"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-canvas via-sand to-canvas" aria-hidden="true" />
+      )}
+      <div className={cn("absolute inset-0", showImage ? "scrim-60" : "scrim-20")} />
       <div className="absolute inset-x-0 bottom-0 p-3">
-        <p className="line-clamp-2 font-serif text-base font-medium leading-tight text-white">{city.label}</p>
-        <p className="mt-0.5 text-[11px] uppercase tracking-wide text-white/80">{city.region}</p>
+        <p className={cn("line-clamp-2 font-serif text-base font-medium leading-tight", showImage ? "text-white" : "text-foreground")}>{city.label}</p>
+        <p className={cn("mt-0.5 text-[11px] uppercase tracking-wide", showImage ? "text-white/80" : "text-foreground-secondary")}>{city.region}</p>
       </div>
     </button>
   );
