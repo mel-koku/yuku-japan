@@ -871,6 +871,16 @@ export const CITY_PAGE_DATA: Record<KnownCityId, CityPageData> = {
     ogDescription:
       "Yamato Museum (1:10 scale battleship, opened 2005), the Akishio submarine you can walk through at JMSDF Kure Museum, kaigun-curry restaurants, and the Etajima naval academy — 35 minutes east of Hiroshima Station.",
   },
+  tsuwano: {
+    id: "tsuwano",
+    name: "Tsuwano",
+    nameJapanese: "津和野",
+    tagline: "The Little Kyoto of San'in — a samurai-quarter town of 6,657 with one of Japan's great Inari shrines on the hill above",
+    description:
+      "Tsuwano is a former castle town in western Shimane known as the 'Little Kyoto of San'in,' a single valley walled by mountains and run through by carp-filled canals. The Tonomachi district along the main street is a national Important Preservation District for Groups of Traditional Buildings, Edo-period white-walled storehouses and samurai residences lined by stone-edged waterways where koi swim. Taikodani Inari Shrine, founded in 1773 by Lord Kamei Noriisada (the seventh daimyō of Tsuwano Domain) and claimed by the shrine itself as one of the Five Great Inari Shrines of Japan, sits on the mountainside above town; the approach climbs through a tunnel of vermilion torii donated by the faithful. Tsuwano Castle, designated a National Historic Site, survives as stone walls on the ridge above the shrine, reachable by chairlift. The Otometōge Maria Chapel, dedicated in 1951, memorializes the 37 Japanese Christians sent here from Nagasaki and persecuted during the Edo and Meiji periods. Washibara Hachiman-gū hosts Japan's oldest dedicated yabusame mounted-archery range; the annual ceremony is held on the second Sunday of April. Reach from Hiroshima requires changing at Shin-Yamaguchi for the JR Yamaguchi Line; the SL Yamaguchi steam locomotive runs the route on weekends and holidays March through November, daily in August.",
+    ogDescription:
+      "Edo-period samurai quarter with koi-filled canals; Taikodani Inari (founded 1773) on the mountainside above town; Japan's oldest yabusame range at Washibara Hachiman-gū; Otometōge Maria Chapel (1951); reached by SL Yamaguchi steam train from Shin-Yamaguchi.",
+  },
 
   // --- Shikoku ---
   matsuyama: {

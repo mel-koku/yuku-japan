@@ -101,6 +101,7 @@ export const CITY_COORDINATES: Record<KnownCityId, CityCoordinates> = {
   iwakuni:      { lat: 34.1675, lon: 132.1784 },  // Kintaikyō Bridge centerpoint, Yamaguchi
   onomichi:     { lat: 34.4036, lon: 133.1937 },  // JR Onomichi Station / Senkō-ji gateway
   kure:         { lat: 34.2424, lon: 132.5650 },  // JR Kure Station / Yamato Museum gateway
+  tsuwano:      { lat: 34.4744, lon: 131.7702 },  // JR Tsuwano Station / Taikodani Inari gateway, Shimane
   // Shikoku
   matsuyama:  { lat: 33.8392, lon: 132.7657 },
   takamatsu:  { lat: 34.3428, lon: 134.0466 },

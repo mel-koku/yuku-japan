@@ -53,6 +53,7 @@ export type KnownCityId =
   | "ginzan" | "zao" | "tazawako" | "hiraizumi" | "hachimantai"  // Tohoku
   | "hiroshima" | "okayama" | "maniwa" | "matsue" | "tottori" | "shimonoseki"
   | "iwakuni" | "onomichi" | "kure"  // Chugoku (Hiroshima sub-region cluster)
+  | "tsuwano"  // Chugoku (San'in / Iwami coast — Taikodani Inari + samurai quarter)
   | "matsuyama" | "takamatsu" | "tokushima" | "kochi" | "iyavalley"  // Shikoku
   | "naha" | "ishigaki" | "miyako" | "amami";  // Okinawa
 
