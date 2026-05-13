@@ -16,6 +16,7 @@ const conciergeInquirySchema = z.object({
     .max(1500, "Message must be 1500 characters or fewer")
     .optional()
     .transform((v) => v || null),
+  source: z.string().trim().max(50).optional(),
 });
 
 /**
@@ -45,6 +46,7 @@ export const POST = withApiHandler(
       .insert({
         name: body.name,
         email: body.email.toLowerCase(),
+        source: body.source ?? "concierge-landing",
         message: body.message ?? null,
         user_agent: userAgent,
       })

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { DEFAULT_OG_IMAGES, DEFAULT_TWITTER_IMAGES } from "@/lib/seo/defaults";
 import { serializeJsonLd } from "@/lib/seo/jsonLd";
-import { CopyEmailButton } from "./CopyEmailButton";
+import { ConciergeInquiryForm } from "@/components/concierge/ConciergeInquiryForm";
 
 const EMAIL = "hello@yukujapan.com";
 
@@ -153,43 +153,20 @@ export default function ContactPage() {
       >
         {serializeJsonLd(faqJsonLd)}
       </Script>
-      {/* ── Hero + Email ─────────────────────────── */}
-      <section className="bg-background px-6 py-12 sm:py-20 lg:py-28">
-        <div className="mx-auto max-w-2xl">
-          <ScrollReveal>
-            <p className="eyebrow-editorial mb-4">Contact</p>
-          </ScrollReveal>
-          <ScrollReveal delay={0.08}>
-            <h1 className={cn(typography({ intent: "editorial-h1" }), "mb-6")}>
-              We read every message.
-            </h1>
-          </ScrollReveal>
-          <ScrollReveal delay={0.16}>
-            <p
-              className={cn(
-                typography({ intent: "utility-body" }),
-                "mb-8 text-foreground-secondary"
-              )}
-            >
-              Feedback, support, press, or partnerships. Add the topic to your subject line and we&apos;ll route it to the right person. Responses within two business days, often sooner.
-            </p>
-          </ScrollReveal>
-          <ScrollReveal delay={0.24}>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-              <a
-                href={`mailto:${EMAIL}`}
-                className={cn(
-                  typography({ intent: "editorial-h3" }),
-                  "text-foreground underline decoration-brand-primary/40 underline-offset-4 transition-colors hover:text-brand-primary"
-                )}
-              >
-                {EMAIL}
-              </a>
-              <CopyEmailButton email={EMAIL} />
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
+      {/* ── Contact form ─────────────────────────── */}
+      <ConciergeInquiryForm
+        source="contact-page"
+        content={{
+          formHeading: "We read every message.",
+          formBody: "Feedback, support, press, or partnerships. We'll route it to the right person and reply within two business days.",
+          formMessageLabel: "What can we help with?",
+          formMessagePlaceholder: "Feedback, support question, press inquiry — whatever's on your mind.",
+          formCtaText: "Send message",
+          formFinePrint: `Or email us directly at ${EMAIL}`,
+          formSuccessHeading: "Thanks. We'll be in touch.",
+          formSuccessBody: "We read every message personally and typically reply within two business days.",
+        }}
+      />
 
       {/* ── FAQs ─────────────────────────────────── */}
       <section
