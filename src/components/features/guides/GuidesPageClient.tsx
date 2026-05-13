@@ -37,6 +37,18 @@ function seasonToDbSeason(season: Season): string {
   return season === "fall" ? "autumn" : season;
 }
 
+function matchesSearch(guide: GuideSummary, query: string): boolean {
+  const q = query.toLowerCase();
+  return (
+    guide.title.toLowerCase().includes(q) ||
+    (guide.subtitle?.toLowerCase().includes(q) ?? false) ||
+    (guide.summary?.toLowerCase().includes(q) ?? false) ||
+    (guide.city?.toLowerCase().includes(q) ?? false) ||
+    (guide.region?.toLowerCase().includes(q) ?? false) ||
+    (guide.tags?.some((t) => t.toLowerCase().includes(q)) ?? false)
+  );
+}
+
 export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
   const searchParams = useSearchParams();
   const initialType = searchParams.get("type") as GuideType | null;
@@ -44,18 +56,25 @@ export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
     initialType && GUIDE_TYPE_OPTIONS.some((o) => o.value === initialType) ? initialType : null
   );
   const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Search-filtered base — all count computations cascade from this
+  const searchFiltered = useMemo(() => {
+    if (!searchQuery.trim()) return guides;
+    return guides.filter((g) => matchesSearch(g, searchQuery.trim()));
+  }, [guides, searchQuery]);
 
   const typeCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    guides.forEach((g) => {
+    searchFiltered.forEach((g) => {
       counts[g.guideType] = (counts[g.guideType] || 0) + 1;
     });
     return counts;
-  }, [guides]);
+  }, [searchFiltered]);
 
   const seasonCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    const base = selectedType ? guides.filter((g) => g.guideType === selectedType) : guides;
+    const base = selectedType ? searchFiltered.filter((g) => g.guideType === selectedType) : searchFiltered;
     base.forEach((g) => {
       if (g.seasons) {
         for (const s of g.seasons) {
@@ -66,7 +85,7 @@ export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
       }
     });
     return counts;
-  }, [guides, selectedType]);
+  }, [searchFiltered, selectedType]);
 
   const filterTypes = useMemo(
     () =>
@@ -97,7 +116,7 @@ export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
   const hasCurrentSeasonGuides = (seasonCounts[currentDbSeason] || 0) > 0;
 
   const filteredGuides = useMemo(() => {
-    let result = guides;
+    let result = searchFiltered;
     if (selectedType) {
       result = result.filter((g) => g.guideType === selectedType);
     }
@@ -105,7 +124,7 @@ export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
       result = result.filter((g) => g.seasons?.includes(selectedSeason));
     }
     return result;
-  }, [guides, selectedType, selectedSeason]);
+  }, [searchFiltered, selectedType, selectedSeason]);
 
   if (guides.length === 0) {
     return (
@@ -142,11 +161,13 @@ export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
         types={filterTypes}
         selectedType={selectedType}
         onTypeChange={setSelectedType}
-        totalCount={guides.length}
+        totalCount={searchFiltered.length}
         seasons={filterSeasons}
         selectedSeason={selectedSeason}
         onSeasonChange={setSelectedSeason}
         currentSeason={hasCurrentSeasonGuides ? currentDbSeason : null}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
       {/* Breathing room between filter bar and content */}
@@ -166,10 +187,14 @@ export function GuidesPageClient({ guides, content }: GuidesPageClientProps) {
         ) : (
           <div className="flex flex-col items-center justify-center py-16">
             <p className="font-serif text-lg text-foreground">
-              {content?.guidesFilteredEmptyHeading ?? "No guides in this category"}
+              {searchQuery
+                ? `No guides match "${searchQuery}"`
+                : (content?.guidesFilteredEmptyHeading ?? "No guides in this category")}
             </p>
             <p className="mt-2 text-sm text-stone">
-              {content?.guidesFilteredEmptyDescription ?? "Try another filter, or browse them all."}
+              {searchQuery
+                ? "Try a different keyword, or clear the search."
+                : (content?.guidesFilteredEmptyDescription ?? "Try another filter, or browse them all.")}
             </p>
           </div>
         )}
