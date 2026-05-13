@@ -433,19 +433,25 @@ describe("Seasonal Availability", () => {
   });
 
   describe("Edge cases", () => {
-    it("should handle seasonal location with no availability rules (conservative)", () => {
+    it("should handle gating-type seasonal location with valid_months but no availability rules", () => {
+      // seasonal_attraction is a gating type — genuinely closed outside its window.
+      // With valid_months set and no availability rules, the valid_months gate applies.
       const location = createLocation({
-        name: "Unknown Festival",
+        name: "Alpine Trail",
         isSeasonal: true,
-        seasonalType: "festival",
+        seasonalType: "seasonal_attraction",
+        validMonths: [5, 6, 7, 8, 9, 10],
         availability: [],
       });
 
-      const result = isLocationAvailableOnDate(location, new Date("2025-06-15"));
-
-      // Should default to unavailable for safety
+      // Outside window — blocked
+      const result = isLocationAvailableOnDate(location, new Date("2025-01-15"));
       expect(result.available).toBe(false);
-      expect(result.reason).toContain("no availability rules");
+      expect(result.reason).toContain("not available in month 1");
+
+      // Inside window — available
+      const summer = isLocationAvailableOnDate(location, new Date("2025-07-15"));
+      expect(summer.available).toBe(true);
     });
 
     it("should allow seasonal location via valid_months when no availability rules exist", () => {
