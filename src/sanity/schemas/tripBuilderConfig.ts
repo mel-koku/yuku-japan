@@ -216,12 +216,12 @@ export const tripBuilderConfig = defineType({
     }),
     defineField({
       name: "dateStepBackgroundImage",
-      title: "Background Image (global fallback)",
+      title: "Background Image (legacy, no longer used)",
       type: "image",
       options: { hotspot: true },
       fieldset: "dateStep",
       description:
-        "Used when no seasonal image is set for the current season. Leave empty to fall back to the curated Wikimedia seasonal photos.",
+        "Legacy field. No longer rendered at runtime — the Date step now picks per-season images from `Seasonal Hero Images` (with a curated Wikimedia photo as fallback). Kept here so existing Sanity data does not error; safe to ignore.",
     }),
     defineField({
       name: "dateStepSeasonalImages",
