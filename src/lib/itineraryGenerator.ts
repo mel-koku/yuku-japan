@@ -103,7 +103,7 @@ const DEFAULT_PER_CITY_CAP_BY_PERSONA: Record<string, number> = {
   "first-timer": 6,
   honeymooner: 3,
   repeat: 0,
-  family: 5,
+  family: 6,
 };
 
 function resolveTotalDays(data: TripBuilderData): number {
