@@ -454,6 +454,28 @@ describe("Seasonal Availability", () => {
       expect(summer.available).toBe(true);
     });
 
+    it("should handle winter_festival gating-type with valid_months but no availability rules", () => {
+      // Post-2026-05-14 reclassify, winter_festival is a gating type — the 2
+      // remaining rows (Sapporo Snow Festival [2], Hakodate Christmas Fantasy
+      // [11,12]) are genuine winter-event-only venues.
+      const location = createLocation({
+        name: "Sapporo Snow Festival",
+        isSeasonal: true,
+        seasonalType: "winter_festival",
+        validMonths: [2],
+        availability: [],
+      });
+
+      // Outside window — blocked
+      const result = isLocationAvailableOnDate(location, new Date("2025-07-15"));
+      expect(result.available).toBe(false);
+      expect(result.reason).toContain("not available in month 7");
+
+      // Inside window — available
+      const february = isLocationAvailableOnDate(location, new Date("2025-02-08"));
+      expect(february.available).toBe(true);
+    });
+
     it("should allow seasonal location via valid_months when no availability rules exist", () => {
       const location = createLocation({
         name: "Cherry Blossom Park",
