@@ -16,6 +16,11 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 10000,
     setupFiles: ["./tests/setup.ts"],
+    server: {
+      deps: {
+        inline: ["sanity"],
+      },
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
