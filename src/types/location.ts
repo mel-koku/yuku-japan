@@ -16,12 +16,33 @@ export type Weekday =
 export type AvailabilityType = "fixed_annual" | "floating_annual" | "date_range";
 
 /**
- * Type of seasonal location.
- * - 'festival': Annual festivals or events
- * - 'seasonal_attraction': Cherry blossoms, autumn leaves, etc.
- * - 'winter_closure': Locations closed during certain seasons
+ * Type of seasonal location. Mirrors the distinct values present in
+ * `locations.seasonal_type` in prod (DB column is plain text, no CHECK constraint).
+ *
+ * This union documents what's actually stored. It is intentionally broader than
+ * `GATING_SEASONAL_TYPES`, which is the narrower set used for planner gating —
+ * gate-vs-marker, not "valid value".
  */
-export type SeasonalType = "festival" | "seasonal_attraction" | "winter_closure";
+export type SeasonalType =
+  | "festival"
+  | "seasonal_attraction"
+  | "winter_closure"
+  | "cherry_blossom"
+  | "summer_festival"
+  | "plum_blossom"
+  | "autumn_foliage"
+  | "winter_illumination"
+  | "lotus"
+  | "snow_winter"
+  | "summer_flowers"
+  | "wisteria"
+  | "winter_festival"
+  | "hydrangea"
+  | "iris"
+  | "sunflower"
+  | "lavender"
+  | "seasonal_food"
+  | "cosmos";
 
 /**
  * Availability rule for a seasonal location.
