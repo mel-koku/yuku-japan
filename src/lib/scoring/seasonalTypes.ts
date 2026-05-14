@@ -4,4 +4,5 @@
 export const GATING_SEASONAL_TYPES = new Set([
   "winter_closure",
   "seasonal_attraction",
+  "winter_festival",
 ]);
