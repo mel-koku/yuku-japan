@@ -37,6 +37,7 @@ function makeLocationRow(overrides: Record<string, unknown> = {}) {
     min_budget: 0,
     place_id: null,
     primary_photo_url: null,
+    hero_attribution: null,
     coordinates: { lat: 35.0, lng: 135.78 },
     google_primary_type: null,
     google_types: null,

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useCallback, useState, useRef, useMemo } from "react";
 import { m } from "framer-motion";
 import { easeReveal, durationBase } from "@/lib/motion";
-import type { Location } from "@/types/location";
+import type { Location, LocationHeroAttribution } from "@/types/location";
 import { useLocationDetailsQuery } from "@/hooks/useLocationDetailsQuery";
 import { useNearbyLocationsQuery } from "@/hooks/useLocationsQuery";
 import { useSaved } from "@/context/SavedContext";
@@ -29,6 +29,7 @@ import {
 } from "./HierarchySections";
 import { SimilarPlaces } from "./SimilarPlaces";
 import { LocationReportDialog } from "./LocationReportDialog";
+import { PhotoAttribution } from "./PhotoAttribution";
 import { EditorNoteBody } from "./EditorNoteBody";
 import { EditorNoteAuditSlot } from "./EditorNoteAuditSlot";
 import type { EditorNotePayload } from "@/sanity/editorNote";
@@ -160,10 +161,17 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
   // Hierarchy context (children, sub-experiences, relationships)
   const { data: hierarchy } = useLocationHierarchy(location.id);
 
-  // Photos — each entry carries its attribution (Google TOS requires a
-  // clickable credit alongside every displayed photo).
+  // Photos — each entry carries its attribution. Google heroes carry a plain
+  // displayName credit (Google TOS satisfied via the linked Commons-style
+  // text). Wikimedia heroes additionally carry structured license metadata
+  // for the PhotoAttribution component (Phase 3).
   const allPhotos = useMemo(() => {
-    type PhotoEntry = { url: string; attribution?: string; attributionUri?: string };
+    type PhotoEntry = {
+      url: string;
+      attribution?: string;
+      attributionUri?: string;
+      heroAttribution?: LocationHeroAttribution;
+    };
 
     const heroUrl = resizePhotoUrl(location.primaryPhotoUrl ?? location.image, 800);
     const heroName = heroUrl
@@ -178,6 +186,17 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
           url: p.proxyUrl as string,
           attribution: attr?.displayName,
           attributionUri: attr?.uri,
+          heroAttribution:
+            attr?.licenseShort && attr?.licenseUri && attr?.sourceUri && attr?.displayName
+              ? {
+                  author: attr.displayName,
+                  authorUri: attr.uri ?? null,
+                  licenseShort: attr.licenseShort,
+                  licenseUri: attr.licenseUri,
+                  licenseNotice: attr.licenseNotice ?? null,
+                  sourceUri: attr.sourceUri,
+                }
+              : undefined,
         };
       });
 
@@ -191,6 +210,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
         url: heroUrl,
         attribution: match?.attribution,
         attributionUri: match?.attributionUri,
+        heroAttribution: match?.heroAttribution ?? location.heroAttribution,
       });
     }
     for (const entry of detailEntries) {
@@ -199,7 +219,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
       if (!photos.some((p) => p.url === entry.url)) photos.push(entry);
     }
     return photos.slice(0, 5);
-  }, [location.primaryPhotoUrl, location.image, details?.photos]);
+  }, [location.primaryPhotoUrl, location.image, location.heroAttribution, details?.photos]);
 
   const displayName = useMemo(
     () => getLocationDisplayName(details?.displayName, location),
@@ -309,17 +329,30 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
   return (
     <div className="min-h-[100dvh] bg-background">
       {/* Hero image */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9]">
-        <Image
-          src={activePhoto?.url || "/placeholder.jpg"}
-          alt={displayName}
-          fill
-          className="object-cover"
-          sizes="100vw"
-          priority
-        />
-        <div className="absolute inset-0 scrim-70" />
-        {activePhoto?.attribution && (
+      <div className="relative">
+        <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9]">
+          <Image
+            src={activePhoto?.url || "/placeholder.jpg"}
+            alt={displayName}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+          <div className="absolute inset-0 scrim-70" />
+        </div>
+        {/* Photo attribution. On mobile it sits as a normal-flow caption below the hero so
+            long license notices (MLIT, personality rights) don't cover the image. On sm+ it
+            promotes to an absolute overlay anchored bottom-right of the hero. */}
+        {activePhoto?.heroAttribution ? (
+          <div className="bg-foreground/85 px-3 py-1.5 text-white/90 sm:absolute sm:bottom-2 sm:right-3 sm:max-w-[calc(100%-1.5rem)] sm:bg-transparent sm:px-0 sm:py-0 sm:text-right sm:text-white/80 [&_a]:underline [&_a]:decoration-white/40 [&_a:hover]:decoration-white">
+            <PhotoAttribution
+              attribution={activePhoto.heroAttribution}
+              variant="inline"
+              showNotice
+            />
+          </div>
+        ) : activePhoto?.attribution ? (
           <p className="absolute bottom-2 right-3 text-[11px] text-white/80">
             Photo:{" "}
             {activePhoto.attributionUri && isSafeUrl(activePhoto.attributionUri) ? (
@@ -335,7 +368,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
               activePhoto.attribution
             )}
           </p>
-        )}
+        ) : null}
       </div>
 
       {/* Photo gallery — sits directly under the hero so the thumbnails are visually

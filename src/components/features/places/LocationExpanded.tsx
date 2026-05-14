@@ -6,7 +6,7 @@ import { m } from "framer-motion";
 import { useEffect, useCallback, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { easeReveal, durationFast } from "@/lib/motion";
-import type { Location } from "@/types/location";
+import type { Location, LocationHeroAttribution } from "@/types/location";
 import { useLenis } from "@/providers/LenisProvider";
 import { useLocationDetailsQuery } from "@/hooks/useLocationDetailsQuery";
 import { useSaved } from "@/context/SavedContext";
@@ -20,6 +20,7 @@ import { isSafeUrl } from "@/lib/utils/urlSafety";
 import { typography } from "@/lib/typography-system";
 import type { TravelGuidance } from "@/types/travelGuidance";
 import { HeartIcon } from "./LocationCard";
+import { PhotoAttribution } from "./PhotoAttribution";
 import { useLocationHierarchy } from "@/hooks/useLocationHierarchy";
 import {
   ChildLocationsSection,
@@ -79,9 +80,15 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
   }, [status, location.id]);
 
   // Build deduplicated photo list: hero first, then details photos.
-  // Each entry carries attribution (Google TOS requires visible credit).
+  // Each entry carries attribution. Wikimedia heroes additionally carry
+  // structured license metadata for the PhotoAttribution component (Phase 3).
   const allPhotos = useMemo(() => {
-    type PhotoEntry = { url: string; attribution?: string; attributionUri?: string };
+    type PhotoEntry = {
+      url: string;
+      attribution?: string;
+      attributionUri?: string;
+      heroAttribution?: LocationHeroAttribution;
+    };
 
     const heroUrl = resizePhotoUrl(location.primaryPhotoUrl ?? location.image, 800);
     const heroName = heroUrl
@@ -96,6 +103,17 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
           url: p.proxyUrl as string,
           attribution: attr?.displayName,
           attributionUri: attr?.uri,
+          heroAttribution:
+            attr?.licenseShort && attr?.licenseUri && attr?.sourceUri && attr?.displayName
+              ? {
+                  author: attr.displayName,
+                  authorUri: attr.uri ?? null,
+                  licenseShort: attr.licenseShort,
+                  licenseUri: attr.licenseUri,
+                  licenseNotice: attr.licenseNotice ?? null,
+                  sourceUri: attr.sourceUri,
+                }
+              : undefined,
         };
       });
 
@@ -109,6 +127,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
         url: heroUrl,
         attribution: match?.attribution,
         attributionUri: match?.attributionUri,
+        heroAttribution: match?.heroAttribution ?? location.heroAttribution,
       });
     }
     for (const entry of detailEntries) {
@@ -117,7 +136,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
       if (!photos.some((p) => p.url === entry.url)) photos.push(entry);
     }
     return photos.slice(0, 5);
-  }, [location.primaryPhotoUrl, location.image, details?.photos]);
+  }, [location.primaryPhotoUrl, location.image, location.heroAttribution, details?.photos]);
 
   const activePhoto = allPhotos[activePhotoIndex];
 
@@ -279,28 +298,40 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
         </button>
 
         {/* Hero image — flush edges */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden">
-          <Image
-            src={activePhoto?.url || "/placeholder.jpg"}
-            alt={displayName}
-            fill
-            className="object-cover"
-            sizes="(min-width: 640px) 560px, 100vw"
-            priority
-          />
-          <div className="absolute inset-0 scrim-60" />
+        <div className="relative">
+          <div className="relative aspect-[16/9] w-full overflow-hidden">
+            <Image
+              src={activePhoto?.url || "/placeholder.jpg"}
+              alt={displayName}
+              fill
+              className="object-cover"
+              sizes="(min-width: 640px) 560px, 100vw"
+              priority
+            />
+            <div className="absolute inset-0 scrim-60" />
 
-          {/* Title overlay */}
-          <div className="absolute inset-x-0 bottom-0 p-4 sm:px-6 sm:pb-5">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-1">
-              {location.city}, {location.region}
-            </p>
-            <h2 className={cn(typography({ intent: "editorial-h3" }), "text-white line-clamp-2")}>
-              {displayName}
-            </h2>
+            {/* Title overlay */}
+            <div className="absolute inset-x-0 bottom-0 p-4 sm:px-6 sm:pb-5">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-1">
+                {location.city}, {location.region}
+              </p>
+              <h2 className={cn(typography({ intent: "editorial-h3" }), "text-white line-clamp-2")}>
+                {displayName}
+              </h2>
+            </div>
           </div>
 
-          {activePhoto?.attribution && (
+          {/* Photo attribution. Static caption below the hero on mobile so notice paragraphs
+              don't cover the image; absolute top-left overlay on sm+. */}
+          {activePhoto?.heroAttribution ? (
+            <div className="bg-foreground/85 px-3 py-1.5 text-white/90 sm:absolute sm:top-2 sm:left-3 sm:max-w-[calc(100%-1.5rem)] sm:bg-transparent sm:px-0 sm:py-0 sm:text-white/75 sm:filter-[drop-shadow(0_1px_2px_rgb(0_0_0/0.6))] [&_a]:underline [&_a]:decoration-white/40 [&_a:hover]:decoration-white">
+              <PhotoAttribution
+                attribution={activePhoto.heroAttribution}
+                variant="inline"
+                showNotice
+              />
+            </div>
+          ) : activePhoto?.attribution ? (
             <p className="absolute top-2 left-3 text-[10px] text-white/75 filter-[drop-shadow(0_1px_2px_rgb(0_0_0/0.6))]">
               Photo:{" "}
               {activePhoto.attributionUri && isSafeUrl(activePhoto.attributionUri) ? (
@@ -316,7 +347,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
                 activePhoto.attribution
               )}
             </p>
-          )}
+          ) : null}
         </div>
 
         {/* Photo thumbnail strip */}

@@ -266,6 +266,12 @@ export type Location = {
    */
   primaryPhotoUrl?: string;
   /**
+   * Structured attribution for the wikimedia-source hero photo, denormalized
+   * from `location_photos`. Null for google heroes (their attribution flows
+   * through Google's htmlAttributions in /api/places/photo).
+   */
+  heroAttribution?: LocationHeroAttribution;
+  /**
    * Accessibility information for the location (legacy structure)
    * @deprecated Use accessibilityOptions from Google Places enrichment instead
    */
@@ -611,6 +617,28 @@ export type LocationPhotoAttribution = {
   displayName?: string;
   uri?: string;
   photoUri?: string;
+  licenseShort?: string;
+  licenseUri?: string;
+  licenseNotice?: string;
+  sourceUri?: string;
+};
+
+/**
+ * Structured hero-photo attribution for wikimedia-source heroes, denormalized
+ * onto `locations.hero_attribution` so listing queries don't need to JOIN
+ * `location_photos`. Null for google heroes — their attribution is satisfied
+ * by Google's htmlAttributions returned through /api/places/photo.
+ *
+ * Backfill: scripts/_phase3-backfill-hero-attribution-2026-05-14.mjs.
+ * Sync contract documented in 20260515130000_add_locations_hero_attribution.sql.
+ */
+export type LocationHeroAttribution = {
+  author: string;
+  authorUri: string | null;
+  licenseShort: string;
+  licenseUri: string;
+  licenseNotice: string | null;
+  sourceUri: string;
 };
 
 export type LocationPhoto = {
