@@ -17,14 +17,22 @@ function buildProxyUrl(photoName: string, maxWidthPx = 1200): string {
   return `/api/places/photo?photoName=${encodeURIComponent(photoName)}&maxWidthPx=${maxWidthPx}`;
 }
 
-// Curated rows store a direct URL (e.g. Wikimedia Commons) in `photo_name`;
-// Google rows store an opaque ref that must be served via the proxy. Mirrors
-// the same source-aware mapping in /api/locations/[id]/route.ts.
-function photoUrlFromRow(source: string, photoName: string, maxWidthPx = 1200): string {
-  return source === "curated" ? photoName : buildProxyUrl(photoName, maxWidthPx);
+function buildWikimediaStorageUrl(photoName: string): string {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  return `${base}/storage/v1/object/public/editorial-photos/${photoName}`;
 }
 
-const PHOTO_SOURCES = ["google", "curated"] as const;
+// Source-aware URL mapping — must match /api/locations/[id]/route.ts:
+//   - 'google'    → opaque ref served via /api/places/photo proxy
+//   - 'wikimedia' → Supabase Storage path under editorial-photos bucket
+//   - 'curated'   → legacy: direct URL stored in photo_name (e.g. raw Wikimedia)
+function photoUrlFromRow(source: string, photoName: string, maxWidthPx = 1200): string {
+  if (source === "wikimedia") return buildWikimediaStorageUrl(photoName);
+  if (source === "curated") return photoName;
+  return buildProxyUrl(photoName, maxWidthPx);
+}
+
+const PHOTO_SOURCES = ["google", "curated", "wikimedia"] as const;
 
 /**
  * Returns a map of location_id -> best available hero photo URL. Prefers
@@ -87,16 +95,19 @@ async function fetchHeroPhotosByLocationIds(
 }
 
 /**
- * Returns all approved Google photos per location (sorted by sort_order)
- * plus a single-photo fallback from `locations.primary_photo_url`. Used by
- * the guide-card fallback to diversify images across guides that share the
- * same location set.
+ * Returns all approved photos per location (sorted by sort_order) plus a
+ * single-photo fallback from `locations.primary_photo_url`. Also returns the
+ * subset of location ids that have ≥1 wikimedia-source photo so callers can
+ * prefer editorial Wikimedia heroes over Google snapshots when both exist.
+ * Used by the guide-card fallback to diversify images across guides that
+ * share the same location set.
  */
 async function fetchHeroPhotoListByLocationIds(
   ids: string[]
-): Promise<Map<string, string[]>> {
-  const map = new Map<string, string[]>();
-  if (ids.length === 0) return map;
+): Promise<{ photosByLocation: Map<string, string[]>; wikimediaLocations: Set<string> }> {
+  const photosByLocation = new Map<string, string[]>();
+  const wikimediaLocations = new Set<string>();
+  if (ids.length === 0) return { photosByLocation, wikimediaLocations };
   try {
     const supabase = await createClient();
     const [photos, locations] = await Promise.all([
@@ -122,9 +133,10 @@ async function fetchHeroPhotoListByLocationIds(
       source: string;
       photo_name: string;
     }>) {
-      const list = map.get(row.location_id) ?? [];
+      const list = photosByLocation.get(row.location_id) ?? [];
       list.push(photoUrlFromRow(row.source, row.photo_name));
-      map.set(row.location_id, list);
+      photosByLocation.set(row.location_id, list);
+      if (row.source === "wikimedia") wikimediaLocations.add(row.location_id);
     }
     if (locations.error) {
       logger.warn("[fallbackImages] locations query failed", {
@@ -135,14 +147,14 @@ async function fetchHeroPhotoListByLocationIds(
       id: string;
       primary_photo_url: string | null;
     }>) {
-      if (map.has(row.id)) continue;
+      if (photosByLocation.has(row.id)) continue;
       if (isMissingImage(row.primary_photo_url)) continue;
-      map.set(row.id, [row.primary_photo_url as string]);
+      photosByLocation.set(row.id, [row.primary_photo_url as string]);
     }
   } catch (error) {
     logger.warn("[fallbackImages] hero photo list lookup threw", { error });
   }
-  return map;
+  return { photosByLocation, wikimediaLocations };
 }
 
 /**
@@ -165,14 +177,13 @@ export async function attachLocationFallbackImages(
   }
   if (candidateIds.size === 0) return summaries;
 
-  const photosByLocation = await fetchHeroPhotoListByLocationIds(
-    Array.from(candidateIds)
-  );
+  const { photosByLocation, wikimediaLocations } =
+    await fetchHeroPhotoListByLocationIds(Array.from(candidateIds));
   if (photosByLocation.size === 0) return summaries;
 
   return summaries.map((s) => {
     const ids = locationIdsByGuide.get(s.id) ?? [];
-    const url = pickLocationImage(s.id, ids, photosByLocation);
+    const url = pickLocationImage(s.id, ids, photosByLocation, wikimediaLocations);
     if (!url) return s;
     return {
       ...s,
@@ -195,12 +206,16 @@ export async function attachGuideFallbackImage(guide: Guide): Promise<Guide> {
   if (!featMissing && !thumbMissing) return guide;
   if (!guide.locationIds || guide.locationIds.length === 0) return guide;
 
-  const photosByLocation = await fetchHeroPhotoListByLocationIds(
-    guide.locationIds
-  );
+  const { photosByLocation, wikimediaLocations } =
+    await fetchHeroPhotoListByLocationIds(guide.locationIds);
   if (photosByLocation.size === 0) return guide;
 
-  const url = pickLocationImage(guide.id, guide.locationIds, photosByLocation);
+  const url = pickLocationImage(
+    guide.id,
+    guide.locationIds,
+    photosByLocation,
+    wikimediaLocations,
+  );
   if (!url) return guide;
 
   return {
@@ -216,18 +231,27 @@ export async function attachGuideFallbackImage(guide: Guide): Promise<Guide> {
  * photo within that location — so guides sharing location sets still surface
  * different photos. Falls back to sequential lookup when the preferred index
  * has no photo.
+ *
+ * When `wikimediaLocations` is non-empty, the hash operates over the
+ * Wikimedia-mirrored subset first — Wikimedia heroes are explicitly
+ * editor-vetted (with license metadata) and outrank Google snapshots even
+ * when both exist for the same guide's location set. Diversity hash still
+ * runs within the higher-quality pool.
  */
 function pickLocationImage(
   guideId: string,
   locationIds: string[],
-  photosByLocation: Map<string, string[]>
+  photosByLocation: Map<string, string[]>,
+  wikimediaLocations: Set<string>
 ): string | undefined {
   if (locationIds.length === 0) return undefined;
-  const locStart = hashString(guideId + ":loc") % locationIds.length;
+  const wikimediaSubset = locationIds.filter((id) => wikimediaLocations.has(id));
+  const pool = wikimediaSubset.length > 0 ? wikimediaSubset : locationIds;
+  const locStart = hashString(guideId + ":loc") % pool.length;
   const photoSeed = hashString(guideId + ":photo");
-  for (let offset = 0; offset < locationIds.length; offset++) {
-    const idx = (locStart + offset) % locationIds.length;
-    const photos = photosByLocation.get(locationIds[idx]!);
+  for (let offset = 0; offset < pool.length; offset++) {
+    const idx = (locStart + offset) % pool.length;
+    const photos = photosByLocation.get(pool[idx]!);
     if (photos && photos.length > 0) {
       return photos[photoSeed % photos.length]!;
     }
