@@ -97,7 +97,7 @@ export function HeroOpening({ locationCount, content, isFreePromo = false }: Her
         {/* Content — bottom-left editorial */}
         <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-[calc(4rem+env(safe-area-inset-bottom))] text-left">
           <div className="mx-auto w-full max-w-7xl">
-          <div className="max-w-2xl">
+          <div className="max-w-4xl">
             <h1 className={cn(typography({ intent: "editorial-hero" }), "leading-[1.05] tracking-tight text-white")}>
               {headline}
             </h1>
@@ -182,7 +182,7 @@ export function HeroOpening({ locationCount, content, isFreePromo = false }: Her
         }}
       >
         <div className="mx-auto w-full max-w-7xl">
-        <div className="max-w-2xl">
+        <div className="max-w-4xl">
           {/* Statement headline — word-by-word clip reveal */}
           <SplitText
             as="h1"
