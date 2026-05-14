@@ -23,7 +23,7 @@ export const CATEGORY_TO_INTERESTS: Record<string, InterestId[]> = {
   garden: ["nature", "wellness", "photography"],
   bar: ["nightlife"],
   onsen: ["wellness", "nature"],
-  entertainment: ["nightlife"],
+  entertainment: ["nightlife", "nature"],
   shopping: ["shopping"],
   museum: ["craft", "culture", "history"],
   viewpoint: ["photography", "nature"],
