@@ -58,13 +58,56 @@ export const editorNote = defineType({
       of: [{ type: "string" }],
       options: { layout: "tags" },
     }),
+    defineField({
+      name: "source",
+      title: "Authoring Source",
+      type: "string",
+      description:
+        "Which authoring workflow produced this note. Internal field for A/B audits.",
+      options: {
+        list: [
+          { title: "Pipeline A", value: "pipeline-a" },
+          { title: "Pipeline B", value: "pipeline-b" },
+          { title: "Human-authored", value: "human" },
+        ],
+      },
+      initialValue: "pipeline-a",
+    }),
+    defineField({
+      name: "sourceMetadata",
+      title: "Authoring Metadata",
+      type: "object",
+      description:
+        "Internal provenance for the workflow that produced this note. Optional; useful for A/B audits.",
+      fields: [
+        defineField({
+          name: "authoredAt",
+          title: "Authored At",
+          type: "datetime",
+        }),
+        defineField({
+          name: "claimsAudit",
+          title: "Claims Audit",
+          type: "array",
+          description:
+            "Each entry: '<claim text> :: INPUT-verbatim | INPUT-implied | unsourced'.",
+          of: [{ type: "string" }],
+        }),
+      ],
+    }),
   ],
   preview: {
-    select: { slug: "locationSlug" },
-    prepare({ slug }) {
+    select: { slug: "locationSlug", source: "source" },
+    prepare({ slug, source }) {
+      const sourceLabel =
+        source === "pipeline-b"
+          ? "Pipeline B"
+          : source === "human"
+            ? "Human"
+            : "Pipeline A";
       return {
         title: slug || "Unassigned editor note",
-        subtitle: "Editor Note",
+        subtitle: `Editor Note · ${sourceLabel}`,
       };
     },
   },
