@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { m, useReducedMotion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { resizePhotoUrl } from "@/lib/google/transformations";
 import { typography } from "@/lib/typography-system";
@@ -81,17 +82,16 @@ export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onO
       className="mx-auto max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12"
     >
       {iconic.length > 0 && (
-        <Lane
+        <RailLane
           eyebrow="The greats"
           intro="The five or six places that justify the flight."
           motionProps={fadeIn}
+          prefersReducedMotion={prefersReducedMotion ?? false}
         >
-          <HorizontalRail>
-            {iconic.map((loc) => (
-              <PlaceTile key={loc.id} location={loc} onSelect={onSelect} />
-            ))}
-          </HorizontalRail>
-        </Lane>
+          {iconic.map((loc) => (
+            <PlaceTile key={loc.id} location={loc} onSelect={onSelect} />
+          ))}
+        </RailLane>
       )}
 
       <Lane
@@ -123,17 +123,16 @@ export function PlacesLanes({ locations, cityHeroes, onSelect, onCitySelect, onO
       </Lane>
 
       {containers.length > 0 && (
-        <Lane
+        <RailLane
           eyebrow="Districts and clusters"
           intro="Walking neighborhoods, hot-spring towns, lantern-lit lanes."
           motionProps={fadeIn}
+          prefersReducedMotion={prefersReducedMotion ?? false}
         >
-          <HorizontalRail>
-            {containers.map((loc) => (
-              <PlaceTile key={loc.id} location={loc} onSelect={onSelect} variant="container" />
-            ))}
-          </HorizontalRail>
-        </Lane>
+          {containers.map((loc) => (
+            <PlaceTile key={loc.id} location={loc} onSelect={onSelect} variant="container" />
+          ))}
+        </RailLane>
       )}
     </section>
   );
@@ -169,14 +168,113 @@ function Lane({
   );
 }
 
-function HorizontalRail({ children }: { children: React.ReactNode }) {
-  // overscroll-x-contain (not the shorthand): horizontal wheel stays in the
-  // rail, vertical wheel chains up so the page can scroll while the cursor
-  // is over a tile.
+function RailLane({
+  eyebrow,
+  intro,
+  children,
+  motionProps,
+  prefersReducedMotion,
+}: {
+  eyebrow: string;
+  intro: string;
+  children: React.ReactNode;
+  motionProps?: Parameters<typeof m.div>[0];
+  prefersReducedMotion: boolean;
+}) {
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateBoundaries = useCallback(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    // 2px epsilon — sub-pixel scrollLeft on retina/zoom can leave a fraction.
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft < max - 2);
+  }, []);
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    updateBoundaries();
+    el.addEventListener("scroll", updateBoundaries, { passive: true });
+    const ro = new ResizeObserver(updateBoundaries);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", updateBoundaries);
+      ro.disconnect();
+    };
+  }, [updateBoundaries]);
+
+  const scrollByDirection = (direction: -1 | 1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({
+      left: direction * Math.round(el.clientWidth * 0.8),
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  };
+
   return (
-    <div className="-mx-4 overflow-x-auto overscroll-x-contain px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-      <div className="flex snap-x snap-mandatory gap-3 sm:gap-4">{children}</div>
-    </div>
+    <m.div
+      {...motionProps}
+      transition={{ duration: durationBase, ease: easeReveal }}
+      className="space-y-4"
+    >
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="eyebrow-editorial">{eyebrow}</p>
+          <p className={cn(typography({ intent: "editorial-h3" }), "mt-1 text-foreground-body")}>
+            {intro}
+          </p>
+        </div>
+        <div className="hidden shrink-0 gap-2 sm:flex">
+          <RailArrowButton
+            direction="left"
+            disabled={!canScrollLeft}
+            onClick={() => scrollByDirection(-1)}
+          />
+          <RailArrowButton
+            direction="right"
+            disabled={!canScrollRight}
+            onClick={() => scrollByDirection(1)}
+          />
+        </div>
+      </div>
+      {/* overscroll-x-contain (not the shorthand): horizontal wheel stays in
+          the rail, vertical wheel chains up so the page can scroll while the
+          cursor is over a tile. */}
+      <div
+        ref={railRef}
+        className="-mx-4 overflow-x-auto overscroll-x-contain px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+      >
+        <div className="flex snap-x snap-mandatory gap-3 sm:gap-4">{children}</div>
+      </div>
+    </m.div>
+  );
+}
+
+function RailArrowButton({
+  direction,
+  disabled,
+  onClick,
+}: {
+  direction: "left" | "right";
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  const Icon = direction === "left" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={direction === "left" ? "Scroll left" : "Scroll right"}
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-divider bg-surface text-foreground-secondary shadow-[var(--shadow-card)] transition hover:text-foreground hover:shadow-[var(--shadow-elevated)] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+    >
+      <Icon className="h-4 w-4" aria-hidden="true" />
+    </button>
   );
 }
 
