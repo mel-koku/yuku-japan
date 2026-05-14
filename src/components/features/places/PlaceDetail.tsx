@@ -30,7 +30,8 @@ import {
 import { SimilarPlaces } from "./SimilarPlaces";
 import { LocationReportDialog } from "./LocationReportDialog";
 import { EditorNoteBody } from "./EditorNoteBody";
-import type { PortableTextBlock } from "@portabletext/react";
+import { EditorNoteAuditSlot } from "./EditorNoteAuditSlot";
+import type { EditorNotePayload } from "@/sanity/editorNote";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { Button } from "@/components/ui/Button";
 import { DataIcon } from "@/components/ui/DataIcon";
@@ -68,7 +69,7 @@ function OverviewSection({
   description,
   sectionReveal,
 }: {
-  editorNote?: PortableTextBlock[] | null;
+  editorNote?: EditorNotePayload | null;
   summary?: string;
   description?: string;
   sectionReveal: Record<string, unknown>;
@@ -81,10 +82,11 @@ function OverviewSection({
   // section entirely (Option B unlabeled — see 2026-05-05 frontend-wiring
   // handoff). Curated takes are the better surface for covered locations;
   // the description still shows for the ~5,060 uncovered locations.
-  if (editorNote && editorNote.length > 0) {
+  if (editorNote?.note && editorNote.note.length > 0) {
     return (
       <m.section {...sectionReveal}>
-        <EditorNoteBody blocks={editorNote} />
+        <EditorNoteBody blocks={editorNote.note} />
+        <EditorNoteAuditSlot payload={editorNote} />
       </m.section>
     );
   }
@@ -125,7 +127,7 @@ function OverviewSection({
 
 type PlaceDetailProps = {
   initialLocation: Location;
-  initialEditorNote?: PortableTextBlock[] | null;
+  initialEditorNote?: EditorNotePayload | null;
   featuredGuides?: GuideSummary[];
 };
 
@@ -514,7 +516,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
       {/* Content sections */}
       <div className="mx-auto max-w-3xl px-6 space-y-8 pb-8">
         {/* Description (replaced by editor note when one exists for this location) */}
-        {(initialEditorNote?.length || summary || description) && (
+        {(initialEditorNote?.note?.length || summary || description) && (
           <OverviewSection
             editorNote={initialEditorNote}
             summary={summary}

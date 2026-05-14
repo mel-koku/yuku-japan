@@ -19,7 +19,22 @@ import { sanityClient } from "./client";
  * to import from server components.
  */
 
-export const EDITOR_NOTE_QUERY = `*[_type == "editorNote" && locationSlug == $slug][0]{ note }`;
+export type EditorNoteSource = "pipeline-a" | "pipeline-b" | "human";
+
+export type EditorNotePayload = {
+  note: PortableTextBlock[];
+  source?: EditorNoteSource;
+  sourceMetadata?: {
+    authoredAt?: string;
+    claimsAudit?: string[];
+  };
+};
+
+export const EDITOR_NOTE_QUERY = `*[_type == "editorNote" && locationSlug == $slug][0]{
+  note,
+  source,
+  sourceMetadata { authoredAt, claimsAudit }
+}`;
 
 /**
  * Server-side fetch. Use in page loaders (`generateMetadata`, server
@@ -28,14 +43,15 @@ export const EDITOR_NOTE_QUERY = `*[_type == "editorNote" && locationSlug == $sl
  */
 export async function fetchEditorNoteByLocationSlug(
   slug: string,
-): Promise<PortableTextBlock[] | null> {
+): Promise<EditorNotePayload | null> {
   if (!slug) return null;
   try {
-    const result = await sanityClient.fetch<{ note?: PortableTextBlock[] } | null>(
+    const result = await sanityClient.fetch<EditorNotePayload | null>(
       EDITOR_NOTE_QUERY,
       { slug },
     );
-    return result?.note ?? null;
+    if (!result?.note) return null;
+    return result;
   } catch {
     // Sanity unreachable / placeholder env / network error — caller already
     // degrades to description, so swallow rather than throw.
