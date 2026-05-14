@@ -7,6 +7,7 @@
  */
 
 import type {
+  LocationHeroAttribution,
   LocationOperatingHours,
   LocationVisitRecommendation,
   LocationTransitMode,
@@ -43,6 +44,7 @@ export type LocationDbRow = {
   review_count: number | null;
   place_id: string | null;
   primary_photo_url: string | null;
+  hero_attribution: LocationHeroAttribution | null;
   // Google Places enrichment fields
   google_primary_type: string | null;
   google_types: string[] | null;
@@ -125,6 +127,7 @@ export const LOCATION_LISTING_COLUMNS = `
   min_budget,
   place_id,
   primary_photo_url,
+  hero_attribution,
   coordinates,
   google_primary_type,
   google_types,
@@ -174,6 +177,7 @@ export const LOCATION_EXPLORE_COLUMNS = `
   review_count,
   estimated_duration,
   primary_photo_url,
+  hero_attribution,
   coordinates,
   google_primary_type,
   price_level,
@@ -219,6 +223,7 @@ export const LOCATION_DETAIL_COLUMNS = `
   timezone,
   place_id,
   primary_photo_url,
+  hero_attribution,
   website_uri,
   phone_number,
   google_maps_uri,
@@ -367,6 +372,7 @@ export type LocationExploreDbRow = Pick<LocationDbRow,
   | "review_count"
   | "estimated_duration"
   | "primary_photo_url"
+  | "hero_attribution"
   | "coordinates"
   | "google_primary_type"
   | "price_level"
@@ -490,6 +496,7 @@ export type LocationListingDbRow = Pick<LocationDbRow,
   | "min_budget"
   | "place_id"
   | "primary_photo_url"
+  | "hero_attribution"
   | "coordinates"
   | "google_primary_type"
   | "google_types"
@@ -532,6 +539,7 @@ export const LOCATION_NEARBY_COLUMNS = `
   review_count,
   estimated_duration,
   primary_photo_url,
+  hero_attribution,
   coordinates,
   google_primary_type,
   price_level,
@@ -559,6 +567,7 @@ export type LocationNearbyDbRow = Pick<LocationDbRow,
   | "review_count"
   | "estimated_duration"
   | "primary_photo_url"
+  | "hero_attribution"
   | "coordinates"
   | "google_primary_type"
   | "price_level"

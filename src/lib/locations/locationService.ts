@@ -144,6 +144,7 @@ export function transformDbRowToLocation(row: LocationDbRow | LocationListingDbR
     reviewCount: "review_count" in r ? (r.review_count as number | null) ?? undefined : undefined,
     placeId: row.place_id ?? undefined,
     primaryPhotoUrl: "primary_photo_url" in r ? (r.primary_photo_url as string | null) ?? undefined : undefined,
+    heroAttribution: "hero_attribution" in r ? (r.hero_attribution as Location["heroAttribution"] | null) ?? undefined : undefined,
     coordinates: "coordinates" in r ? (r.coordinates as Location["coordinates"]) ?? undefined : undefined,
     // Google Places enrichment fields
     googlePrimaryType: "google_primary_type" in r ? (r.google_primary_type as string | null) ?? undefined : undefined,
