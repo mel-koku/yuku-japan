@@ -298,29 +298,33 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
         </button>
 
         {/* Hero image — flush edges */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden">
-          <Image
-            src={activePhoto?.url || "/placeholder.jpg"}
-            alt={displayName}
-            fill
-            className="object-cover"
-            sizes="(min-width: 640px) 560px, 100vw"
-            priority
-          />
-          <div className="absolute inset-0 scrim-60" />
+        <div className="relative">
+          <div className="relative aspect-[16/9] w-full overflow-hidden">
+            <Image
+              src={activePhoto?.url || "/placeholder.jpg"}
+              alt={displayName}
+              fill
+              className="object-cover"
+              sizes="(min-width: 640px) 560px, 100vw"
+              priority
+            />
+            <div className="absolute inset-0 scrim-60" />
 
-          {/* Title overlay */}
-          <div className="absolute inset-x-0 bottom-0 p-4 sm:px-6 sm:pb-5">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-1">
-              {location.city}, {location.region}
-            </p>
-            <h2 className={cn(typography({ intent: "editorial-h3" }), "text-white line-clamp-2")}>
-              {displayName}
-            </h2>
+            {/* Title overlay */}
+            <div className="absolute inset-x-0 bottom-0 p-4 sm:px-6 sm:pb-5">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-1">
+                {location.city}, {location.region}
+              </p>
+              <h2 className={cn(typography({ intent: "editorial-h3" }), "text-white line-clamp-2")}>
+                {displayName}
+              </h2>
+            </div>
           </div>
 
+          {/* Photo attribution. Static caption below the hero on mobile so notice paragraphs
+              don't cover the image; absolute top-left overlay on sm+. */}
           {activePhoto?.heroAttribution ? (
-            <div className="absolute top-2 left-3 max-w-[calc(100%-1.5rem)] text-white/75 filter-[drop-shadow(0_1px_2px_rgb(0_0_0/0.6))] [&_a]:underline [&_a]:decoration-white/40 [&_a:hover]:decoration-white">
+            <div className="bg-foreground/85 px-3 py-1.5 text-white/90 sm:absolute sm:top-2 sm:left-3 sm:max-w-[calc(100%-1.5rem)] sm:bg-transparent sm:px-0 sm:py-0 sm:text-white/75 sm:filter-[drop-shadow(0_1px_2px_rgb(0_0_0/0.6))] [&_a]:underline [&_a]:decoration-white/40 [&_a:hover]:decoration-white">
               <PhotoAttribution
                 attribution={activePhoto.heroAttribution}
                 variant="inline"

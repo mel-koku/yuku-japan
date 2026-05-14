@@ -329,18 +329,23 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
   return (
     <div className="min-h-[100dvh] bg-background">
       {/* Hero image */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9]">
-        <Image
-          src={activePhoto?.url || "/placeholder.jpg"}
-          alt={displayName}
-          fill
-          className="object-cover"
-          sizes="100vw"
-          priority
-        />
-        <div className="absolute inset-0 scrim-70" />
+      <div className="relative">
+        <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9]">
+          <Image
+            src={activePhoto?.url || "/placeholder.jpg"}
+            alt={displayName}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+          <div className="absolute inset-0 scrim-70" />
+        </div>
+        {/* Photo attribution. On mobile it sits as a normal-flow caption below the hero so
+            long license notices (MLIT, personality rights) don't cover the image. On sm+ it
+            promotes to an absolute overlay anchored bottom-right of the hero. */}
         {activePhoto?.heroAttribution ? (
-          <div className="absolute bottom-2 right-3 max-w-[calc(100%-1.5rem)] text-right text-white/80 [&_a]:underline [&_a]:decoration-white/40 [&_a:hover]:decoration-white">
+          <div className="bg-foreground/85 px-3 py-1.5 text-white/90 sm:absolute sm:bottom-2 sm:right-3 sm:max-w-[calc(100%-1.5rem)] sm:bg-transparent sm:px-0 sm:py-0 sm:text-right sm:text-white/80 [&_a]:underline [&_a]:decoration-white/40 [&_a:hover]:decoration-white">
             <PhotoAttribution
               attribution={activePhoto.heroAttribution}
               variant="inline"
