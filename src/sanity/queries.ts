@@ -253,6 +253,24 @@ export const tripBuilderConfigQuery = groq`
       ...,
       "url": asset->url
     },
+    "dateStepSeasonalImages": dateStepSeasonalImages {
+      "spring": spring {
+        ...,
+        "url": asset->url
+      },
+      "summer": summer {
+        ...,
+        "url": asset->url
+      },
+      "autumn": autumn {
+        ...,
+        "url": asset->url
+      },
+      "winter": winter {
+        ...,
+        "url": asset->url
+      }
+    },
     dateStepStartLabel,
     dateStepEndLabel,
     entryPointHeading,

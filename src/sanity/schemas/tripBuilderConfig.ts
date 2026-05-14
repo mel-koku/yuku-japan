@@ -216,10 +216,46 @@ export const tripBuilderConfig = defineType({
     }),
     defineField({
       name: "dateStepBackgroundImage",
-      title: "Background Image",
+      title: "Background Image (global fallback)",
       type: "image",
       options: { hotspot: true },
       fieldset: "dateStep",
+      description:
+        "Used when no seasonal image is set for the current season. Leave empty to fall back to the curated Wikimedia seasonal photos.",
+    }),
+    defineField({
+      name: "dateStepSeasonalImages",
+      title: "Seasonal Hero Images",
+      type: "object",
+      fieldset: "dateStep",
+      description:
+        "One hero per season. The Date step picks by current month (Spring = Mar/Apr/May, Summer = Jun/Jul/Aug, Autumn = Sep/Oct/Nov, Winter = Dec/Jan/Feb). Leave any season empty to fall back to a curated Wikimedia photo.",
+      fields: [
+        defineField({
+          name: "spring",
+          title: "Spring (Mar/Apr/May)",
+          type: "image",
+          options: { hotspot: true },
+        }),
+        defineField({
+          name: "summer",
+          title: "Summer (Jun/Jul/Aug)",
+          type: "image",
+          options: { hotspot: true },
+        }),
+        defineField({
+          name: "autumn",
+          title: "Autumn (Sep/Oct/Nov)",
+          type: "image",
+          options: { hotspot: true },
+        }),
+        defineField({
+          name: "winter",
+          title: "Winter (Dec/Jan/Feb)",
+          type: "image",
+          options: { hotspot: true },
+        }),
+      ],
     }),
     defineField({
       name: "dateStepStartLabel",

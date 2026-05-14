@@ -129,6 +129,12 @@ export type TripBuilderConfig = {
   dateStepHeading?: string;
   dateStepDescription?: string;
   dateStepBackgroundImage?: SanityImageAsset & { url?: string };
+  dateStepSeasonalImages?: {
+    spring?: SanityImageAsset & { url?: string };
+    summer?: SanityImageAsset & { url?: string };
+    autumn?: SanityImageAsset & { url?: string };
+    winter?: SanityImageAsset & { url?: string };
+  };
   dateStepStartLabel?: string;
   dateStepEndLabel?: string;
 
