@@ -31,6 +31,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { DataIcon } from "@/components/ui/DataIcon";
 import { LocationReportDialog } from "./LocationReportDialog";
 import { EditorNoteBody } from "./EditorNoteBody";
+import { EditorNoteAuditSlot } from "./EditorNoteAuditSlot";
 import { useEditorNoteByLocationSlug } from "@/sanity/useEditorNote";
 
 type LocationExpandedProps = {
@@ -55,7 +56,8 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
   // Smart Guidebook editor note (Option B unlabeled — replaces description
   // when present). Returns undefined while loading, null when no note exists.
   const editorNote = useEditorNoteByLocationSlug(location.id);
-  const hasEditorNote = !!editorNote && editorNote.length > 0;
+  const editorNoteBlocks = editorNote?.note;
+  const hasEditorNote = !!editorNoteBlocks && editorNoteBlocks.length > 0;
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
   const { data: hierarchy } = useLocationHierarchy(location.id);
@@ -444,7 +446,8 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
           {/* Description (replaced by editor note when one exists for this location) */}
           {hasEditorNote ? (
             <section>
-              <EditorNoteBody blocks={editorNote!} />
+              <EditorNoteBody blocks={editorNoteBlocks!} />
+              {editorNote && <EditorNoteAuditSlot payload={editorNote} />}
             </section>
           ) : (
             (summary || description) && (
