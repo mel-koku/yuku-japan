@@ -7,7 +7,11 @@
  *   - cdn.sanity.io: served via Sanity's own ?w/?q/?auto=format pipeline
  *   - /api/places/photo: served via Google Places maxWidthPx (proxy already
  *     forwards the resize request to Google server-side)
- *   - upload.wikimedia.org: served via Wikimedia's /thumb/ CDN
+ *   - editorial-photos bucket: pre-generated widths (250/500/960/1280/1920)
+ *     served direct from Supabase Storage. Loader buckets the requested
+ *     width to the nearest pre-generated size.
+ *   - upload.wikimedia.org: served via Wikimedia's /thumb/ CDN (transition
+ *     state and fallback for any URL not yet mirrored to editorial-photos)
  *   - /images/**: pre-sized static assets in /public, served direct
  *
  * All other sources (other remote hosts) still flow through /_next/image
@@ -22,6 +26,18 @@ function bucketWikimediaWidth(width: number): number {
     if (w >= width) return w;
   }
   return 3840;
+}
+
+// editorial-photos bucket pre-generated widths. The ingest pipeline writes
+// one object per width per location, keyed `{location_id}/{width}.{ext}`.
+// Source: docs/superpowers/plans/2026-05-07-wikimedia-photo-mirror.md §Phase 2.
+const EDITORIAL_PHOTOS_WIDTHS = [250, 500, 960, 1280, 1920] as const;
+
+function bucketEditorialWidth(width: number): number {
+  for (const w of EDITORIAL_PHOTOS_WIDTHS) {
+    if (w >= width) return w;
+  }
+  return 1920;
 }
 
 export default function imageLoader({
@@ -55,10 +71,24 @@ export default function imageLoader({
     return `${path}?${params.toString()}`;
   }
 
+  // editorial-photos bucket (Supabase Storage): pre-generated widths. The
+  // ingest pipeline writes 5 sizes per file keyed `{location_id}/{width}.{ext}`,
+  // and locations.primary_photo_url is rewritten to the 1280-width object.
+  // The loader swaps that token to the nearest pre-generated size when a
+  // narrower or wider viewport requests it.
+  if (src.includes("/editorial-photos/")) {
+    const bucketed = bucketEditorialWidth(width);
+    // Match `/{digits}.{ext}` immediately before query or end-of-string.
+    return src.replace(/\/(\d+)(\.[a-zA-Z0-9]+)(\?|$)/, `/${bucketed}$2$3`);
+  }
+
   // Wikimedia Commons: rewrite originals to /thumb/ URLs so resizing runs on
   // Wikimedia's CDN, not Vercel's. Wikimedia restricts thumbnails to a fixed
   // set of widths (anything else 400s); see Common_thumbnail_sizes on
   // mediawiki.org. We round up the requested width to the next allowed bucket.
+  // Kept in place during the transition window where photo_name still holds
+  // raw upload.wikimedia.org URLs for rows not yet mirrored, and as a permanent
+  // fallback for any direct-Commons URL the data path emits in the future.
   if (src.includes("upload.wikimedia.org/wikipedia/commons/")) {
     const bucketed = bucketWikimediaWidth(width);
     if (src.includes("/commons/thumb/")) {
