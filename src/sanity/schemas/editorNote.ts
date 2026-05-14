@@ -71,7 +71,6 @@ export const editorNote = defineType({
           { title: "Human-authored", value: "human" },
         ],
       },
-      initialValue: "pipeline-a",
     }),
     defineField({
       name: "sourceMetadata",
@@ -100,11 +99,13 @@ export const editorNote = defineType({
     select: { slug: "locationSlug", source: "source" },
     prepare({ slug, source }) {
       const sourceLabel =
-        source === "pipeline-b"
-          ? "Pipeline B"
-          : source === "human"
-            ? "Human"
-            : "Pipeline A";
+        source === "pipeline-a"
+          ? "Pipeline A"
+          : source === "pipeline-b"
+            ? "Pipeline B"
+            : source === "human"
+              ? "Human"
+              : "Unset";
       return {
         title: slug || "Unassigned editor note",
         subtitle: `Editor Note · ${sourceLabel}`,
