@@ -69,6 +69,7 @@ export const editorNote = defineType({
           { title: "Pipeline A", value: "pipeline-a" },
           { title: "Pipeline B", value: "pipeline-b" },
           { title: "Human-authored", value: "human" },
+          { title: "Claude team", value: "claude-team" },
         ],
       },
     }),
@@ -105,7 +106,9 @@ export const editorNote = defineType({
             ? "Pipeline B"
             : source === "human"
               ? "Human"
-              : "Unset";
+              : source === "claude-team"
+                ? "Claude team"
+                : "Unset";
       return {
         title: slug || "Unassigned editor note",
         subtitle: `Editor Note · ${sourceLabel}`,

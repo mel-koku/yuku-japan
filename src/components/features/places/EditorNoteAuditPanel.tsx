@@ -18,6 +18,7 @@ const SOURCE_LABEL: Record<EditorNoteSource, string> = {
   "pipeline-a": "Pipeline A",
   "pipeline-b": "Pipeline B",
   human: "Human",
+  "claude-team": "Claude team",
 };
 
 const CLAIMS_COLLAPSE_THRESHOLD = 5;
