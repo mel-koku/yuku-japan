@@ -10,7 +10,7 @@ import { typography } from "@/lib/typography-system";
 import { cn } from "@/lib/cn";
 
 const PLACES_DESCRIPTION =
-  "Over 6,000 locations across Japan. Cultural landmarks, neighborhood favorites, and an interactive map.";
+  "Over 4,000 curated places across all 47 prefectures. Cultural landmarks, neighborhood favorites, and an interactive map.";
 
 const PLACES_H1_DEFAULT = "Every place worth knowing about, in one collection.";
 
