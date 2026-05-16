@@ -22,6 +22,8 @@ import {
 } from "./extractFacts";
 import { generateEditorNoteProse } from "./generateProse";
 import { critiqueEditorNoteProse } from "./critiqueProse";
+import { extractVerifiableClaims } from "./extractVerifiableClaims";
+import { verifyEditorNoteClaims } from "./verifyClaims";
 
 /**
  * Orchestrator for the Smart Guidebook content authoring pipeline.
@@ -35,12 +37,14 @@ import { critiqueEditorNoteProse } from "./critiqueProse";
  * Pass 1 becomes an LLM step at that point. Stub orchestrators below.
  *
  * This module wires:
- *   - AuthoringBudget ($30/$10 ledger, env-tunable)
+ *   - AuthoringBudget ($30/$10 ledger, env-tunable; tracks grounding fees)
  *   - Voice anchors (refuse to run at scale if drafts only)
  *   - Cacheable prompt prefix (built once per run for Vertex implicit caching)
  *   - Pass 1 deterministic fact extraction
  *   - Pass 2 prose generation (with one deny-list retry)
  *   - Pass 3 critique (with plausible-but-unsourced flagging)
+ *   - Pass 4 fact verification (claim-gated grounded verification — only
+ *     fires on the ~13% of notes carrying a verifiable claim shape)
  *   - Sanity draft write
  */
 
@@ -221,18 +225,44 @@ async function authorOneEditorNote(
     abortSignal: signal,
   });
 
+  // Pass 4 — fact verification. Additive to Pass 3, not a replacement.
+  // Claim-gated: extractVerifiableClaims is a zero-cost regex scan; only the
+  // ~13% of notes with a verifiable claim shape incur the grounded call.
+  // Skipped if the budget is exhausted — Pass 4's grounded request costs the
+  // $0.035 fee + Pro tokens, so it must respect the same halt the loop does.
+  let flaggedClaims = critique.flaggedClaims;
+  const verifiableClaims = extractVerifiableClaims(critique.prose);
+  if (verifiableClaims.length > 0 && !budget.shouldHalt()) {
+    const pass4 = await verifyEditorNoteClaims({
+      claims: verifiableClaims,
+      facts,
+      budget,
+      abortSignal: signal,
+    });
+    // Merge Pass 4 flags into the Pass 3 set, deduped within this run.
+    // extractVerifiableClaims is deterministic, but the grounded verification
+    // is not fully so — a re-run on a different day can surface a different
+    // top-ranked source and thus a different verdict. `createOrReplace`
+    // overwrites, so re-running the batch can resurrect a flag an editor
+    // already dismissed in Studio. Known wrinkle; acceptable because a batch
+    // re-run is a deliberate act, not a routine one.
+    if (pass4.flags.length > 0) {
+      flaggedClaims = [...new Set([...flaggedClaims, ...pass4.flags])];
+    }
+  }
+
   // Write Sanity draft. Editor publishes from Studio after reviewing flags.
   const sanityDocId = await writeEditorNoteDraft({
     locationId,
     note: critique.prose,
-    flaggedClaims: critique.flaggedClaims,
+    flaggedClaims,
   });
 
   return {
     kind: "ok",
     locationId,
     sanityDocId,
-    flaggedClaimCount: critique.flaggedClaims.length,
+    flaggedClaimCount: flaggedClaims.length,
     retried,
   };
 }

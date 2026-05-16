@@ -1,7 +1,10 @@
 import "server-only";
 
 import { logger } from "@/lib/logger";
-import { estimateCostTenthsCent } from "@/lib/api/costPrices";
+import {
+  estimateCostTenthsCent,
+  groundingFeeTenthsCent,
+} from "@/lib/api/costPrices";
 import { CONTENT_AUTHORING_MODEL } from "./contentAuthoringModel";
 
 /**
@@ -39,6 +42,16 @@ export type VertexUsage = {
    * (already surfaced by `logVertexUsage` in vertexProvider.ts).
    */
   cachedTokens?: number;
+  /**
+   * Number of grounded requests this call made — a call billed the
+   * $35/1k Vertex AI Search grounding fee per request that actually invoked
+   * the search tool (≥1 web query). 0 (or omitted) for non-grounded calls.
+   *
+   * Pass 4 (fact verification) is the only authoring pass that grounds;
+   * Pass 2 / Pass 3 never set this. Without it the budget ledger would
+   * silently under-count Pass 4 spend and the $30 hard-kill would fire late.
+   */
+  groundedRequests?: number;
 };
 
 export type BudgetSummary = {
@@ -48,6 +61,8 @@ export type BudgetSummary = {
   cacheHitRate: number;
   totalInputTokens: number;
   totalOutputTokens: number;
+  /** Total grounded requests recorded across the run (Pass 4 fact checks). */
+  groundedRequests: number;
 };
 
 const DEFAULT_HARD_KILL_USD = 30;
@@ -59,6 +74,7 @@ export class AuthoringBudget {
   private totalInputTokens = 0;
   private totalOutputTokens = 0;
   private totalCachedTokens = 0;
+  private totalGroundedRequests = 0;
   private escalateLogged = false;
   private haltLogged = false;
 
@@ -91,17 +107,23 @@ export class AuthoringBudget {
       Math.max(0, usage.cachedTokens || 0),
       inputTokens,
     );
-
-    const tc = estimateCostTenthsCent(
-      CONTENT_AUTHORING_MODEL,
-      inputTokens,
-      outputTokens,
+    const groundedRequests = Math.max(
+      0,
+      Math.floor(usage.groundedRequests || 0),
     );
+
+    // Token cost + the Vertex AI Search grounding fee ($0.035/grounded
+    // request). Both go onto the same ledger so the $30 hard-kill reflects
+    // total spend — token cost alone would under-count any Pass 4 run.
+    const tc =
+      estimateCostTenthsCent(CONTENT_AUTHORING_MODEL, inputTokens, outputTokens) +
+      groundingFeeTenthsCent(groundedRequests);
     this.spentTc += tc;
     this.callCount++;
     this.totalInputTokens += inputTokens;
     this.totalOutputTokens += outputTokens;
     this.totalCachedTokens += cachedTokens;
+    this.totalGroundedRequests += groundedRequests;
 
     if (!this.escalateLogged && this.spentUsd() >= this.limits.escalateUsd) {
       this.escalateLogged = true;
@@ -151,6 +173,7 @@ export class AuthoringBudget {
       cacheHitRate,
       totalInputTokens: this.totalInputTokens,
       totalOutputTokens: this.totalOutputTokens,
+      groundedRequests: this.totalGroundedRequests,
     };
   }
 
