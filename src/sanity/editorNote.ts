@@ -19,7 +19,11 @@ import { sanityClient } from "./client";
  * to import from server components.
  */
 
-export type EditorNoteSource = "pipeline-a" | "pipeline-b" | "human";
+export type EditorNoteSource =
+  | "pipeline-a"
+  | "pipeline-b"
+  | "human"
+  | "claude-team";
 
 export type EditorNotePayload = {
   note: PortableTextBlock[];
