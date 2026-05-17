@@ -113,10 +113,13 @@ export function logVertexUsage(
   result: VertexUsageResultLike,
   extra?: Record<string, unknown>,
 ): void {
+  // @ai-sdk/google-vertex emits provider metadata under the `vertex` key, not
+  // `google`. Reading `.google` here silently yields undefined → cached-token
+  // and thinking-budget telemetry log 0 on every call.
   const cached =
-    result.providerMetadata?.google?.usageMetadata?.cachedContentTokenCount ?? 0;
+    result.providerMetadata?.vertex?.usageMetadata?.cachedContentTokenCount ?? 0;
   const thoughts =
-    result.providerMetadata?.google?.usageMetadata?.thoughtsTokenCount ?? 0;
+    result.providerMetadata?.vertex?.usageMetadata?.thoughtsTokenCount ?? 0;
   logger.info("llm.usage", {
     source,
     inputTokens: result.usage?.inputTokens ?? 0,
