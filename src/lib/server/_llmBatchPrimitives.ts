@@ -238,8 +238,12 @@ export async function callVertexGroundedText(
       prompt,
       abortSignal: combined,
     });
+    // @ai-sdk/google-vertex emits provider metadata under the `vertex` key,
+    // not `google`. Reading `.google` here silently yields undefined → a
+    // grounded call is misreported as ungrounded and the $0.035 fee is
+    // dropped from the onUsage cost callback.
     const groundingMeta =
-      result.providerMetadata?.google?.groundingMetadata as
+      result.providerMetadata?.vertex?.groundingMetadata as
         | { webSearchQueries?: unknown[] | null }
         | null
         | undefined;

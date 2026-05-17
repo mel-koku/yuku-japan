@@ -38,7 +38,7 @@ export type VertexUsage = {
   outputTokens: number;
   /**
    * Tokens served from Vertex implicit cache. Sourced from
-   * `result.providerMetadata.google.usageMetadata.cachedContentTokenCount`
+   * `result.providerMetadata.vertex.usageMetadata.cachedContentTokenCount`
    * (already surfaced by `logVertexUsage` in vertexProvider.ts).
    */
   cachedTokens?: number;
