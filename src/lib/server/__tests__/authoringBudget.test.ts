@@ -208,6 +208,66 @@ describe("AuthoringBudget", () => {
     });
   });
 
+  describe("grounding fees (Pass 4)", () => {
+    it("adds the $0.035/grounded-request fee on top of token cost", () => {
+      const b = new AuthoringBudget({ hardKillUsd: 30, escalateUsd: 10 });
+      // 1000 input + 500 output Pro tokens =
+      //   (1000 * 1250 + 500 * 10000) / 1M = 1.25 + 5 = 6.25 → ceil 7 tc
+      // + 1 grounded request = 35 tc
+      // total = 42 tc = $0.042
+      b.recordCall({
+        inputTokens: 1_000,
+        outputTokens: 500,
+        groundedRequests: 1,
+      });
+      expect(b.spentUsd()).toBeCloseTo(0.042, 4);
+    });
+
+    it("charges no grounding fee when groundedRequests is 0 or omitted", () => {
+      const b = new AuthoringBudget({ hardKillUsd: 30, escalateUsd: 10 });
+      // Pure token cost: (100k * 1250 + 1k * 10000) / 1M = 125 + 10 = 135 tc
+      b.recordCall({ inputTokens: 100_000, outputTokens: 1_000 });
+      expect(b.spentUsd()).toBeCloseTo(0.135, 4);
+      b.recordCall({
+        inputTokens: 100_000,
+        outputTokens: 1_000,
+        groundedRequests: 0,
+      });
+      expect(b.spentUsd()).toBeCloseTo(0.27, 3);
+    });
+
+    it("accumulates grounding fees across calls and exposes the count", () => {
+      const b = new AuthoringBudget({ hardKillUsd: 30, escalateUsd: 10 });
+      b.recordCall({ inputTokens: 0, outputTokens: 0, groundedRequests: 1 });
+      b.recordCall({ inputTokens: 0, outputTokens: 0, groundedRequests: 1 });
+      b.recordCall({ inputTokens: 0, outputTokens: 0, groundedRequests: 1 });
+      // 3 grounded requests × 35 tc = 105 tc = $0.105
+      expect(b.spentUsd()).toBeCloseTo(0.105, 4);
+      expect(b.summary().groundedRequests).toBe(3);
+    });
+
+    it("floors negative / fractional groundedRequests", () => {
+      const b = new AuthoringBudget({ hardKillUsd: 30, escalateUsd: 10 });
+      b.recordCall({ inputTokens: 0, outputTokens: 0, groundedRequests: -3 });
+      b.recordCall({ inputTokens: 0, outputTokens: 0, groundedRequests: 1.9 });
+      // -3 → 0, 1.9 → 1. Total 1 grounded = 35 tc = $0.035
+      expect(b.spentUsd()).toBeCloseTo(0.035, 4);
+      expect(b.summary().groundedRequests).toBe(1);
+    });
+
+    it("counts grounding fees toward the hard-kill threshold", () => {
+      // The accounting-bug guard: without grounding fees on the ledger, a
+      // grounding-only run would never trip the hard-kill.
+      const b = new AuthoringBudget({ hardKillUsd: 1, escalateUsd: 0.5 });
+      expect(b.shouldHalt()).toBe(false);
+      // 29 grounded requests × 35 tc = 1015 tc = $1.015 > $1 hard-kill
+      for (let i = 0; i < 29; i++) {
+        b.recordCall({ inputTokens: 0, outputTokens: 0, groundedRequests: 1 });
+      }
+      expect(b.shouldHalt()).toBe(true);
+    });
+  });
+
   describe("logRunComplete", () => {
     it("emits info log with summary fields", () => {
       const b = new AuthoringBudget({ hardKillUsd: 30, escalateUsd: 10 });
@@ -219,6 +279,7 @@ describe("AuthoringBudget", () => {
           spentUsd: expect.any(Number),
           calls: 1,
           cacheHitRate: 0.5,
+          groundedRequests: 0,
           stage: "smoke-test",
         }),
       );

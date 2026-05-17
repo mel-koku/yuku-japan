@@ -51,10 +51,10 @@ export const editorNote = defineType({
     }),
     defineField({
       name: "flaggedClaims",
-      title: "Flagged Claims (Pass 3 review)",
+      title: "Flagged Claims (Pass 3 + Pass 4 review)",
       type: "array",
       description:
-        "Auto-populated by Pass 3 critique. Yellow-underline markers in Studio. Editor publishes only after every flag is dismissed or the prose is rewritten.",
+        "Auto-populated by the authoring pipeline. Yellow-underline markers in Studio. A bare entry is a Pass 3 hallucination / deny-list flag. An entry prefixed 'VERIFY-STALE:', 'VERIFY-CONTESTED:', or 'VERIFY-UNVERIFIABLE:' is a Pass 4 fact-check flag — STALE means a current source contradicts the value, CONTESTED means the claim is a legend or disputed, UNVERIFIABLE means no source could confirm it. Editor publishes only after every flag is dismissed or the prose is rewritten.",
       of: [{ type: "string" }],
       options: { layout: "tags" },
     }),
