@@ -90,7 +90,8 @@ export const VERTEX_CHAT_OPTIONS = {
 type VertexUsageResultLike = {
   usage?: { inputTokens?: number; outputTokens?: number } | null;
   providerMetadata?: {
-    google?: {
+    // @ai-sdk/google-vertex emits provider metadata under the `vertex` key.
+    vertex?: {
       usageMetadata?: {
         cachedContentTokenCount?: number | null;
         thoughtsTokenCount?: number | null;
