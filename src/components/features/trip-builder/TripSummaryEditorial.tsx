@@ -414,7 +414,7 @@ export function TripSummaryEditorial({
                 />
                 {autoReturnNote && (
                   <p className="mt-2 text-xs text-foreground-secondary">
-                    Added a night in {autoReturnNote.returnCityName} before your flight. {autoReturnNote.farCityName} is about {autoReturnNote.timeStr} from {autoReturnNote.airportName}, too far for a calm departure morning.
+                    We added a night in {autoReturnNote.returnCityName} before your flight — {autoReturnNote.farCityName} is about {autoReturnNote.timeStr} from {autoReturnNote.airportName}, a rushed last morning otherwise. Adjust the route below if you&apos;d rather not.
                   </p>
                 )}
                 {departureWarning && !autoReturnNote && (
