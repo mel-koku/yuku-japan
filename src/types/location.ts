@@ -168,6 +168,14 @@ export type DietaryFlag = (typeof DIETARY_FLAG_VALUES)[number];
 
 export type Location = {
   id: string;
+  /**
+   * Human-readable URL slug, used by the `/places/[slug]` route. Derived from
+   * `id` with the trailing MD5 hash suffix stripped (see migration
+   * 20260518120000). Distinct from `id`, which stays the primary key and the
+   * FK target for all child tables. Distinct from `sanitySlug` (CMS editorial
+   * slug for experiences).
+   */
+  slug: string;
   name: string;
   region: string;
   city: string;

@@ -45,9 +45,13 @@ function buildFallbackLocation(
   const fallbackCategory = activity.tags?.[0] ?? "culture";
   const fallbackCity = activity.neighborhood ?? "Japan";
 
+  const fallbackId = activity.locationId ?? `__fallback__${activity.id}`;
   return {
     // Use locationId if available, otherwise mark as fallback to prevent API calls
-    id: activity.locationId ?? `__fallback__${activity.id}`,
+    id: fallbackId,
+    // Synthetic fallback Location — never rendered into a /places/ link.
+    // `Location.slug` is required by the type; mirror `id`.
+    slug: fallbackId,
     name: activity.title,
     city: fallbackCity,
     region: fallbackCity,
@@ -126,6 +130,9 @@ function useEntryPointLocation(
           // Build Location object from Basic tier response
           const loc: Location = {
             id: place.placeId,
+            // Google-place entry point, not a `locations` row — never linked
+            // via /places/. `Location.slug` is required; mirror the place id.
+            slug: place.placeId,
             name: place.displayName,
             city,
             region: city,

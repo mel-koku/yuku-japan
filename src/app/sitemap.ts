@@ -87,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? locationsResult.value.map((entry) => {
           const photo = absolutePhotoUrl(entry.photoUrl);
           return {
-            url: `${BASE_URL}/places/${entry.id}`,
+            url: `${BASE_URL}/places/${entry.slug}`,
             lastModified: parseIsoOrFallback(entry.updatedAt),
             changeFrequency: "monthly" as const,
             priority: 0.6,

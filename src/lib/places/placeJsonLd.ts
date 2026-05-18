@@ -45,7 +45,7 @@ export function buildPlaceJsonLd(location: Location) {
       !location.shortDescription && {
         description: location.description.slice(0, 300),
       }),
-    url: `${BASE_URL}/places/${location.id}`,
+    url: `${BASE_URL}/places/${location.slug}`,
     ...(location.primaryPhotoUrl && { image: absoluteImageUrl(location.primaryPhotoUrl) }),
     ...(location.coordinates && {
       geo: {

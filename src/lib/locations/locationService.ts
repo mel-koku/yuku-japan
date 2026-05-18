@@ -127,6 +127,11 @@ export function transformDbRowToLocation(row: LocationDbRow | LocationListingDbR
   const r = row as Record<string, unknown>;
   const base: Location = {
     id: row.id,
+    // `slug` is present in every projection that flows through this mapper
+    // (all 9 locations-table projections include it). The `?? row.id` fallback
+    // is a defensive guard for the pre-backfill window only — once Phase 2 has
+    // run, slug is NOT NULL and the fallback never fires.
+    slug: ("slug" in r ? (r.slug as string | null) : null) ?? row.id,
     name: row.name,
     region: row.region,
     city: row.city,
@@ -811,6 +816,8 @@ export async function fetchPlacesLanesData(): Promise<{
 
 export type SitemapLocationEntry = {
   id: string;
+  /** URL slug — the `/places/[slug]` route segment the sitemap emits. */
+  slug: string;
   /** ISO timestamp; `null` if the row never had `updated_at` populated. */
   updatedAt: string | null;
   /** Absolute URL of the primary photo, if present. Used for Image sitemap extension. */
@@ -834,7 +841,7 @@ export async function getSitemapLocationEntries(): Promise<SitemapLocationEntry[
   for (let page = 0; ; page += 1) {
     const { data, error } = await supabase
       .from("locations")
-      .select("id, updated_at, primary_photo_url")
+      .select("id, slug, updated_at, primary_photo_url")
       .eq("is_active", true)
       .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
       .order("id", { ascending: true })
@@ -847,9 +854,14 @@ export async function getSitemapLocationEntries(): Promise<SitemapLocationEntry[
     if (!data || data.length === 0) break;
 
     for (const row of data) {
-      if (row && typeof row.id === "string") {
+      // Skip rows with no slug — only possible in the pre-backfill window
+      // (Phase 2). Once the backfill has run, slug is NOT NULL and every
+      // active row is emitted. Emitting a NULL-slug entry would produce a
+      // `/places/null` URL.
+      if (row && typeof row.id === "string" && typeof row.slug === "string") {
         entries.push({
           id: row.id,
+          slug: row.slug,
           updatedAt: typeof row.updated_at === "string" ? row.updated_at : null,
           photoUrl: typeof row.primary_photo_url === "string" ? row.primary_photo_url : null,
         });

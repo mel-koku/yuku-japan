@@ -7,7 +7,7 @@ export const alt = "Yuku Japan place";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ slug: string }> };
 
 const WORDMARK = "Yuku Japan";
 const FALLBACK_TITLE = "Discover Japan with Local Experts";
@@ -23,31 +23,55 @@ type PlaceShape = {
   nameJapanese: string | null;
 };
 
-async function loadPlace(id: string): Promise<PlaceShape | null> {
+const PLACE_OG_COLUMNS = "name, name_japanese, city, category, primary_photo_url, image";
+
+function placeShapeFromRow(row: Record<string, unknown>): PlaceShape {
+  const photo =
+    (typeof row.primary_photo_url === "string" ? row.primary_photo_url : null) ??
+    (typeof row.image === "string" ? row.image : null);
+  return {
+    name: typeof row.name === "string" ? row.name : FALLBACK_TITLE,
+    city: typeof row.city === "string" ? row.city : null,
+    category: typeof row.category === "string" ? row.category : null,
+    photoUrl: photo,
+    nameJapanese: typeof row.name_japanese === "string" ? row.name_japanese : null,
+  };
+}
+
+async function loadPlace(param: string): Promise<PlaceShape | null> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
+
+    // Slug-first lookup, mirroring the page route. `.eq()` escapes its value
+    // (PostgREST treats it as a literal) — unlike `.or()`, whose raw filter
+    // string would let a crafted path segment inject predicates.
+    const bySlug = await supabase
       .from("locations")
-      .select("name, name_japanese, city, category, primary_photo_url, image")
-      .eq("id", id)
+      .select(PLACE_OG_COLUMNS)
+      .eq("slug", param)
       .eq("is_active", true)
       .maybeSingle();
+    if (!bySlug.error && bySlug.data) {
+      return placeShapeFromRow(bySlug.data as Record<string, unknown>);
+    }
 
-    if (error || !data) return null;
-    const row = data as Record<string, unknown>;
-    const photo =
-      (typeof row.primary_photo_url === "string" ? row.primary_photo_url : null) ??
-      (typeof row.image === "string" ? row.image : null);
-    return {
-      name: typeof row.name === "string" ? row.name : FALLBACK_TITLE,
-      city: typeof row.city === "string" ? row.city : null,
-      category: typeof row.category === "string" ? row.category : null,
-      photoUrl: photo,
-      nameJapanese: typeof row.name_japanese === "string" ? row.name_japanese : null,
-    };
+    // Slug miss → fall back to the old `id` PK so stale-id URLs still render a
+    // real image (the page route, not this OG image, owns the canonical
+    // redirect). Separate `.eq()` query — value-escaped, same as above.
+    const byId = await supabase
+      .from("locations")
+      .select(PLACE_OG_COLUMNS)
+      .eq("id", param)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (!byId.error && byId.data) {
+      return placeShapeFromRow(byId.data as Record<string, unknown>);
+    }
+
+    return null;
   } catch (error) {
     logger.warn("og-image: place fetch failed", {
-      id,
+      param,
       error: error instanceof Error ? error.message : String(error),
     });
     return null;
@@ -71,8 +95,8 @@ function titleFontSize(title: string): number {
 }
 
 export default async function PlaceOpengraphImage({ params }: Props) {
-  const { id } = await params;
-  const place = await loadPlace(id);
+  const { slug } = await params;
+  const place = await loadPlace(slug);
 
   const title = place?.name ?? FALLBACK_TITLE;
   const city = place?.city ?? null;

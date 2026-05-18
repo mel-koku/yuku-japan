@@ -426,6 +426,9 @@ export async function fetchPlaceDetailsByPlaceId(
   // Build Location object
   const location: Location = {
     id: placeId,
+    // Synthesized from a raw Google Places response — not a `locations` row,
+    // never linked via /places/. `Location.slug` is required; mirror the id.
+    slug: placeId,
     name: payload.displayName?.text ?? fallbackName ?? "",
     region: region || "Japan",
     city: city || "Japan",

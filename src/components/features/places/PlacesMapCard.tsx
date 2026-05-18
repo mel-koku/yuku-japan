@@ -35,7 +35,7 @@ export const PlacesMapCard = memo(
         onMouseLeave={() => onHover?.(null)}
       >
         <Link
-          href={`/places/${location.id}`}
+          href={`/places/${location.slug}`}
           onClick={onSelect ? (e) => { e.preventDefault(); onSelect(location); } : undefined}
           className={`flex items-center gap-2 rounded-lg bg-background pl-2 pr-3 py-2.5 min-h-[44px] shadow-[var(--shadow-sm)] transition ${
             isHighlighted

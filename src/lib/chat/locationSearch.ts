@@ -8,6 +8,8 @@ import { normalizeOperatingHours } from "@/lib/locations/normalizeHours";
 
 export type ChatLocationResult = {
   id: string;
+  /** URL slug for the `/places/[slug]` route — see LocationDbRow.slug. */
+  slug: string;
   name: string;
   city: string;
   region: string;
@@ -30,6 +32,7 @@ export type ChatLocationResult = {
 function transformChatRow(row: LocationChatDbRow): ChatLocationResult {
   return {
     id: row.id,
+    slug: row.slug,
     name: row.name,
     city: row.city,
     region: row.region,
