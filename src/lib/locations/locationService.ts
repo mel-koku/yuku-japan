@@ -128,9 +128,10 @@ export function transformDbRowToLocation(row: LocationDbRow | LocationListingDbR
   const base: Location = {
     id: row.id,
     // `slug` is present in every projection that flows through this mapper
-    // (all 9 locations-table projections include it). The `?? row.id` fallback
-    // is a defensive guard for the pre-backfill window only — once Phase 2 has
-    // run, slug is NOT NULL and the fallback never fires.
+    // (the `LOCATION_*` constants in projections.ts plus the inline
+    // LANES_COLUMNS below). The `?? row.id` fallback is a defensive guard for
+    // the pre-backfill window only — once Phase 2 has run, slug is NOT NULL
+    // and the fallback never fires.
     slug: ("slug" in r ? (r.slug as string | null) : null) ?? row.id,
     name: row.name,
     region: row.region,
@@ -771,8 +772,11 @@ const LANES_ICONIC_CATEGORIES = [
   "tower",
 ];
 
-// Columns needed to render PlacesLanes tiles (name, photo, city/region for subtitle)
-const LANES_COLUMNS = `id,name,region,city,category,image,primary_photo_url,rating,review_count,is_featured,is_unesco_site,parent_mode,planning_city,prefecture`;
+// Columns needed to render PlacesLanes tiles (name, photo, city/region for subtitle).
+// `slug` is carried so transformDbRowToLocation hydrates it from the row (not the
+// `?? row.id` fallback) — keeps lane-sourced Location objects consistent with the
+// other projections and with the comment on transformDbRowToLocation.
+const LANES_COLUMNS = `id,slug,name,region,city,category,image,primary_photo_url,rating,review_count,is_featured,is_unesco_site,parent_mode,planning_city,prefecture`;
 
 /**
  * Fetches the two data slices needed to render PlacesLanes at SSR time:
