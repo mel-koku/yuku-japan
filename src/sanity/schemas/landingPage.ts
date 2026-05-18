@@ -72,14 +72,13 @@ export const landingPage = defineType({
       title: "Eyebrow Text",
       type: "string",
       fieldset: "philosophy",
-      initialValue: "Locally sourced, locally verified",
     }),
     defineField({
       name: "philosophyHeading",
       title: "Heading",
       type: "string",
       fieldset: "philosophy",
-      initialValue: "Not from a desk, but from years of living here.",
+      initialValue: "Curated for how you actually travel",
     }),
     defineField({
       name: "philosophyImage",

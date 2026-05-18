@@ -20,8 +20,7 @@ export function Philosophy({ locationCount, prefectureCount, tipCount, content }
         {/* Heading */}
         <ScrollReveal direction="none">
           <h2 className={cn(typography({ intent: "editorial-h2" }), "mx-auto max-w-2xl")}>
-            {content?.philosophyHeading ??
-              "Sourced from Japan\u2019s tourism boards. Curated for how you actually travel."}
+            {content?.philosophyHeading ?? "Curated for how you actually travel"}
           </h2>
         </ScrollReveal>
 
