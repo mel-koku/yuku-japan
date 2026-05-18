@@ -239,6 +239,14 @@ const nextConfig: NextConfig = {
         destination: "/b/guides/:slug",
         permanent: true,
       },
+      // Guide slug renamed to drop the inaccurate `chugoku-` region prefix —
+      // the guide spans the Seto Inland Sea (Kagawa/Shikoku + Okayama/Chugoku),
+      // so no single region prefix fits. Old URL kept alive for SEO/inbound links.
+      {
+        source: "/guides/chugoku-setouchi-art-islands",
+        destination: "/guides/setouchi-art-islands-beyond-naoshima",
+        permanent: true,
+      },
     ];
   },
   async headers() {
