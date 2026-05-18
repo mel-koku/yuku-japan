@@ -65,27 +65,37 @@ export function RegionStep({ onValidityChange, sanityConfig }: RegionStepProps) 
   const lastAugmentedExitRef = useRef<string | null>(null);
   const hoverClearTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPanelHovered = useRef(false);
+  // Set when a region row is tapped/clicked. Keeps the detail panel open
+  // against the synthesized `mouseleave` that touch devices fire after a tap,
+  // so hybrid-touch users (iPad + trackpad, touchscreen laptops) — which match
+  // the desktop `lg:` branch but can't sustain a hover — still see the panel.
+  const pinnedByClick = useRef(false);
 
   const [hoveredRegion, setHoveredRegion] = useState<KnownRegionId | null>(null);
   const [expandedRegion, setExpandedRegion] = useState<KnownRegionId | null>(null);
   const [autoSelectMessage, setAutoSelectMessage] = useState<string | null>(null);
   const hasUserHovered = useRef(false);
 
-  // Debounced hover: cancel any pending clear, set immediately
+  // Debounced hover: cancel any pending clear, set immediately.
+  // A deliberate hover onto a different region wins over a click-pin.
   const handleHoverRegion = useCallback((regionId: KnownRegionId) => {
     hasUserHovered.current = true;
+    setHoveredRegion((prev) => {
+      if (prev !== regionId) pinnedByClick.current = false;
+      return regionId;
+    });
     if (hoverClearTimer.current) {
       clearTimeout(hoverClearTimer.current);
       hoverClearTimer.current = null;
     }
-    setHoveredRegion(regionId);
   }, []);
 
   // Debounced leave: delay clear so cursor can travel to the detail panel.
-  // Skip clearing if the mouse is still over the panel (e.g. focus moved to panel input).
+  // Skip clearing if the mouse is still over the panel, or if the panel was
+  // pinned open by a tap/click (touch devices fire a synthesized mouseleave).
   const handleLeaveRegion = useCallback(() => {
     hoverClearTimer.current = setTimeout(() => {
-      if (!isPanelHovered.current) {
+      if (!isPanelHovered.current && !pinnedByClick.current) {
         setHoveredRegion(null);
       }
       hoverClearTimer.current = null;
@@ -369,6 +379,24 @@ export function RegionStep({ onValidityChange, sanityConfig }: RegionStepProps) 
     [selectedCities, setData, showToast]
   );
 
+  // Desktop row click: select the region AND pin its detail panel open. Hover
+  // alone is a pure preview; a click commits the selection and keeps the panel
+  // visible — which is what hybrid-touch users get when a tap can't sustain a
+  // hover, and a small improvement for mouse users (click now confirms in the
+  // panel instead of relying on the cursor still being over the row).
+  const handleClickRegion = useCallback(
+    (regionId: KnownRegionId) => {
+      toggleRegion(regionId);
+      pinnedByClick.current = true;
+      if (hoverClearTimer.current) {
+        clearTimeout(hoverClearTimer.current);
+        hoverClearTimer.current = null;
+      }
+      setHoveredRegion(regionId);
+    },
+    [toggleRegion]
+  );
+
   // Compute selection state for a region (considers all cities in region, not just known)
   const getRegionSelectionState = useCallback(
     (regionId: KnownRegionId): RegionSelectionState => {
@@ -541,7 +569,7 @@ export function RegionStep({ onValidityChange, sanityConfig }: RegionStepProps) 
             const additionalCityCount = Math.max(0, dbTotal - MAX_VISIBLE_CITIES);
             return (
               <div key={scored.region.id}>
-                {/* Desktop: hover-driven */}
+                {/* Desktop: hover previews, click selects + pins the panel */}
                 <div className="hidden lg:block">
                   <RegionRow
                     index={i}
@@ -557,7 +585,7 @@ export function RegionStep({ onValidityChange, sanityConfig }: RegionStepProps) 
                     isEntryPointRegion={scored.isEntryPointRegion}
                     isExitPointRegion={scored.isExitPointRegion}
                     regionSelectionState={getRegionSelectionState(scored.region.id)}
-                    onClick={() => toggleRegion(scored.region.id)}
+                    onClick={() => handleClickRegion(scored.region.id)}
                     onHover={() => handleHoverRegion(scored.region.id)}
                     onLeave={handleLeaveRegion}
                   />
