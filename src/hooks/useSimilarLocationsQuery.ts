@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Location } from "@/types/location";
 
-type SimilarLocation = Location & { similarity: number };
-
 export function useSimilarLocationsQuery(locationId: string | undefined) {
-  return useQuery<SimilarLocation[]>({
+  return useQuery<Location[]>({
     queryKey: ["similar-locations", locationId],
     queryFn: async () => {
       if (!locationId) return [];
