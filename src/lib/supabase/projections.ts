@@ -27,7 +27,6 @@ export type LocationDbRow = {
   region: string;
   city: string;
   planning_city: string | null;
-  city_original: string | null;
   neighborhood: string | null;
   prefecture: string | null;
   category: string;
