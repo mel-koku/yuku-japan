@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, m, useReducedMotion, type Variants } from "framer-motion";
 
@@ -111,7 +111,7 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
 
   return (
     <div className="relative bg-background">
-      <WizardChrome />
+      <WizardChrome currentStep={currentStep} />
 
       {/* Step Content */}
       <AnimatePresence mode="wait" custom={direction}>
@@ -329,29 +329,23 @@ function StepShell({
   const resolvedBackLabel = backLabel ?? "Back";
   const [showHint, setShowHint] = useState(false);
 
-  const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  // The hint stays visible until the blocking condition resolves — it explains
+  // why Continue is disabled, so it should persist until the user acts, not
+  // race a timer. The effect below hides it the moment `nextDisabled` flips.
   const showDisabledHint = useCallback(() => {
     if (nextDisabled && disabledHint) {
-      if (hintTimer.current) clearTimeout(hintTimer.current);
       setShowHint(true);
-      hintTimer.current = setTimeout(() => setShowHint(false), 4500);
     }
   }, [nextDisabled, disabledHint]);
 
   const handleDisabledClick = showDisabledHint;
 
-  // Reset hint when button becomes enabled; cleanup timer
+  // Reset hint when the button becomes enabled.
   useEffect(() => {
     if (!nextDisabled) {
       setShowHint(false);
-      if (hintTimer.current) clearTimeout(hintTimer.current);
     }
   }, [nextDisabled]);
-
-  useEffect(() => {
-    return () => { if (hintTimer.current) clearTimeout(hintTimer.current); };
-  }, []);
 
   return (
     <div className="flex min-h-[100dvh] flex-col pt-14 pb-20">

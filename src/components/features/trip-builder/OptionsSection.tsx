@@ -147,7 +147,7 @@ export function OptionsSection(props: OptionsSectionProps) {
           aria-expanded={isInlineOpen}
           className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-brand-primary/5"
         >
-          <h4 className="flex-1 text-sm font-medium text-foreground">Options</h4>
+          <span className="flex-1 text-sm font-medium text-foreground">Options</span>
           <span className="text-xs text-stone">
             {setCount} of 7 set
           </span>

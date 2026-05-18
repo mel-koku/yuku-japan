@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { m, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence, useReducedMotion } from "framer-motion";
 import { easeReveal, durationFast } from "@/lib/motion";
 import { typography } from "@/lib/typography-system";
 import { GoogleSignInButton } from "@/components/ui/GoogleSignInButton";
@@ -44,6 +44,7 @@ export function GeneratingOverlay({ sanityConfig, successData, onSuccessComplete
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState<{ message: string; isError: boolean } | null>(null);
   const supabase = createClient();
+  const prefersReducedMotion = useReducedMotion();
 
   async function sendMagicLink(e: FormEvent) {
     e.preventDefault();
@@ -245,14 +246,29 @@ export function GeneratingOverlay({ sanityConfig, successData, onSuccessComplete
                 {sanityConfig?.generatingHeading ?? "Building your itinerary"}
               </m.h2>
 
-              {/* Progress bar */}
-              <div className="h-0.5 w-64 overflow-hidden rounded-full bg-border">
-                <m.div
-                  className="h-full bg-brand-primary"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "90%" }}
-                  transition={{ duration: 8, ease: easeReveal }}
-                />
+              {/* Indeterminate progress bar — the plan API is a single
+                  non-streaming request, so there is no real percentage to
+                  show. A looping segment conveys activity without a false
+                  ETA. Reduced motion gets a static partial fill. */}
+              <div
+                className="h-0.5 w-64 overflow-hidden rounded-full bg-border"
+                role="progressbar"
+                aria-label="Building your itinerary"
+              >
+                {prefersReducedMotion ? (
+                  <div className="h-full w-1/3 rounded-full bg-brand-primary" />
+                ) : (
+                  <m.div
+                    className="h-full w-1/3 rounded-full bg-brand-primary"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "300%" }}
+                    transition={{
+                      duration: 1.4,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                    }}
+                  />
+                )}
               </div>
 
               {/* Rotating status messages */}

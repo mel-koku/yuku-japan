@@ -413,19 +413,19 @@ export function TripSummaryEditorial({
                   }
                 />
                 {autoReturnNote && (
-                  <p className="mt-2 text-xs text-foreground-secondary">
-                    Added a night in {autoReturnNote.returnCityName} before your flight. {autoReturnNote.farCityName} is about {autoReturnNote.timeStr} from {autoReturnNote.airportName}, too far for a calm departure morning.
+                  <p role="status" className="mt-2 text-xs text-foreground-secondary">
+                    We added a night in {autoReturnNote.returnCityName} before your flight — {autoReturnNote.farCityName} is about {autoReturnNote.timeStr} from {autoReturnNote.airportName}, a rushed last morning otherwise. Adjust the route below if you&apos;d rather not.
                   </p>
                 )}
                 {departureWarning && !autoReturnNote && (
-                  <p className="mt-2 text-xs text-warning">
+                  <p role="status" className="mt-2 text-xs text-warning">
                     {departureWarning.cityName} is about {departureWarning.timeStr} from {departureWarning.airportName}. Consider ending your trip in a city closer to your departure airport to keep your last day relaxed.
                   </p>
                 )}
                 {thinCityWarnings.map((w) => {
                   const reduceTo = Math.max(1, Math.floor(w.locationCount / 5));
                   return (
-                    <p key={w.cityName} className="mt-2 text-xs text-warning">
+                    <p role="status" key={w.cityName} className="mt-2 text-xs text-warning">
                       {w.cityName} has {w.locationCount} places for {w.days} days. Your itinerary there may feel thin. Consider reducing to {reduceTo} day{reduceTo === 1 ? "" : "s"} or adding a nearby city as a day trip.
                     </p>
                   );
@@ -556,6 +556,14 @@ function InlineAccommodationInput({
             </button>
           ))}
         </div>
+      )}
+      {/* No-results state — once the user has typed enough and the search
+          settled, an empty dropdown is indistinguishable from "still loading".
+          Make it explicit. */}
+      {searchInput.length >= 3 && !isLoading && suggestions.length === 0 && (
+        <p role="status" className="mt-1 px-3 py-1.5 text-xs text-stone">
+          No matches for &ldquo;{searchInput}&rdquo;.
+        </p>
       )}
     </div>
   );

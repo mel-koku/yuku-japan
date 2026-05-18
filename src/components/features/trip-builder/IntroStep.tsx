@@ -6,6 +6,7 @@ import { SplitText } from "@/components/ui/SplitText";
 import { IntroImagePanel } from "@/components/features/trip-builder/IntroImagePanel";
 import { easeReveal, staggerWord, durationBase } from "@/lib/motion";
 import { cn } from "@/lib/cn";
+import { typography } from "@/lib/typography-system";
 import { deriveRegionsFromCities } from "@/data/regions";
 
 import type { TripBuilderData, CityId, EntryPoint } from "@/types/trip";
@@ -20,12 +21,19 @@ const QUICK_ENTRY_POINTS: Record<string, EntryPoint> = {
 };
 
 const QUICK_PRESETS = [
-  { id: "tokyo", label: "Tokyo", cities: ["tokyo"], airport: "NRT" },
-  { id: "kyoto-osaka", label: "Kyoto & Osaka", cities: ["kyoto", "osaka"], airport: "KIX" },
-  { id: "tokyo-kyoto", label: "Tokyo, Kyoto & Osaka", cities: ["tokyo", "kyoto", "osaka"], airport: "NRT", exit: "KIX" },
-  { id: "hokkaido", label: "Hokkaido", cities: ["sapporo", "hakodate"], airport: "CTS" },
-  { id: "kyushu", label: "Kyushu", cities: ["fukuoka", "nagasaki"], airport: "FUK" },
-] as const;
+  { id: "tokyo", label: "Tokyo", cities: ["tokyo"], airport: "NRT", vibes: ["modern_japan", "foodie_paradise"] },
+  { id: "kyoto-osaka", label: "Kyoto & Osaka", cities: ["kyoto", "osaka"], airport: "KIX", vibes: ["temples_tradition", "foodie_paradise"] },
+  { id: "tokyo-kyoto", label: "Tokyo, Kyoto & Osaka", cities: ["tokyo", "kyoto", "osaka"], airport: "NRT", exit: "KIX", vibes: ["temples_tradition", "foodie_paradise"] },
+  { id: "hokkaido", label: "Hokkaido", cities: ["sapporo", "hakodate"], airport: "CTS", vibes: ["nature_adventure", "foodie_paradise"] },
+  { id: "kyushu", label: "Kyushu", cities: ["fukuoka", "nagasaki"], airport: "FUK", vibes: ["nature_adventure", "history_buff"] },
+] as const satisfies readonly {
+  id: string;
+  label: string;
+  cities: readonly string[];
+  airport: string;
+  exit?: string;
+  vibes: readonly VibeId[];
+}[];
 
 const DURATION_OPTIONS = [3, 5, 7, 10] as const;
 
@@ -47,7 +55,7 @@ export function IntroStep({ onStart, onQuickStart, sanityConfig }: IntroStepProp
     const preset = QUICK_PRESETS.find((p) => p.id === quickPreset) ?? QUICK_PRESETS[2];
     const cities = [...preset.cities] as CityId[];
     const regions = deriveRegionsFromCities(cities);
-    const vibes: VibeId[] = ["temples_tradition", "foodie_paradise"];
+    const vibes: VibeId[] = [...preset.vibes];
 
     // Start date 2 weeks from now
     const start = new Date();
@@ -113,7 +121,7 @@ export function IntroStep({ onStart, onQuickStart, sanityConfig }: IntroStepProp
           {/* Heading — lead-in */}
           <SplitText
             as="p"
-            className="mt-4 font-serif text-[clamp(2rem,6vw,3.5rem)] leading-[1.1] text-foreground-secondary"
+            className={cn(typography({ intent: "editorial-h1" }), "mt-4 leading-[1.1] text-foreground-secondary")}
             splitBy="word"
             animation="fadeUp"
             staggerDelay={staggerWord}
@@ -125,7 +133,7 @@ export function IntroStep({ onStart, onQuickStart, sanityConfig }: IntroStepProp
           {/* Subheading — dramatic scale, brand-primary */}
           <SplitText
             as="h1"
-            className="mt-2 font-serif text-[clamp(4rem,12vw,9rem)] leading-[0.9] text-brand-primary"
+            className={cn(typography({ intent: "editorial-display" }), "mt-2 text-brand-primary")}
             splitBy="word"
             animation="clipY"
             staggerDelay={0.08}
