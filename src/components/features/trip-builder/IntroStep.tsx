@@ -20,12 +20,19 @@ const QUICK_ENTRY_POINTS: Record<string, EntryPoint> = {
 };
 
 const QUICK_PRESETS = [
-  { id: "tokyo", label: "Tokyo", cities: ["tokyo"], airport: "NRT" },
-  { id: "kyoto-osaka", label: "Kyoto & Osaka", cities: ["kyoto", "osaka"], airport: "KIX" },
-  { id: "tokyo-kyoto", label: "Tokyo, Kyoto & Osaka", cities: ["tokyo", "kyoto", "osaka"], airport: "NRT", exit: "KIX" },
-  { id: "hokkaido", label: "Hokkaido", cities: ["sapporo", "hakodate"], airport: "CTS" },
-  { id: "kyushu", label: "Kyushu", cities: ["fukuoka", "nagasaki"], airport: "FUK" },
-] as const;
+  { id: "tokyo", label: "Tokyo", cities: ["tokyo"], airport: "NRT", vibes: ["modern_japan", "foodie_paradise"] },
+  { id: "kyoto-osaka", label: "Kyoto & Osaka", cities: ["kyoto", "osaka"], airport: "KIX", vibes: ["temples_tradition", "foodie_paradise"] },
+  { id: "tokyo-kyoto", label: "Tokyo, Kyoto & Osaka", cities: ["tokyo", "kyoto", "osaka"], airport: "NRT", exit: "KIX", vibes: ["temples_tradition", "foodie_paradise"] },
+  { id: "hokkaido", label: "Hokkaido", cities: ["sapporo", "hakodate"], airport: "CTS", vibes: ["nature_adventure", "foodie_paradise"] },
+  { id: "kyushu", label: "Kyushu", cities: ["fukuoka", "nagasaki"], airport: "FUK", vibes: ["nature_adventure", "history_buff"] },
+] as const satisfies readonly {
+  id: string;
+  label: string;
+  cities: readonly string[];
+  airport: string;
+  exit?: string;
+  vibes: readonly VibeId[];
+}[];
 
 const DURATION_OPTIONS = [3, 5, 7, 10] as const;
 
@@ -47,7 +54,7 @@ export function IntroStep({ onStart, onQuickStart, sanityConfig }: IntroStepProp
     const preset = QUICK_PRESETS.find((p) => p.id === quickPreset) ?? QUICK_PRESETS[2];
     const cities = [...preset.cities] as CityId[];
     const regions = deriveRegionsFromCities(cities);
-    const vibes: VibeId[] = ["temples_tradition", "foodie_paradise"];
+    const vibes: VibeId[] = [...preset.vibes];
 
     // Start date 2 weeks from now
     const start = new Date();
