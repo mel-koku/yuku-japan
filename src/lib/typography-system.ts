@@ -16,6 +16,11 @@ export const typography = cva("", {
   variants: {
     intent: {
       // ── Editorial (Serif - Cormorant) ──────────────────────
+      /** Oversized display headline — landing/intro hero punch line.
+       *  Larger than `editorial-hero` and set tight; callers typically
+       *  override the color (e.g. `text-brand-primary`). */
+      "editorial-display":
+        "font-serif text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-semibold leading-[0.9] tracking-normal text-foreground text-balance",
       /** Massive hero headlines */
       "editorial-hero":
         "font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold leading-[1.05] tracking-normal text-foreground text-balance",

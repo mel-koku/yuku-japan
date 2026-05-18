@@ -6,6 +6,7 @@ import { SplitText } from "@/components/ui/SplitText";
 import { IntroImagePanel } from "@/components/features/trip-builder/IntroImagePanel";
 import { easeReveal, staggerWord, durationBase } from "@/lib/motion";
 import { cn } from "@/lib/cn";
+import { typography } from "@/lib/typography-system";
 import { deriveRegionsFromCities } from "@/data/regions";
 
 import type { TripBuilderData, CityId, EntryPoint } from "@/types/trip";
@@ -120,7 +121,7 @@ export function IntroStep({ onStart, onQuickStart, sanityConfig }: IntroStepProp
           {/* Heading — lead-in */}
           <SplitText
             as="p"
-            className="mt-4 font-serif text-[clamp(2rem,6vw,3.5rem)] leading-[1.1] text-foreground-secondary"
+            className={cn(typography({ intent: "editorial-h1" }), "mt-4 leading-[1.1] text-foreground-secondary")}
             splitBy="word"
             animation="fadeUp"
             staggerDelay={staggerWord}
@@ -132,7 +133,7 @@ export function IntroStep({ onStart, onQuickStart, sanityConfig }: IntroStepProp
           {/* Subheading — dramatic scale, brand-primary */}
           <SplitText
             as="h1"
-            className="mt-2 font-serif text-[clamp(4rem,12vw,9rem)] leading-[0.9] text-brand-primary"
+            className={cn(typography({ intent: "editorial-display" }), "mt-2 text-brand-primary")}
             splitBy="word"
             animation="clipY"
             staggerDelay={0.08}
