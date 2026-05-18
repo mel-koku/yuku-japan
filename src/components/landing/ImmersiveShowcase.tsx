@@ -19,9 +19,9 @@ const defaultActs = [
   {
     number: "02",
     eyebrow: "PLAN",
-    title: "Routes that account for every minute",
+    title: "Days that flow, not zigzag",
     description:
-      "Local trains, walking segments, bus connections. Every transfer timed. Your day is built around how Japan actually moves, not how it looks on a map.",
+      "Activities ordered by where they are, with travel time built into every day — so the plan is realistic, not a wishlist of everything at once.",
     image: "/images/fallback.jpg",
     alt: "Japanese train platform",
   },
@@ -30,7 +30,7 @@ const defaultActs = [
     eyebrow: "GO",
     title: "Your plan, in your pocket",
     description:
-      "Day-by-day timeline, transit directions, and weather-aware tips. Ask Yuku anything mid-trip. Download as a PDF, share it with a link.",
+      "Day-by-day timeline, travel time between every stop, and weather-aware tips. Ask Yuku anything mid-trip. Download as a PDF, share it with a link.",
     image: "/images/fallback.jpg",
     alt: "Traveler exploring Japan",
   },

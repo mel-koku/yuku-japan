@@ -11,8 +11,8 @@ import type { LandingPageContent } from "@/types/sanitySiteContent";
 // ── Feature showcase (default when no Sanity testimonials) ──────────
 
 const FEATURES = [
-  { title: "Routed Days", description: "Activities ordered by geography and transit. No backtracking." },
-  { title: "Transit Directions", description: "Station names, line numbers, transfer points. Step by step." },
+  { title: "Routed Days", description: "Activities ordered by geography so your days flow, not zigzag. No backtracking." },
+  { title: "Realistic Timing", description: "Every stop placed with travel time between it and the next — so your day is a plan, not a wishlist." },
   { title: "Seasonal Fit", description: "Cherry blossom timing, rainy season, festival crowds. Your dates shape what we suggest." },
   { title: "Practical Tips", description: "IC card reminders on Day 1. Luggage forwarding before long rides." },
   { title: "Day Trip Ideas", description: "Locations outside your route, scored and ready to swap in." },
