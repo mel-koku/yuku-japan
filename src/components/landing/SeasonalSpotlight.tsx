@@ -48,7 +48,7 @@ export function SeasonalSpotlight({
   }
   for (const loc of locations) {
     if (cards.length >= 6) break;
-    cards.push({ type: "location", id: loc.id, title: loc.name, image: loc.primaryPhotoUrl || loc.image || "", href: `/places/${loc.id}`, subtitle: loc.city, summary: loc.shortDescription || "" });
+    cards.push({ type: "location", id: loc.id, title: loc.name, image: loc.primaryPhotoUrl || loc.image || "", href: `/places/${loc.slug}`, subtitle: loc.city, summary: loc.shortDescription || "" });
   }
 
   if (cards.length === 0) return null;

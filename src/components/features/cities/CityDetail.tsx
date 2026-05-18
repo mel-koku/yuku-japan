@@ -39,7 +39,7 @@ function LocationCard({ location, eager }: { location: Location; eager?: boolean
   const imageSrc = resizePhotoUrl(location.primaryPhotoUrl ?? location.image, 600);
   return (
     <Link
-      href={`/places/${location.id}`}
+      href={`/places/${location.slug}`}
       className="group block overflow-hidden rounded-lg bg-surface border border-border transition-all hover:-translate-y-1"
     >
       <div className="relative w-full overflow-hidden aspect-[4/3]">

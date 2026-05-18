@@ -326,6 +326,7 @@ export const chatTools = {
           const openStatus = getOpenStatus(loc.operatingHours);
           return {
             id: loc.id,
+            slug: loc.slug,
             name: loc.name,
             category: loc.category,
             city: loc.city,

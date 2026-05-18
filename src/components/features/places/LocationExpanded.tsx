@@ -785,7 +785,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
               <ChildLocationsSection
                 childLocations={hierarchy.children}
                 parentName={locationWithDetails.name}
-                onSelect={(loc) => router.push(`/places/${loc.id}`)}
+                onSelect={(loc) => router.push(`/places/${loc.slug}`)}
               />
             </div>
           )}
@@ -793,7 +793,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
             <div className="border-t border-border pt-6">
               <RelationshipsSection
                 relationships={hierarchy.relationships}
-                onSelect={(loc) => router.push(`/places/${loc.id}`)}
+                onSelect={(loc) => router.push(`/places/${loc.slug}`)}
               />
             </div>
           )}

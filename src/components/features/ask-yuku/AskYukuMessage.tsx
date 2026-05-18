@@ -14,6 +14,7 @@ type AskYukuMessageProps = {
 
 type LocationToolResult = {
   id: string;
+  slug: string;
   name: string;
   category: string;
   city: string;
@@ -208,7 +209,7 @@ export function AskYukuMessage({ message, onClosePanel }: AskYukuMessageProps) {
             {locations.map((loc) => (
               <AskYukuLocationCard
                 key={loc.id}
-                id={loc.id}
+                slug={loc.slug}
                 name={loc.name}
                 category={loc.category}
                 city={loc.city}

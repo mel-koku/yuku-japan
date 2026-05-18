@@ -9,7 +9,8 @@ const FALLBACK_IMAGE =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 
 type AskYukuLocationCardProps = {
-  id: string;
+  /** URL slug for the `/places/[slug]` route. */
+  slug: string;
   name: string;
   category: string;
   city: string;
@@ -19,7 +20,7 @@ type AskYukuLocationCardProps = {
 };
 
 export function AskYukuLocationCard({
-  id,
+  slug,
   name,
   category,
   city,
@@ -31,7 +32,7 @@ export function AskYukuLocationCard({
 
   return (
     <Link
-      href={`/places/${id}`}
+      href={`/places/${slug}`}
       className="group flex items-center gap-3 rounded-lg bg-surface p-2 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-card)]"
     >
       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">

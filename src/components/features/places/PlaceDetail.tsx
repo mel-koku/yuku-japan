@@ -807,7 +807,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
             <ChildLocationsSection
               childLocations={hierarchy.children}
               parentName={location.name}
-              onSelect={(loc) => router.push(`/places/${loc.id}`)}
+              onSelect={(loc) => router.push(`/places/${loc.slug}`)}
             />
           </div>
         </section>
@@ -824,7 +824,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
               <RelationshipsSection
                 relationships={hierarchy.relationships}
                 nearby={hierarchy.nearby}
-                onSelect={(loc) => router.push(`/places/${loc.id}`)}
+                onSelect={(loc) => router.push(`/places/${loc.slug}`)}
               />
             </div>
           </section>
@@ -871,7 +871,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
                 <LocationCard
                   key={nearby.id}
                   location={nearby}
-                  onSelect={(loc) => router.push(`/places/${loc.id}`)}
+                  onSelect={(loc) => router.push(`/places/${loc.slug}`)}
                 />
               ))}
             </div>

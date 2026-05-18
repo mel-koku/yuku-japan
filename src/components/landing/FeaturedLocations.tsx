@@ -60,7 +60,7 @@ export function FeaturedLocations({ locations, content }: FeaturedLocationsProps
                 )}
               >
                 <Link
-                  href={`/places/${location.id}`}
+                  href={`/places/${location.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/30"
                 >
                   <div className={cn(

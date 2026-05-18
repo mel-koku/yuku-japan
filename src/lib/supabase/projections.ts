@@ -22,6 +22,7 @@ import type {
  */
 export type LocationDbRow = {
   id: string;
+  slug: string;
   name: string;
   region: string;
   city: string;
@@ -114,6 +115,7 @@ export type LocationDbRow = {
  */
 export const LOCATION_LISTING_COLUMNS = `
   id,
+  slug,
   name,
   region,
   city,
@@ -166,6 +168,7 @@ export const LOCATION_LISTING_COLUMNS = `
  */
 export const LOCATION_EXPLORE_COLUMNS = `
   id,
+  slug,
   name,
   region,
   city,
@@ -200,6 +203,7 @@ export const LOCATION_EXPLORE_COLUMNS = `
  */
 export const LOCATION_DETAIL_COLUMNS = `
   id,
+  slug,
   name,
   name_japanese,
   region,
@@ -266,6 +270,7 @@ export const LOCATION_DETAIL_COLUMNS = `
  */
 export const LOCATION_ITINERARY_COLUMNS = `
   id,
+  slug,
   name,
   region,
   city,
@@ -319,6 +324,7 @@ export const LOCATION_ITINERARY_COLUMNS = `
  */
 export const LOCATION_DAY_TRIP_COLUMNS = `
   id,
+  slug,
   name,
   region,
   city,
@@ -342,6 +348,7 @@ export const LOCATION_DAY_TRIP_COLUMNS = `
  */
 export const LOCATION_PHOTO_COLUMNS = `
   id,
+  slug,
   name,
   place_id,
   image,
@@ -354,13 +361,14 @@ export const LOCATION_PHOTO_COLUMNS = `
 /**
  * Subset of LocationDbRow for photo endpoint
  */
-export type LocationPhotoDbRow = Pick<LocationDbRow, "id" | "name" | "place_id" | "image" | "city" | "region" | "category" | "coordinates">;
+export type LocationPhotoDbRow = Pick<LocationDbRow, "id" | "slug" | "name" | "place_id" | "image" | "city" | "region" | "category" | "coordinates">;
 
 /**
  * Subset of LocationDbRow for the places /api/locations/all endpoint
  */
 export type LocationExploreDbRow = Pick<LocationDbRow,
   | "id"
+  | "slug"
   | "name"
   | "region"
   | "city"
@@ -434,6 +442,7 @@ export const EXPERIENCE_EXPLORE_COLUMNS = `
  */
 export const LOCATION_CHAT_COLUMNS = `
   id,
+  slug,
   name,
   city,
   region,
@@ -460,6 +469,7 @@ export const LOCATION_CHAT_COLUMNS = `
  */
 export type LocationChatDbRow = Pick<LocationDbRow,
   | "id"
+  | "slug"
   | "name"
   | "city"
   | "region"
@@ -483,6 +493,7 @@ export type LocationChatDbRow = Pick<LocationDbRow,
 
 export type LocationListingDbRow = Pick<LocationDbRow,
   | "id"
+  | "slug"
   | "name"
   | "region"
   | "city"
@@ -529,6 +540,7 @@ export type LocationListingDbRow = Pick<LocationDbRow,
  */
 export const LOCATION_NEARBY_COLUMNS = `
   id,
+  slug,
   name,
   region,
   city,
@@ -557,6 +569,7 @@ export const LOCATION_NEARBY_COLUMNS = `
  */
 export type LocationNearbyDbRow = Pick<LocationDbRow,
   | "id"
+  | "slug"
   | "name"
   | "region"
   | "city"

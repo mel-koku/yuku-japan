@@ -50,6 +50,10 @@ function setCache(data: Location[], total: number) {
 function mapToLocation(row: SupabaseExperience): Location {
   return {
     id: row.id,
+    // Experiences are not `locations` rows and route via /experiences/[slug],
+    // never /places/[slug]. `Location.slug` is required by the type; mirror
+    // `id` so shared place components type-check.
+    slug: row.id,
     name: row.name,
     region: row.region ?? "",
     city: row.city ?? "",
