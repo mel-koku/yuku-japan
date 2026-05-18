@@ -87,7 +87,7 @@ export function AirportSearch({
       </AnimatePresence>
 
       {searchQuery && filteredAirports.length === 0 && (
-        <p className="mt-2 text-center text-sm text-stone">{noResultsText}</p>
+        <p role="status" className="mt-2 text-center text-sm text-stone">{noResultsText}</p>
       )}
 
       {/* Popular airports grid */}

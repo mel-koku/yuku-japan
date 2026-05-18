@@ -816,7 +816,13 @@ function JapanSilhouette({
                   />
                 )}
 
-                {/* Click target (larger invisible circle) */}
+                {/* Click target (larger invisible circle). The map is a
+                    pointer-only visual aid — its parent <svg> is aria-hidden,
+                    and the AirportSearch input is the keyboard/screen-reader
+                    path to the same airports. So this target carries no
+                    role/tabIndex/aria-label: a focusable element inside an
+                    aria-hidden subtree would trap keyboard users on an
+                    element their screen reader cannot announce. */}
                 <circle
                   cx={pos.x}
                   cy={pos.y}
@@ -826,15 +832,6 @@ function JapanSilhouette({
                   onClick={() => { if (!didDrag.current) onSelectAirport(airport); }}
                   onMouseEnter={() => setHoveredAirport({ iataCode: airport.iataCode, name: airport.shortName, x: pos.x, y: pos.y })}
                   onMouseLeave={() => setHoveredAirport(null)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      if (!didDrag.current) onSelectAirport(airport);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Select ${airport.name}`}
                 />
 
                 {/* Marker dot */}
