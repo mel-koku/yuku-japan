@@ -111,7 +111,7 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
 
   return (
     <div className="relative bg-background">
-      <WizardChrome />
+      <WizardChrome currentStep={currentStep} />
 
       {/* Step Content */}
       <AnimatePresence mode="wait" custom={direction}>
