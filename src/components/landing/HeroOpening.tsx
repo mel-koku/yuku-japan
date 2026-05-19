@@ -25,13 +25,16 @@ type HeroOpeningProps = {
 const FALLBACK_IMAGE = "/images/fallback.jpg";
 const FALLBACK_ALT = "A scene from Japan";
 
-const FALLBACK_HEADLINE_LINE_1 = "Your Japan trip,";
-const FALLBACK_HEADLINE_LINE_2 = "planned day by day.";
+const FALLBACK_HEADLINE = "Your Japan trip, | planned day by day.";
 
 export function HeroOpening({ locationCount, content, isFreePromo = false }: HeroOpeningProps) {
-  const headline =
-    content?.heroHeadline ?? `${FALLBACK_HEADLINE_LINE_1} ${FALLBACK_HEADLINE_LINE_2}`;
-  const useFallbackTwoLine = !content?.heroHeadline;
+  // Editors mark an intentional line break with "|"; absent it, the headline
+  // wraps naturally. Split into one trimmed part per line.
+  const headlineLines = (content?.heroHeadline ?? FALLBACK_HEADLINE)
+    .split("|")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const headline = headlineLines.join(" ");
   const description = (
     content?.heroDescription ??
     "Tell us your dates and vibe. We build a routed itinerary with real transit times across {locationCount}+ places in all 47 prefectures."
@@ -103,14 +106,9 @@ export function HeroOpening({ locationCount, content, isFreePromo = false }: Her
           <div className="mx-auto w-full max-w-7xl">
           <div className="max-w-4xl">
             <h1 className={cn(typography({ intent: "editorial-hero" }), "leading-[1.05] tracking-tight text-white")}>
-              {useFallbackTwoLine ? (
-                <>
-                  <span className="block">{FALLBACK_HEADLINE_LINE_1}</span>
-                  <span className="block">{FALLBACK_HEADLINE_LINE_2}</span>
-                </>
-              ) : (
-                headline
-              )}
+              {headlineLines.map((line, i) => (
+                <span key={i} className="block">{line}</span>
+              ))}
             </h1>
             <p className="mt-5 max-w-lg text-base text-white/80 sm:text-lg">
               {description}
@@ -195,33 +193,31 @@ export function HeroOpening({ locationCount, content, isFreePromo = false }: Her
         <div className="mx-auto w-full max-w-7xl">
         <div className="max-w-4xl">
           {/* Statement headline — word-by-word clip reveal */}
-          {useFallbackTwoLine ? (
+          {headlineLines.length > 1 ? (
             <h1
               className={cn(typography({ intent: "editorial-hero" }), "leading-[1.05] tracking-tight text-white")}
               aria-label={headline}
             >
-              <SplitText
-                as="span"
-                className="block"
-                splitBy="word"
-                trigger="load"
-                animation="clipY"
-                staggerDelay={staggerWord}
-                delay={0.05}
-              >
-                {FALLBACK_HEADLINE_LINE_1}
-              </SplitText>
-              <SplitText
-                as="span"
-                className="block"
-                splitBy="word"
-                trigger="load"
-                animation="clipY"
-                staggerDelay={staggerWord}
-                delay={0.05 + 3 * staggerWord}
-              >
-                {FALLBACK_HEADLINE_LINE_2}
-              </SplitText>
+              {headlineLines.map((line, i) => {
+                // Stagger continues across the break: offset by the words above.
+                const wordsBefore = headlineLines
+                  .slice(0, i)
+                  .reduce((n, l) => n + l.split(/\s+/).length, 0);
+                return (
+                  <SplitText
+                    key={i}
+                    as="span"
+                    className="block"
+                    splitBy="word"
+                    trigger="load"
+                    animation="clipY"
+                    staggerDelay={staggerWord}
+                    delay={0.05 + wordsBefore * staggerWord}
+                  >
+                    {line}
+                  </SplitText>
+                );
+              })}
             </h1>
           ) : (
             <SplitText

@@ -23,7 +23,7 @@ export const landingPage = defineType({
       type: "string",
       fieldset: "hero",
       description:
-        "Main editorial statement (max ~60 chars). e.g. 'Travel Japan like the people who live here'",
+        "Main editorial statement (max ~60 chars). Use \"|\" to force a line break, e.g. 'Your Japan trip, | planned day by day.'",
       initialValue: "Travel Japan like the people who live here",
     }),
     defineField({
