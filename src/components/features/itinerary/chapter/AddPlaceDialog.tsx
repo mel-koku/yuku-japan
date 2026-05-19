@@ -77,7 +77,12 @@ export function AddPlaceDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  const selectedDay = days[selectedDayIdx] ?? days[0];
+  // `selectedDayIdx` holds a true day index (from `defaultDayIndex` and the
+  // `<option value>`s), not an array position — resolve by the `index` field
+  // so a filtered/non-contiguous `days` list (locked days removed) still maps
+  // correctly.
+  const selectedDay =
+    days.find((d) => d.index === selectedDayIdx) ?? days[0];
 
   return (
     <AnimatePresence>

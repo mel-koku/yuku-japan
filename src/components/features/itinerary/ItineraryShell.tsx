@@ -632,6 +632,16 @@ export const ItineraryShell = ({
       const targetDay = model.days[dayIndex];
       if (!tripId || isUsingMock || !targetDay) return;
 
+      // Authoritative paywall guard: never append to a locked day, even if a
+      // caller bypasses the day-selector filter. Route to the unlock prompt.
+      const dayLocked =
+        !isDayAccessible(dayIndex, tripUnlocked ?? false, fullAccessEnabled)
+        || Boolean(targetDay.isLocked);
+      if (dayLocked) {
+        requireUnlock("locked_day");
+        return;
+      }
+
       if (newActivity.isCustom) {
         trackCustomLocationAdded({
           addressSource: meta.addressSource === "none" ? "as-is" : meta.addressSource,
@@ -714,7 +724,7 @@ export const ItineraryShell = ({
         scheduleUserPlanningRef.current?.(nextItinerary);
       }, 0);
     },
-    [tripId, isUsingMock, isReadOnly, model, addActivity, setModelState, scheduleUserPlanningRef, pendingMealContext],
+    [tripId, isUsingMock, isReadOnly, model, addActivity, setModelState, scheduleUserPlanningRef, pendingMealContext, tripUnlocked, fullAccessEnabled, requireUnlock],
   );
 
   // ── Refine day (Adjust button) ──
@@ -1023,12 +1033,24 @@ export const ItineraryShell = ({
               // otherwise the next non-meal Add-place would inherit it.
               setPendingMealContext(null);
             }}
-            days={model.days.map((d, idx) => ({
-              index: idx,
-              label: `Day ${idx + 1}${d.cityId ? ` · ${formatCityName(d.cityId)}` : ""}`,
-              activities: d.activities,
-              city: d.cityId ? formatCityName(d.cityId) : undefined,
-            }))}
+            // Locked days (guest on Day 2-N) are filtered out entirely — a
+            // guest can only add to days they can access. `index` stays the
+            // true `model.days` index so `handleAddActivityToDay` resolves the
+            // right day. Same predicate as `chapterDays`: server `isLocked`
+            // overrides the client gate. The unlock CTA lives on the UnlockBeat
+            // and the day-selector strip — the dialog need not re-advertise it.
+            days={model.days
+              .map((d, idx) => ({
+                index: idx,
+                label: `Day ${idx + 1}${d.cityId ? ` · ${formatCityName(d.cityId)}` : ""}`,
+                activities: d.activities,
+                city: d.cityId ? formatCityName(d.cityId) : undefined,
+                accessible:
+                  isDayAccessible(idx, tripUnlocked ?? false, fullAccessEnabled)
+                  && !d.isLocked,
+              }))
+              .filter((d) => d.accessible)
+              .map(({ accessible: _accessible, ...d }) => d)}
             defaultDayIndex={safeSelectedDay}
             onAdd={handleAddActivityToDay}
             presetMealType={pendingMealContext ?? undefined}
