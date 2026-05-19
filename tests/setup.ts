@@ -124,7 +124,7 @@ vi.mock("@/lib/logger", () => ({
 // Mock the at-the-door cost gate so route tests don't fail closed against
 // the missing Upstash Redis (the gate's correct production behavior on
 // Redis errors is to refuse the request, which would surface as 429 in
-// every plan/refine/nearby-food/ai-recommend test). Tests that want to
+// every plan/refine/nearby-food test). Tests that want to
 // exercise the gate itself can vi.mock it locally.
 vi.mock("@/lib/api/costGate", () => ({
   gateOnDailyCost: vi.fn().mockResolvedValue(null),

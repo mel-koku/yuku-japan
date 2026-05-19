@@ -17,7 +17,6 @@ export const RATE_LIMITS = {
   WEBHOOK: { maxRequests: 30, windowMs: 60_000 },
   HEALTH: { maxRequests: 200, windowMs: 60_000 },
   CHAT: { maxRequests: 20, windowMs: 60_000 },
-  AI_RECOMMEND: { maxRequests: 20, windowMs: 60_000 },
   TRIPS: { maxRequests: 100, windowMs: 60_000 },
   RATINGS: { maxRequests: 60, windowMs: 60_000 },
   BOOKINGS: { maxRequests: 10, windowMs: 60_000 },
@@ -51,7 +50,6 @@ export const DAILY_QUOTAS = {
   ITINERARY_REFINE: { name: "itinerary-refine", maxPerDay: 50 },
   CHAT: { name: "chat", maxPerDay: 50 },
   DAY_TRIPS_PLAN: { name: "day-trip-plan", maxPerDay: 10 },
-  AI_RECOMMEND: { name: "ai-recommend", maxPerDay: 30 },
   SMART_PROMPTS: { name: "smart-prompts", maxPerDay: 30 },
   PLACES: { name: "places", maxPerDay: 200 },
 } as const;

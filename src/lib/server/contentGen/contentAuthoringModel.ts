@@ -6,7 +6,7 @@ import type { LanguageModelV3 } from "@ai-sdk/provider";
 /**
  * Content authoring runs on `gemini-2.5-pro`, NOT the `gemini-2.5-flash` used
  * by every user-facing route (itineraryEngine, dayRefinement, guideProseGenerator,
- * dailyBriefingGenerator, intentExtractor, placeRecommender, searchQueryRewriter,
+ * dailyBriefingGenerator, intentExtractor, searchQueryRewriter,
  * dayIntroGenerator, chat).
  *
  * Boundary discipline (locked 2026-05-04, see
