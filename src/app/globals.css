@@ -463,6 +463,47 @@ h3 {
   }
 }
 
+/* Trip-builder wizard step transition — directional clip-path wipe (YUK-72).
+   Applied to a per-step keyed element in TripBuilderV2.tsx so it replays on
+   each transition. CSS-only and time-based: it always reaches `inset(0)` and
+   cannot stall mid-wipe and leave a step rendering blank (the YUK-59 failure
+   of the old framer-motion AnimatePresence approach). `fill-mode: backwards`
+   applies the clipped start state before the first frame but leaves NO
+   clip-path at rest — clip-path would otherwise establish a containing block
+   for StepShell's `position: fixed` nav bars. */
+@keyframes wizard-wipe-forward {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes wizard-wipe-back {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.wizard-step-wipe-forward {
+  animation: wizard-wipe-forward 0.5s cubic-bezier(0.76, 0, 0.24, 1) backwards;
+}
+
+.wizard-step-wipe-back {
+  animation: wizard-wipe-back 0.5s cubic-bezier(0.76, 0, 0.24, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-step-wipe-forward,
+  .wizard-step-wipe-back {
+    animation: none;
+  }
+}
+
 @keyframes modal-enter {
   from {
     opacity: 0;
