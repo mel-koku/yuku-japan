@@ -172,15 +172,17 @@ export function GeneratingOverlay({ sanityConfig, successData, onSuccessComplete
                   {/* Magic link toggle */}
                   <div className="flex items-center gap-3">
                     <span className="h-px flex-1 bg-border" />
-                    <button
-                      type="button"
-                      onClick={() => setShowEmailForm((v) => !v)}
-                      className="text-xs text-stone transition-colors hover:text-foreground-secondary"
-                    >
-                      or use email
-                    </button>
+                    <span className="text-xs text-stone">or</span>
                     <span className="h-px flex-1 bg-border" />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailForm((v) => !v)}
+                    aria-expanded={showEmailForm}
+                    className="flex w-full items-center justify-center h-12 rounded-lg border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-surface hover:shadow-[var(--shadow-card)]"
+                  >
+                    Sign in with email
+                  </button>
 
                   <AnimatePresence>
                     {showEmailForm && (
@@ -223,9 +225,9 @@ export function GeneratingOverlay({ sanityConfig, successData, onSuccessComplete
                   <button
                     type="button"
                     onClick={onSkipSignIn}
-                    className="block w-full text-center text-xs text-stone transition-colors hover:text-foreground-secondary"
+                    className="block w-full text-center text-xs text-foreground-secondary underline underline-offset-4 transition-colors hover:text-foreground"
                   >
-                    {process.env.NEXT_PUBLIC_FREE_FULL_ACCESS === "true" ? "Continue with Day 1 only" : "Continue without saving"}
+                    {process.env.NEXT_PUBLIC_FREE_FULL_ACCESS === "true" ? "Continue with Day 1. Sign in later to unlock the rest." : "Continue without saving"}
                   </button>
                 </m.div>
               )}
