@@ -22,6 +22,7 @@ import { transformDbRowToLocation } from "@/lib/locations/locationService";
 import { parseLocalDateWithOffset, formatLocalDateISO } from "@/lib/utils/dateUtils";
 import { filterByMealType } from "@/lib/mealFiltering";
 import { createKonbiniActivity } from "@/lib/itinerary/konbiniNote";
+import { escapePostgrestValue } from "@/lib/supabase/sanitize";
 
 /**
  * Default durations for different meal types in minutes
@@ -254,6 +255,27 @@ const INDOOR_CATEGORIES = new Set([
 ]);
 
 /**
+ * Builds the PostgREST `.or(...)` filter that scopes a query to a planner-hub
+ * city. `cityId` here is a planner-hub slug (e.g. "kanazawa") sourced from
+ * `day.cityId` — the `planning_city` namespace, NOT the admin `city` column.
+ *
+ * Mirrors the strict planner picker in `locationService.fetchAllLocations`
+ * and the refine route: `planning_city` is authoritative when set; the
+ * `city.ilike` fallback only fires for rows where `planning_city IS NULL`
+ * (legacy bridge, ~35 rows corpus-wide). A bare `city.ilike(cityId)` — the
+ * pre-fix shape — could only ever match the subset of a hub whose admin
+ * `city` happens to equal the hub slug, dropping 47–122 rows per hub.
+ *
+ * `cityId` is escaped: `recommendRequestSchema.cityId` accepts any string,
+ * so it must be treated as untrusted in a `.or()` filter expression.
+ */
+function cityScopedFilter(cityId: string): string {
+  const escaped = escapePostgrestValue(cityId);
+  const escapedLower = escapePostgrestValue(cityId.toLowerCase());
+  return `planning_city.eq.${escapedLower},and(planning_city.is.null,city.ilike.${escaped})`;
+}
+
+/**
  * Apply refinement filters to a list of locations.
  * Returns a filtered/sorted subset. If a filter would eliminate all results, it's relaxed.
  */
@@ -376,7 +398,7 @@ export const POST = withApiHandler(
         .from("locations")
         .select(LOCATION_ITINERARY_COLUMNS)
         .eq("is_active", true)
-        .ilike("city", cityId)
+        .or(cityScopedFilter(cityId))
         .in("category", ["restaurant", "cafe", "bar"])
         .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
         .limit(100);
@@ -452,7 +474,7 @@ export const POST = withApiHandler(
         .from("locations")
         .select(LOCATION_ITINERARY_COLUMNS)
         .eq("is_active", true)
-        .ilike("city", cityId)
+        .or(cityScopedFilter(cityId))
         .neq("category", "restaurant")
         .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
         .limit(100);
@@ -542,7 +564,7 @@ export const POST = withApiHandler(
         .from("locations")
         .select(LOCATION_ITINERARY_COLUMNS)
         .eq("is_active", true)
-        .ilike("city", cityId)
+        .or(cityScopedFilter(cityId))
         .not("category", "in", '("restaurant","cafe","bar")')
         .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
         .limit(100);
@@ -610,7 +632,7 @@ export const POST = withApiHandler(
         .from("locations")
         .select(LOCATION_ITINERARY_COLUMNS)
         .eq("is_active", true)
-        .ilike("city", cityId)
+        .or(cityScopedFilter(cityId))
         .not("category", "in", '("restaurant","cafe","bar")')
         .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
         .limit(100);
@@ -671,7 +693,7 @@ export const POST = withApiHandler(
         .from("locations")
         .select(LOCATION_ITINERARY_COLUMNS)
         .eq("is_active", true)
-        .ilike("city", cityId)
+        .or(cityScopedFilter(cityId))
         .in("category", categories)
         .or("business_status.is.null,business_status.neq.PERMANENTLY_CLOSED")
         .limit(100);
