@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence, m, useReducedMotion, type Variants } from "framer-motion";
 
 import { IntroStep } from "./IntroStep";
 import { EntryPointStep } from "./EntryPointStep";
@@ -13,7 +12,6 @@ import { ArrowLineCTA } from "./ArrowLineCTA";
 import { useTripBuilderNavigation } from "@/hooks/useTripBuilderNavigation";
 import { useTripBuilder } from "@/context/TripBuilderContext";
 import { validateCityDayRatio } from "@/lib/tripBuilder/cityDayValidation";
-import { easePageTransition, durationSlow } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { ChevronLeft } from "lucide-react";
 import { WizardChrome } from "./WizardChrome";
@@ -23,9 +21,10 @@ import type { TripBuilderConfig } from "@/types/sanitySiteContent";
 //   - DateStep pulls in `react-day-picker` via DatePicker (Step 1 only).
 //   - ReviewStep pulls in `@dnd-kit/*` via TripSummaryEditorial → SortableCityList,
 //     plus the ~509-line OptionsSection with framer-motion disclosures (Step 5 only).
-// We pre-warm the next step's chunk from inside an effect (see below) so transitions
-// stay snappy. `loading: () => null` is intentional — the AnimatePresence wipe covers
-// the gap, and the project doesn't have a shared StepSkeleton component.
+// We pre-warm the next step's chunk from inside an effect (see below) so the
+// chunk is already hydrated by the time the user advances. `loading: () => null`
+// is intentional — the preloader closes the gap, and the project doesn't have a
+// shared StepSkeleton component.
 const DateStep = dynamic(
   () => import("./DateStep").then((m) => ({ default: m.DateStep })),
   { ssr: false, loading: () => null },
@@ -47,33 +46,11 @@ export type TripBuilderV2Props = {
   sanityConfig?: TripBuilderConfig;
 };
 
-const stepVariants: Variants = {
-  enter: (dir: number) => ({
-    clipPath: dir > 0 ? "inset(100% 0 0 0)" : "inset(0 0 100% 0)",
-  }),
-  center: {
-    clipPath: "inset(0 0 0 0)",
-    transition: { duration: durationSlow, ease: [...easePageTransition] },
-  },
-  exit: (dir: number) => ({
-    clipPath: dir > 0 ? "inset(0 0 100% 0)" : "inset(100% 0 0 0)",
-    transition: { duration: 0.5, ease: [...easePageTransition] },
-  }),
-};
-
-const reducedMotionVariants: Variants = {
-  enter: { opacity: 0 },
-  center: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.2 } },
-};
-
 export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) {
-  const prefersReducedMotion = useReducedMotion();
   const { data } = useTripBuilder();
 
   const {
     currentStep,
-    direction,
     completedSteps,
     stepCount,
     setDatesValid,
@@ -89,8 +66,6 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
     isNextDisabled,
     getNextLabel,
   } = useTripBuilderNavigation({ onComplete, sanityConfig });
-
-  const variants = prefersReducedMotion ? reducedMotionVariants : stepVariants;
 
   // Pre-warm dynamic step chunks so wizard transitions stay snappy.
   // Strategy: while the user is on the *previous* step, fetch the next step's
@@ -114,16 +89,7 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
       <WizardChrome currentStep={currentStep} />
 
       {/* Step Content */}
-      <AnimatePresence mode="wait" custom={direction}>
-        <m.div
-          key={`step-${currentStep}`}
-          custom={direction}
-          variants={variants}
-          initial={currentStep === 0 ? false : "enter"}
-          animate="center"
-          exit="exit"
-          className="min-h-[100dvh]"
-        >
+      <div className="min-h-[100dvh]">
           {currentStep === 0 && <IntroStep onStart={() => goToStep(1)} onQuickStart={quickStart} sanityConfig={sanityConfig} />}
 
           {currentStep === 1 && (
@@ -220,8 +186,7 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
               />
             </StepShell>
           )}
-        </m.div>
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
