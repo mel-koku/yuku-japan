@@ -25,10 +25,30 @@ type PlaceShape = {
 
 const PLACE_OG_COLUMNS = "name, name_japanese, city, category, primary_photo_url, image";
 
+// The `location-photos` Supabase Storage bucket was made private 2026-04-14 for
+// Google TOS remediation — its old public URLs now 403/404. Stale values still
+// sit in many rows' `image` column. The visible card routes them through
+// `resizePhotoUrl` (google/transformations.ts), which strips this same prefix;
+// this OG path reads the columns raw, so it must drop them itself or the
+// share-card `<img>` fetches a dead URL. Falling through to null yields the
+// branded fallback card instead.
+const DEAD_BUCKET_PREFIX = "/storage/v1/object/public/location-photos/";
+
+/** Returns the first usable photo URL, skipping dead-bucket values. */
+export function pickOgPhotoUrl(
+  primaryPhotoUrl: unknown,
+  image: unknown,
+): string | null {
+  for (const value of [primaryPhotoUrl, image]) {
+    if (typeof value === "string" && !value.includes(DEAD_BUCKET_PREFIX)) {
+      return value;
+    }
+  }
+  return null;
+}
+
 function placeShapeFromRow(row: Record<string, unknown>): PlaceShape {
-  const photo =
-    (typeof row.primary_photo_url === "string" ? row.primary_photo_url : null) ??
-    (typeof row.image === "string" ? row.image : null);
+  const photo = pickOgPhotoUrl(row.primary_photo_url, row.image);
   return {
     name: typeof row.name === "string" ? row.name : FALLBACK_TITLE,
     city: typeof row.city === "string" ? row.city : null,
