@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { resizePhotoUrl } from "@/lib/google/transformations";
+import { formatCityRegion } from "@/lib/locationNameUtils";
 import { LOCATION_EDITORIAL_SUMMARIES } from "@/data/locationEditorialSummaries";
 import { typography } from "@/lib/typography-system";
 import { cn } from "@/lib/utils";
@@ -87,7 +88,7 @@ export function FeaturedLocations({ locations, content }: FeaturedLocationsProps
                       {location.name}
                     </h3>
                     <p className={cn(typography({ intent: "utility-meta" }), "text-stone")}>
-                      {location.city}, {location.region}
+                      {formatCityRegion(location.city, location.region)}
                     </p>
                     {isHero && (
                       <p className={cn(typography({ intent: "utility-meta" }), "mt-1 line-clamp-2 leading-relaxed")}>

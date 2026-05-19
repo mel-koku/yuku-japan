@@ -11,7 +11,7 @@ import { useLenis } from "@/providers/LenisProvider";
 import { useLocationDetailsQuery } from "@/hooks/useLocationDetailsQuery";
 import { useSaved } from "@/context/SavedContext";
 import { useFirstSaveToast } from "@/hooks/useFirstSaveToast";
-import { getLocationDisplayName } from "@/lib/locationNameUtils";
+import { getLocationDisplayName, formatCityRegion } from "@/lib/locationNameUtils";
 import { resizePhotoUrl } from "@/lib/google/transformations";
 import { resolveTimeEstimate } from "@/lib/locations/timeEstimates";
 import { fetchLocationSpecificGuidance } from "@/lib/tips/guidanceService";
@@ -313,7 +313,7 @@ export function LocationExpanded({ location, onClose }: LocationExpandedProps) {
             {/* Title overlay */}
             <div className="absolute inset-x-0 bottom-0 p-4 sm:px-6 sm:pb-5">
               <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-1">
-                {location.city}, {location.region}
+                {formatCityRegion(location.city, location.region)}
               </p>
               <h2 className={cn(typography({ intent: "editorial-h3" }), "text-white line-clamp-2")}>
                 {displayName}

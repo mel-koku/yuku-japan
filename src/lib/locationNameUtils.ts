@@ -16,6 +16,21 @@ export function getLocationDisplayName(
   if (displayName && displayName.trim().length > 0) {
     return displayName.trim();
   }
-  
+
   return location.name;
+}
+
+/**
+ * Formats a location's geographic context as "City, Region" for display near a
+ * photo (e.g. "Kyoto, Kansai"). Falls back to city-only when region is absent or
+ * identical to the city, so city-as-region rows don't render "Kyoto, Kyoto".
+ */
+export function formatCityRegion(
+  city: string,
+  region: string | undefined | null,
+): string {
+  if (region && region !== city) {
+    return `${city}, ${region}`;
+  }
+  return city;
 }
