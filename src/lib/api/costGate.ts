@@ -18,7 +18,6 @@ const MODEL_ID = "gemini-2.5-flash";
 export const COST_ESTIMATES = {
   itineraryPlan: { inputTokens: 30_000, maxOutputTokens: 15_000 },
   itineraryRefine: { inputTokens: 20_000, maxOutputTokens: 10_000 },
-  aiRecommend: { inputTokens: 2_000, maxOutputTokens: 1_000 },
   nearbyFood: { inputTokens: 2_000, maxOutputTokens: 1_500 },
 } as const satisfies Record<string, { inputTokens: number; maxOutputTokens: number }>;
 

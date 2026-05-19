@@ -470,22 +470,6 @@ export const availabilityRequestSchema = z.object({
 });
 
 /**
- * Schema for AI-powered place recommendation request
- */
-export const aiRecommendRequestSchema = z.object({
-  query: z.string().min(1).max(500),
-  cityId: z.string().max(255),
-  dayIndex: z.number().int().min(0).max(30).optional(),
-  dayDate: z.string().max(20).optional(),
-  dayActivities: z.array(z.object({
-    name: z.string().max(500).optional(),
-    category: z.string().max(100).optional(),
-  }).passthrough()).max(50).optional(),
-  tripBuilderData: z.unknown().optional(),
-  usedLocationIds: z.array(z.string()).max(500).optional(),
-});
-
-/**
  * Schema for smart prompt recommendation request
  */
 export const recommendRequestSchema = z.object({
