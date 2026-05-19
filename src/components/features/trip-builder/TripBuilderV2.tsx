@@ -51,6 +51,7 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
 
   const {
     currentStep,
+    direction,
     completedSteps,
     stepCount,
     setDatesValid,
@@ -88,8 +89,19 @@ export function TripBuilderV2({ onComplete, sanityConfig }: TripBuilderV2Props) 
     <div className="relative bg-background">
       <WizardChrome currentStep={currentStep} />
 
-      {/* Step Content */}
-      <div className="min-h-[100dvh]">
+      {/* Step Content — `key` forces a fresh DOM node per step so the CSS wipe
+          (globals.css) replays on each transition. The wipe is CSS-only and
+          time-based, so it always reaches its end state and can never stall
+          mid-transition the way the old framer-motion AnimatePresence did
+          (YUK-72 / YUK-59). Step 0 (Intro) mounts un-wiped. */}
+      <div
+        key={currentStep}
+        className={cn(
+          "min-h-[100dvh]",
+          currentStep !== 0 &&
+            (direction > 0 ? "wizard-step-wipe-forward" : "wizard-step-wipe-back"),
+        )}
+      >
           {currentStep === 0 && <IntroStep onStart={() => goToStep(1)} onQuickStart={quickStart} sanityConfig={sanityConfig} />}
 
           {currentStep === 1 && (
