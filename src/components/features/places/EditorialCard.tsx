@@ -7,6 +7,7 @@ import { m, useReducedMotion } from "framer-motion";
 import { useSaved } from "@/context/SavedContext";
 import { useFirstSaveToast } from "@/hooks/useFirstSaveToast";
 import { resizePhotoUrl } from "@/lib/google/transformations";
+import { formatCityRegion } from "@/lib/locationNameUtils";
 import { easeReveal, durationBase } from "@/lib/motion";
 import type { Location } from "@/types/location";
 import { HeartIcon } from "./LocationCard";
@@ -115,7 +116,7 @@ export const EditorialCard = memo(function EditorialCard({
             <div className={isFeature ? "flex items-end justify-between" : ""}>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-1">
-                  {location.city}{location.region ? `, ${location.region}` : ""}
+                  {formatCityRegion(location.city, location.region)}
                 </p>
                 <h3
                   className={`font-serif text-white line-clamp-2 ${

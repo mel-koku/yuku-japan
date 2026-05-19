@@ -5,6 +5,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import { useSaved } from "@/context/SavedContext";
 import { useFirstSaveToast } from "@/hooks/useFirstSaveToast";
 import { resizePhotoUrl } from "@/lib/google/transformations";
+import { formatCityRegion } from "@/lib/locationNameUtils";
 import type { Location } from "@/types/location";
 import { HeartIcon } from "./LocationCard";
 import { PracticalBadges } from "@/components/ui/PracticalBadges";
@@ -111,7 +112,7 @@ export const PlacesCompactCard = memo(function PlacesCompactCard({
           {/* Text overlay */}
           <div className="absolute inset-x-0 bottom-0 p-3">
             <p className="text-[10px] uppercase tracking-[0.25em] text-white/60 mb-0.5 font-mono">
-              {location.city}
+              {formatCityRegion(location.city, location.region)}
             </p>
             <p className="font-serif text-white text-base line-clamp-1">
               {location.name}

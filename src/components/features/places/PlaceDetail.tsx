@@ -10,7 +10,7 @@ import { useLocationDetailsQuery } from "@/hooks/useLocationDetailsQuery";
 import { useNearbyLocationsQuery } from "@/hooks/useLocationsQuery";
 import { useSaved } from "@/context/SavedContext";
 import { useFirstSaveToast } from "@/hooks/useFirstSaveToast";
-import { getLocationDisplayName } from "@/lib/locationNameUtils";
+import { getLocationDisplayName, formatCityRegion } from "@/lib/locationNameUtils";
 import { resizePhotoUrl } from "@/lib/google/transformations";
 import { resolveTimeEstimate } from "@/lib/locations/timeEstimates";
 import { fetchLocationSpecificGuidance } from "@/lib/tips/guidanceService";
@@ -477,7 +477,7 @@ export function PlaceDetail({ initialLocation, initialEditorNote, featuredGuides
               {location.priceLevel === 0 ? "Free" : "¥".repeat(location.priceLevel)}
             </span>
           )}
-          <span className="text-stone">{location.city}, {location.region}</span>
+          <span className="text-stone">{formatCityRegion(location.city, location.region)}</span>
         </m.div>
 
         {/* JTA + Hidden Gem badges */}
