@@ -77,4 +77,40 @@ describe("AddPlaceDialog", () => {
     expect(screen.getByText("Day 1 · Tokyo")).toBeInTheDocument();
     expect(screen.getByText("Day 2 · Kyoto")).toBeInTheDocument();
   });
+
+  // Locked days are filtered out by ItineraryShell before they reach this
+  // dialog, so `days` can be non-contiguous (e.g. Day 1 + Day 3, Day 2 locked).
+  // `selectedDayIdx` holds a true day index, not an array position — the dialog
+  // must resolve the selected day by its `index` field. Adding to the resolved
+  // day must report that true index back through onAdd so the caller writes to
+  // the right day.
+  it("resolves the selected day by index field for a non-contiguous days list", async () => {
+    const onAdd = vi.fn();
+    render(
+      <AddPlaceDialog
+        open={true}
+        onClose={() => {}}
+        days={[
+          { index: 0, label: "Day 1 · Tokyo", activities: [] },
+          // Day 2 (index 1) omitted — locked, filtered by the caller.
+          { index: 2, label: "Day 3 · Osaka", activities: [] },
+        ]}
+        defaultDayIndex={2}
+        onAdd={onAdd}
+      />,
+      { wrapper: makeWrapper() },
+    );
+    // The selector shows the gap-free filtered list, defaulted to Day 3.
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    expect(select.value).toBe("2");
+    expect(screen.getByText("Day 3 · Osaka")).toBeInTheDocument();
+    expect(screen.queryByText("Day 2 · Kyoto")).not.toBeInTheDocument();
+
+    // Adding a custom place reports the true day index (2), not array pos (1).
+    await userEvent.click(screen.getByRole("button", { name: /add your own/i }));
+    await userEvent.type(screen.getByLabelText(/title/i), "Dotonbori");
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+    expect(onAdd).toHaveBeenCalledTimes(1);
+    expect(onAdd.mock.calls[0][0]).toBe(2);
+  });
 });
